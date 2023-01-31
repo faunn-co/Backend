@@ -1,0 +1,45 @@
+syntax = "proto3";
+package affiliate.pb;
+option go_package = "/affiliate";
+
+message Affiliate{
+  optional int64 affiliate_id = 1;
+  optional string affiliate_name = 2;
+  optional int64 unique_referral_code = 3;
+  repeated ReferralDetails referral_details = 4;
+  optional int64 total_referrals = 5;
+  optional int64 total_commission = 6;
+}
+
+message ReferralDetails{
+  optional int64 referral_id = 1;
+  optional int64 referral_code = 2;
+  optional int64 referral_click_time = 3;
+  optional int64 referral_status = 4;
+  optional int64 booking_status = 5;
+  optional int64 payment_status = 6;
+  optional int64 booking_time = 7;
+  optional int64 payment_time = 8;
+}
+
+message CustomerInfo{
+  optional string customer_name = 1;
+  optional string customer_mobile = 2;
+  optional string customer_email = 3;
+}
+
+message TicketInfo{
+  optional int64 adult_ticket = 1;
+  optional int64 child_ticket = 2;
+  optional int64 total_amount = 3;
+}
+
+message BookingDetails{
+  optional int64 booking_id = 1;
+  optional int64 booking_status = 2;
+  optional int64 transaction_time = 3;
+  optional int64 booking_time = 4;
+  optional CustomerInfo customer_info = 5;
+  optional int64 referral_id = 6;
+  optional TicketInfo ticket_info = 7;
+}
