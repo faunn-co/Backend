@@ -2,6 +2,15 @@ syntax = "proto3";
 package affiliate.pb;
 option go_package = "/affiliate";
 
+message RequestMeta{
+  optional string user_token = 1;
+}
+
+message ResponseMeta{
+  optional int64 error_code = 1;
+  optional int64 error_msg = 2;
+}
+
 message Affiliate{
   optional int64 affiliate_id = 1;
   optional string affiliate_name = 2;
