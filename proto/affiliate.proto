@@ -8,21 +8,23 @@ message RequestMeta{
 
 message ResponseMeta{
   optional int64 error_code = 1;
-  optional int64 error_msg = 2;
+  optional string error_msg = 2;
 }
 
-message Affiliate{
+message GenericResponse{
+  optional ResponseMeta response_meta = 1;
+}
+
+message AffiliateMeta{
   optional int64 affiliate_id = 1;
   optional string affiliate_name = 2;
   optional int64 unique_referral_code = 3;
-  repeated ReferralDetails referral_details = 4;
-  optional int64 total_referrals = 5;
-  optional int64 total_commission = 6;
+  optional int64 referral_count = 4;
 }
 
 message ReferralDetails{
   optional int64 referral_id = 1;
-  optional int64 referral_code = 2;
+  optional int64 affiliate_id = 2;
   optional int64 referral_click_time = 3;
   optional int64 referral_status = 4;
   optional int64 booking_status = 5;
@@ -51,4 +53,51 @@ message BookingDetails{
   optional CustomerInfo customer_info = 5;
   optional int64 referral_id = 6;
   optional TicketInfo ticket_info = 7;
+}
+
+message GetAffiliateStatsRequest{
+  optional RequestMeta request_meta = 1;
+}
+
+message GetAffiliateStatsResponse{
+  optional ResponseMeta response_meta = 1;
+}
+
+message GetAffiliateDetailsRequest{
+  optional RequestMeta request_meta = 1;
+}
+
+message GetAffiliateDetailsResponse{
+  optional ResponseMeta response_meta = 1;
+  optional AffiliateMeta affiliate_details = 2;
+}
+
+message GetReferralStatsRequest{
+  optional RequestMeta request_meta = 1;
+}
+
+message GetReferralStatsResponse{
+  optional ResponseMeta response_meta = 1;
+}
+
+message GetAvailableSlotRequest{
+  optional RequestMeta request_meta = 1;
+  optional string date = 2;
+}
+
+message BookingSlot{
+  optional int64 slot = 2;
+  optional int64 adult_slot = 3;
+  optional int64 child_slot = 4;
+}
+
+message BookingDates{
+  optional string date = 1;
+  optional BookingSlot slots = 2;
+}
+
+message GetAvailableSlotResponse{
+  optional ResponseMeta response_meta = 1;
+  optional string date = 2;
+  repeated BookingSlot booking_slots = 3;
 }
