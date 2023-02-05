@@ -20,7 +20,7 @@ func main() {
 	//returns details of this affiliate
 	e.GET("api/v1/affiliate/:id", cmd.GetAffiliateById)
 	//get affiliate id from token
-	e.GET("api/v1/affiliate/details", cmd.GetAffiliateDetails)
+	e.POST("api/v1/affiliate/details", cmd.GetAffiliateDetails)
 	//get affiliate id from token
 	//time range etc
 	e.POST("api/v1/affiliate/stats", cmd.GetAffiliateStats)
@@ -33,6 +33,8 @@ func main() {
 	e.GET("api/v1/referral/:id", cmd.GetReferralById)
 	//sort and filter
 	e.GET("api/v1/affiliate/referral/list", cmd.GetAffiliateReferralsList)
+
+	e.GET("api/v1/booking/slots/available", cmd.GetAvailableSlot)
 
 	e.Logger.Fatal(e.Start(":8888"))
 }
