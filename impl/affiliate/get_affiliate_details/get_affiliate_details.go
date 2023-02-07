@@ -1,1 +1,0 @@
-package get_affiliate_details

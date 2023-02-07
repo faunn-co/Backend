@@ -19,3 +19,27 @@ func Sql1() string {
 	}
 	return string(query)
 }
+
+func Sql2() string {
+	query, err := os.ReadFile(openSql("sql2.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}
+
+func Sql3() string {
+	query, err := os.ReadFile(openSql("sql3.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}
+
+func Sql4() string {
+	query, err := os.ReadFile(openSql("sql4.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}

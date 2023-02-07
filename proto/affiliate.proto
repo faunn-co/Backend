@@ -5,6 +5,7 @@ option go_package = "/affiliate";
 enum GlobalErrorCode{
   SUCCESS = 0;
   ERROR_FAIL = 1000;
+  ERROR_JSON_BIND =1001;
   ERROR_INVALID_PARAMS = 1002;
   ERROR_DATABASE =1003;
 }
@@ -121,6 +122,20 @@ message CustomerInfo{
 }
 
 //Direct from booking_details_table
+message BookingDetailsDb{
+  optional int64 booking_id = 1;
+  optional int64 booking_status = 2;
+  optional string booking_day = 3;
+  optional int64 booking_slot = 4;
+  optional int64 transaction_time = 5;
+  optional int64 payment_status = 6;
+  optional int64 adult_ticket_count = 7;
+  optional int64 child_ticket_count = 8;
+  optional int64 adult_ticket_total = 9;
+  optional int64 child_ticket_total = 10;
+  optional bytes customer_info = 11;
+}
+
 message BookingDetails{
   optional int64 booking_id = 1;
   optional int64 booking_status = 2;

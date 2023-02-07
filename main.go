@@ -18,9 +18,9 @@ func main() {
 	//sort and filter
 	e.GET("api/v1/affiliate/list", cmd.GetAffiliateList)
 	//returns details of this affiliate
-	e.GET("api/v1/affiliate/:id", cmd.GetAffiliateById)
+	e.GET("api/v1/affiliate/:id", cmd.GetAffiliateDetailsById)
 	//get affiliate id from token
-	e.POST("api/v1/affiliate/details", cmd.GetAffiliateDetails)
+	e.POST("api/v1/affiliate/info", cmd.GetAffiliateInfo)
 	//get affiliate id from token
 	//time range etc
 	e.POST("api/v1/affiliate/stats", cmd.GetAffiliateStats)

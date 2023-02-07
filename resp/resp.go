@@ -27,3 +27,14 @@ func GetAffiliateListResponseJSON(c echo.Context, list []*pb.AffiliateMeta) erro
 		AffiliateList: list,
 	})
 }
+
+func GetAffiliateDetailsByIdResponseJSON(c echo.Context, meta *pb.AffiliateMeta, list []*pb.ReferralDetails) error {
+	return c.JSON(http.StatusOK, pb.GetAffiliateDetailsByIdResponse{
+		ResponseMeta: &pb.ResponseMeta{
+			ErrorCode: proto.Int64(int64(pb.GlobalErrorCode_SUCCESS)),
+			ErrorMsg:  proto.String("success"),
+		},
+		AffiliateMeta: meta,
+		ReferralList:  list,
+	})
+}
