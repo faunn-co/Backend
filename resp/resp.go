@@ -8,16 +8,22 @@ import (
 )
 
 func GetAvailableSlotResponseJSON(c echo.Context, date *string, slots []*pb.BookingSlot) error {
-	return c.JSON(http.StatusOK, getAvailableSlotResponse(date, slots))
-}
-
-func getAvailableSlotResponse(date *string, slots []*pb.BookingSlot) pb.GetAvailableSlotResponse {
-	return pb.GetAvailableSlotResponse{
+	return c.JSON(http.StatusOK, pb.GetAvailableSlotResponse{
 		ResponseMeta: &pb.ResponseMeta{
-			ErrorCode: proto.Int64(0),
+			ErrorCode: proto.Int64(int64(pb.GlobalErrorCode_SUCCESS)),
 			ErrorMsg:  proto.String("success"),
 		},
 		Date:         date,
 		BookingSlots: slots,
-	}
+	})
+}
+
+func GetAffiliateListResponseJSON(c echo.Context, list []*pb.AffiliateMeta) error {
+	return c.JSON(http.StatusOK, pb.GetAffiliateListResponse{
+		ResponseMeta: &pb.ResponseMeta{
+			ErrorCode: proto.Int64(int64(pb.GlobalErrorCode_SUCCESS)),
+			ErrorMsg:  proto.String("success"),
+		},
+		AffiliateList: list,
+	})
 }

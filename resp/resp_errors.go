@@ -7,15 +7,23 @@ import (
 	"net/http"
 )
 
-func JSONResp(c echo.Context, code int64, msg string) error {
-	return c.JSON(http.StatusOK, response(code, msg))
+type Error struct {
+	err     error
+	errCode *int64
 }
 
-func response(code int64, msg string) pb.GenericResponse {
-	return pb.GenericResponse{
-		ResponseMeta: &pb.ResponseMeta{
-			ErrorCode: proto.Int64(code),
-			ErrorMsg:  proto.String(msg),
-		},
+func BuildError(err error, code pb.GlobalErrorCode) *Error {
+	return &Error{
+		err:     err,
+		errCode: proto.Int64(int64(code)),
 	}
+}
+
+func JSONResp(c echo.Context, err *Error) error {
+	return c.JSON(http.StatusOK, pb.GenericResponse{
+		ResponseMeta: &pb.ResponseMeta{
+			ErrorCode: err.errCode,
+			ErrorMsg:  proto.String(err.err.Error()),
+		},
+	})
 }

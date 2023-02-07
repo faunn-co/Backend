@@ -8,7 +8,7 @@ import (
 
 func GetAvailableSlot(c echo.Context) error {
 	if d, s, err := get_available_slot.New(c).GetAvailableSlotImpl(); err != nil {
-		return resp.JSONResp(c, 0, "")
+		return resp.JSONResp(c, err)
 	} else {
 		return resp.GetAvailableSlotResponseJSON(c, d, s)
 	}

@@ -2,6 +2,50 @@ syntax = "proto3";
 package affiliate.pb;
 option go_package = "/affiliate";
 
+enum GlobalErrorCode{
+  SUCCESS = 0;
+  ERROR_FAIL = 1000;
+  ERROR_INVALID_PARAMS = 1002;
+  ERROR_DATABASE =1003;
+}
+
+enum UserRole{
+  ROLE_AFFILIATE = 0;
+  ROLE_ADMIN = 1;
+  ROLE_DEV = 2;
+}
+
+enum AffiliateType{
+  AFFILIATE_TYPE_ACCOMMODATION = 0;
+  AFFILIATE_TYPE_RIDE_HAILING = 1;
+}
+
+enum ReferralStatus{
+  REFERRAL_STATUS_SUCCESS = 0;
+  REFERRAL_STATUS_PENDING = 1;
+  REFERRAL_STATUS_FAILED = 2;
+  REFERRAL_STATUS_CANCELLED = 3;
+}
+
+enum BookingStatus{
+  BOOKING_STATUS_SUCCESS = 0;
+  BOOKING_STATUS_PENDING = 1;
+  BOOKING_STATUS_FAILED = 2;
+  BOOKING_STATUS_CANCELLED = 3;
+}
+
+enum PaymentStatus{
+  PAYMENT_STATUS_SUCCESS = 0;
+  PAYMENT_STATUS_PENDING = 1;
+  PAYMENT_STATUS_FAILED = 2;
+  PAYMENT_STATUS_REFUNDED = 3;
+}
+
+enum TicketType{
+  TICKET_TYPE_ADULTS = 0;
+  TICKET_TYPE_CHILD = 1;
+}
+
 message RequestMeta{
   optional string user_token = 1;
 }
@@ -15,80 +59,156 @@ message GenericResponse{
   optional ResponseMeta response_meta = 1;
 }
 
-message AffiliateMeta{
-  optional int64 affiliate_id = 1;
-  optional string affiliate_name = 2;
-  optional int64 unique_referral_code = 3;
-  optional int64 referral_count = 4;
+//Direct from user_table
+message User{
+  optional int64 user_id = 1;
+  optional string user_name = 2;
+  optional string user_email = 3;
+  optional string user_contact = 4;
+  optional int64 user_role = 5;
+  optional int64 create_timestamp = 6;
 }
 
+//Direct from affiliate_details_table
+message AffiliateDetailsDb{
+  optional int64 user_id = 1;
+  optional int64 affiliate_type = 2;
+  optional string unique_referral_code = 3;
+}
+
+//Joining user_table, affiliate_details_table and referral_table
+message AffiliateMeta{
+  optional int64 user_id = 1;
+  optional string affiliate_name = 2;
+  optional int64 affiliate_type = 3;
+  optional string unique_referral_code = 4;
+  optional int64 referral_count = 5;
+}
+
+//Direct from referral_table
+message ReferralDb{
+  optional int64 referral_id = 1;
+  optional int64 affiliate_id = 2;
+  optional int64 referral_click_time = 3;
+  optional int64 referral_status = 4;
+  optional int64 booking_id = 5;
+  optional int64 referral_commission = 6;
+}
+
+//Join referral_table, booking_details_table
 message ReferralDetails{
   optional int64 referral_id = 1;
   optional int64 affiliate_id = 2;
   optional int64 referral_click_time = 3;
   optional int64 referral_status = 4;
-  optional int64 booking_status = 5;
-  optional int64 payment_status = 6;
-  optional int64 booking_time = 7;
-  optional int64 payment_time = 8;
+  optional BookingDetails booking_details = 5; //nil if referral is not successful
+  optional int64 referral_commission = 6;
+}
+
+message ReferralBasic{
+  optional int64 referral_id = 1;
+  optional int64 referral_click_time = 3;
+  optional int64 referral_status = 4;
+  optional int64 referral_commission = 6;
 }
 
 message CustomerInfo{
   optional string customer_name = 1;
   optional string customer_mobile = 2;
   optional string customer_email = 3;
+  optional int64 ticket_type = 4;
+  optional int64 ticket_price = 5;
 }
 
-message TicketInfo{
-  optional int64 adult_ticket = 1;
-  optional int64 child_ticket = 2;
-  optional int64 total_amount = 3;
-}
-
+//Direct from booking_details_table
 message BookingDetails{
   optional int64 booking_id = 1;
   optional int64 booking_status = 2;
-  optional int64 transaction_time = 3;
-  optional int64 booking_time = 4;
-  optional CustomerInfo customer_info = 5;
-  optional int64 referral_id = 6;
-  optional TicketInfo ticket_info = 7;
+  optional string booking_day = 3;
+  optional int64 booking_slot = 4;
+  optional int64 transaction_time = 5;
+  optional int64 payment_status = 6;
+  optional int64 adult_ticket_count = 7;
+  optional int64 child_ticket_count = 8;
+  optional int64 adult_ticket_total = 9;
+  optional int64 child_ticket_total = 10;
+  repeated CustomerInfo customer_info = 11;
 }
 
+//Admin to view all affiliate stats
 message GetAffiliateStatsRequest{
   optional RequestMeta request_meta = 1;
 }
 
+//Also get time stats based on datepicker start end timestamp
 message GetAffiliateStatsResponse{
   optional ResponseMeta response_meta = 1;
+  optional int64 total_monthly_affiliate_revenue = 2; //From referral_table join booking_table, SUM(adult_ticket_total,child_ticket_total)
+  optional int64 total_monthly_commission = 3; //SUM(referral_commission)
+  optional int64 total_monthly_active_affiliates = 4; //COUNT(affiliate_id)
+  optional int64 total_monthly_affiliate_bookings = 5; //COUNT(referral_id)
+  repeated int64 monthly_top_affiliates = 6; //By referral count, COUNT(referral_id) GROUP BY affiliate_id ORDER BY COUNT(referral_id) DESC LIMIT 5
+  repeated int64 monthly_top_commission = 7; //By total commission, SUM(referral_commission) GROUP BY affiliate_id ORDER BY SUM(referral_commission) DESC LIMIT 5
 }
 
-message GetAffiliateDetailsRequest{
+//Admin to view all affiliates
+message GetAffiliateListRequest{
   optional RequestMeta request_meta = 1;
 }
 
-message GetAffiliateDetailsResponse{
+message GetAffiliateListResponse{
   optional ResponseMeta response_meta = 1;
-  optional AffiliateMeta affiliate_details = 2;
+  repeated AffiliateMeta affiliate_list = 2;
 }
 
-message GetReferralStatsRequest{
+//Admin to view individual affiliate details with list of referrals
+message GetAffiliateDetailsByIdRequest{
   optional RequestMeta request_meta = 1;
+  optional int64 affiliate_id = 2;
 }
 
-message GetReferralStatsResponse{
+message GetAffiliateDetailsByIdResponse{
+  optional ResponseMeta response_meta = 1;
+  optional AffiliateMeta affiliate_meta = 2;
+  repeated ReferralDetails referral_list = 3;
+}
+
+//Affiliates to view their referral stats
+message GetReferralStatsByAffiliateIdRequest{
+  optional RequestMeta request_meta = 1;
+  optional int64 affiliate_id = 2;
+}
+
+message GetReferralStatsByAffiliateIdResponse{
   optional ResponseMeta response_meta = 1;
 }
 
-message GetAvailableSlotRequest{
+//Affiliates to view list of their referrals
+message GetReferralListByAffiliateIdRequest{
   optional RequestMeta request_meta = 1;
-  optional string date = 2;
+  optional int64 affiliate_id = 2;
+}
+
+message GetReferralListByAffiliateIdResponse{
+  optional ResponseMeta response_meta = 1;
+  repeated ReferralBasic referral_list = 2;
+}
+
+//Admin, Affiliates to view details of referrals
+message GetReferralDetailsByReferralIdRequest{
+  optional RequestMeta request_meta = 1; //blocks if user id requesting does not own this referral / not admin
+  optional int64 referral_id = 2;
+}
+
+message GetReferralDetailsByReferralIdResponse{
+  optional ResponseMeta response_meta = 1;
+  optional ReferralDetails referral_details = 2;
 }
 
 message BookingSlot{
-  optional int64 slot = 2;
-  optional int64 adult_slot = 3;
-  optional int64 child_slot = 4;
+  optional int64 slot = 1;
+  optional int64 adult_slot = 2;
+  optional int64 child_slot = 3;
 }
 
 message BookingDates{
@@ -96,6 +216,7 @@ message BookingDates{
   optional BookingSlot slots = 2;
 }
 
+//Landing page to get available time slot based on date
 message GetAvailableSlotResponse{
   optional ResponseMeta response_meta = 1;
   optional string date = 2;

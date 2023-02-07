@@ -51,7 +51,7 @@ var (
 
 func DbInstance(ctx echo.Context) *gorm.DB {
 	if db == nil {
-		if err := ConnectMySQL(ctx, "affiliate_manager_db"); err != nil {
+		if err := ConnectMySQL(ctx, AFFILIATE_MANAGER_DB); err != nil {
 		}
 	}
 	return db
