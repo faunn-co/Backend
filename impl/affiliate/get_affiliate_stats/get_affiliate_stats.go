@@ -31,7 +31,7 @@ func (g *GetAffiliateStats) GetAffiliateStatsImpl() (*pb.AffiliateStats, *pb.Aff
 
 	start, end := utils.WeekStartEndDate(time.Now().Unix())
 	end = utils.Min(end, time.Now().Unix())
-	prevStart, prevEnd := start-utils.WEEK, end-utils.WEEK
+	prevStart, prevEnd := start-utils.WEEK, start-utils.SECOND
 
 	//TODO add time stats filter
 	if err := orm.DbInstance(g.c).Raw(orm.Sql5(), start, end).Scan(&s).Error; err != nil {

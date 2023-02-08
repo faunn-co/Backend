@@ -5,7 +5,11 @@ import "time"
 const (
 	//TimeZone constant timezone
 	TimeZone = "Asia/Singapore"
-	WEEK     = 604800
+	SECOND   = 1
+	MINUTE   = 60 * SECOND
+	HOUR     = 60 * MINUTE
+	DAY      = 24 * HOUR
+	WEEK     = 7 * DAY
 )
 
 var (

@@ -33,7 +33,7 @@ func (g *GetAffiliateRankingList) GetAffiliateRankingListImpl() (*pb.AffiliateRa
 
 	start, end := utils.WeekStartEndDate(time.Now().Unix())
 	end = utils.Min(end, time.Now().Unix())
-	prevStart, prevEnd := start-utils.WEEK, end-utils.WEEK
+	prevStart, prevEnd := start-utils.WEEK, start-utils.SECOND
 
 	if err := orm.DbInstance(g.c).Raw(orm.Sql6(), start, end).Scan(&r).Error; err != nil {
 		return nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
