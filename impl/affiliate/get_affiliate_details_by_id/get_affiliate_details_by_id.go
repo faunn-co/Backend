@@ -79,16 +79,16 @@ func (g *GetAffiliateDetailsById) verifyGetAffiliateDetailsById() *resp.Error {
 func (g *GetAffiliateDetailsById) bookingDetailsDbToBookingDetails(b *pb.BookingDetailsDb) *pb.BookingDetails {
 	//TODO unmarshal CustomerInfo
 	return &pb.BookingDetails{
-		BookingId:        b.BookingId,
-		BookingStatus:    b.BookingStatus,
-		BookingDay:       b.BookingDay,
-		BookingSlot:      b.BookingSlot,
-		TransactionTime:  b.TransactionTime,
-		PaymentStatus:    b.PaymentStatus,
-		AdultTicketCount: b.AdultTicketCount,
-		ChildTicketCount: b.ChildTicketCount,
-		AdultTicketTotal: b.AdultTicketTotal,
-		ChildTicketTotal: b.ChildTicketTotal,
-		CustomerInfo:     nil,
+		BookingId:          b.BookingId,
+		BookingStatus:      b.BookingStatus,
+		BookingDay:         b.BookingDay,
+		BookingSlot:        b.BookingSlot,
+		TransactionTime:    b.TransactionTime,
+		PaymentStatus:      b.PaymentStatus,
+		CitizenTicketCount: b.CitizenTicketCount,
+		TouristTicketCount: b.TouristTicketCount,
+		CitizenTicketTotal: b.CitizenTicketTotal,
+		TouristTicketTotal: b.TouristTicketTotal,
+		CustomerInfo:       nil,
 	}
 }

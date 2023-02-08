@@ -38,3 +38,25 @@ func GetAffiliateDetailsByIdResponseJSON(c echo.Context, meta *pb.AffiliateMeta,
 		ReferralList:  list,
 	})
 }
+
+func GetAffiliateStatsResponseJSON(c echo.Context, curr *pb.AffiliateStats, prev *pb.AffiliateStats) error {
+	return c.JSON(http.StatusOK, pb.GetAffiliateStatsResponse{
+		ResponseMeta: &pb.ResponseMeta{
+			ErrorCode: proto.Int64(int64(pb.GlobalErrorCode_SUCCESS)),
+			ErrorMsg:  proto.String("success"),
+		},
+		AffiliateStats:              curr,
+		AffiliateStatsPreviousCycle: prev,
+	})
+}
+
+func GetAffiliateRankingListResponseJSON(c echo.Context, curr *pb.AffiliateRanking, prev *pb.AffiliateRanking) error {
+	return c.JSON(http.StatusOK, pb.GetAffiliateRankingListResponse{
+		ResponseMeta: &pb.ResponseMeta{
+			ErrorCode: proto.Int64(int64(pb.GlobalErrorCode_SUCCESS)),
+			ErrorMsg:  proto.String("success"),
+		},
+		AffiliateRanking:              curr,
+		AffiliateRankingPreviousCycle: prev,
+	})
+}

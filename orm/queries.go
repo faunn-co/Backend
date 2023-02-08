@@ -43,3 +43,43 @@ func Sql4() string {
 	}
 	return string(query)
 }
+
+func Sql5() string {
+	query, err := os.ReadFile(openSql("sql5.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}
+
+func Sql6() string {
+	query, err := os.ReadFile(openSql("sql6.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}
+
+func Sql7() string {
+	query, err := os.ReadFile(openSql("sql7.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}
+
+func Sql8() string {
+	query, err := os.ReadFile(openSql("sql8.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}
+
+func Sql9() string {
+	query, err := os.ReadFile(openSql("sql9.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}
