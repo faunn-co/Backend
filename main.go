@@ -24,6 +24,7 @@ func main() {
 	//get affiliate id from token
 	//time range etc
 	e.GET("api/v1/affiliate/stats", cmd.GetAffiliateStats)
+	e.GET("api/v1/affiliate/trend", cmd.GetAffiliateStats)
 	e.GET("api/v1/affiliate/ranking/list", cmd.GetAffiliateRankingList)
 
 	//sort and filter

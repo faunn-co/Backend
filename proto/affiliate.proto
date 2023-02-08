@@ -220,6 +220,23 @@ message GetAffiliateRankingListResponse{
   optional AffiliateRanking affiliate_ranking_previous_cycle = 3;
 }
 
+message GetAffiliateTrendRequest{
+  optional RequestMeta request_meta = 1;
+  optional string start_date = 2;
+  optional string end_date = 3;
+}
+
+message AffiliateTimedStats{
+  optional int64 start_time = 1;
+  optional int64 end_time = 2;
+  optional AffiliateCoreStats stats = 3;
+}
+//Get the revenue, commission, bookings trend within the period
+message GetAffiliateTrendResponse{
+  optional ResponseMeta response_meta = 1;
+  repeated AffiliateTimedStats times_stats = 2;
+}
+
 //Admin to view all affiliates
 message GetAffiliateListRequest{
   optional RequestMeta request_meta = 1;
