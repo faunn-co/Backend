@@ -60,6 +60,8 @@ enum TimeSelectorPeriod{
   PERIOD_WEEK = 2;
   PERIOD_MONTH = 3;
   PERIOD_RANGE = 4;
+  PERIOD_LAST_7_DAYS = 5;
+  PERIOD_LAST_28_DAYS = 6;
 }
 
 message RequestMeta{
