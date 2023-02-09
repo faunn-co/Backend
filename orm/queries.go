@@ -83,3 +83,11 @@ func Sql9() string {
 	}
 	return string(query)
 }
+
+func Sql10() string {
+	query, err := os.ReadFile(openSql("sql10.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}

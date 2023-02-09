@@ -60,3 +60,13 @@ func GetAffiliateRankingListResponseJSON(c echo.Context, curr *pb.AffiliateRanki
 		AffiliateRankingPreviousCycle: prev,
 	})
 }
+
+func GetAffiliateTrendResponseJSON(c echo.Context, trend []*pb.AffiliateCoreTimedStats) error {
+	return c.JSON(http.StatusOK, pb.GetAffiliateTrendResponse{
+		ResponseMeta: &pb.ResponseMeta{
+			ErrorCode: proto.Int64(int64(pb.GlobalErrorCode_SUCCESS)),
+			ErrorMsg:  proto.String("success"),
+		},
+		TimesStats: trend,
+	})
+}

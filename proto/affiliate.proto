@@ -54,6 +54,14 @@ enum TicketSlot{
   SLOT_DOGS_1700_1830 = 3;
 }
 
+enum TimeSelectorPeriod{
+  PERIOD_NONE = 0;
+  PERIOD_DAY = 1;
+  PERIOD_WEEK = 2;
+  PERIOD_MONTH = 3;
+  PERIOD_RANGE = 4;
+}
+
 message RequestMeta{
   optional string user_token = 1;
 }
@@ -158,11 +166,6 @@ message BookingDetails{
   repeated CustomerInfo customer_info = 11;
 }
 
-//Admin to view all affiliate stats
-message GetAffiliateStatsRequest{
-  optional RequestMeta request_meta = 1;
-}
-
 message AffiliateMetaTopCommission{
   optional int64 user_id = 1;
   optional string affiliate_name = 2;
@@ -202,6 +205,19 @@ message AffiliateRanking{
   optional int64 end_time = 4;
 }
 
+message TimeSelector{
+  optional int64 base_ts = 1;
+  optional int64 start_ts = 2;
+  optional int64 end_ts = 3;
+  optional int64 period = 4;
+}
+
+//Admin to view all affiliate stats
+message GetAffiliateStatsRequest{
+  optional RequestMeta request_meta = 1;
+  optional TimeSelector time_selector = 2;
+}
+
 //Also get time stats based on datepicker start end timestamp
 message GetAffiliateStatsResponse{
   optional ResponseMeta response_meta = 1;
@@ -222,19 +238,22 @@ message GetAffiliateRankingListResponse{
 
 message GetAffiliateTrendRequest{
   optional RequestMeta request_meta = 1;
-  optional string start_date = 2;
-  optional string end_date = 3;
+  optional TimeSelector time_selector = 2;
 }
 
-message AffiliateTimedStats{
-  optional int64 start_time = 1;
-  optional int64 end_time = 2;
-  optional AffiliateCoreStats stats = 3;
+message AffiliateCoreTimedStats{
+  optional string date_string = 1;
+  optional int64 citizen_ticket_total = 2; //citizen_ticket_total,tourist_ticket_total from referral_table join booking_table
+  optional int64 tourist_ticket_total = 3;
+  optional int64 total_commission = 4; //SUM(referral_table.referral_commission)
+  optional int64 total_active_affiliates = 5; //COUNT(referral_table.affiliate_id)
+  optional int64 total_affiliate_bookings = 6; //COUNT(referral_table.referral_id)
 }
+
 //Get the revenue, commission, bookings trend within the period
 message GetAffiliateTrendResponse{
   optional ResponseMeta response_meta = 1;
-  repeated AffiliateTimedStats times_stats = 2;
+  repeated AffiliateCoreTimedStats times_stats = 2;
 }
 
 //Admin to view all affiliates
