@@ -59,11 +59,13 @@ func (g *GetAffiliateStats) GetAffiliateStatsImpl() (*pb.AffiliateStats, *pb.Aff
 	case int64(pb.TimeSelectorPeriod_PERIOD_LAST_7_DAYS):
 		end = g.req.GetTimeSelector().GetBaseTs()
 		start = end - utils.WEEK
+		start, _ = utils.DayStartEndDate(start)
 		prevStart, prevEnd = start-utils.WEEK, start-utils.SECOND
 		break
 	case int64(pb.TimeSelectorPeriod_PERIOD_LAST_28_DAYS):
 		end = g.req.GetTimeSelector().GetBaseTs()
 		start = end - utils.MONTH
+		start, _ = utils.DayStartEndDate(start)
 		prevStart, prevEnd = start-utils.MONTH, start-utils.SECOND
 		break
 	case int64(pb.TimeSelectorPeriod_PERIOD_RANGE):

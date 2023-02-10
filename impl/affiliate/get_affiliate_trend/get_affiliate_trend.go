@@ -60,12 +60,14 @@ func (g *GetAffiliateTrend) GetAffiliateTrendImpl() ([]*pb.AffiliateCoreTimedSta
 	case int64(pb.TimeSelectorPeriod_PERIOD_LAST_7_DAYS):
 		endTs := g.req.GetTimeSelector().GetBaseTs()
 		startTs := endTs - utils.WEEK
+		startTs, _ = utils.DayStartEndDate(startTs)
 		end = utils.ConvertTimeStampYearMonthDay(endTs)
 		start = utils.ConvertTimeStampYearMonthDay(startTs)
 		break
 	case int64(pb.TimeSelectorPeriod_PERIOD_LAST_28_DAYS):
 		endTs := g.req.GetTimeSelector().GetBaseTs()
 		startTs := endTs - utils.MONTH
+		startTs, _ = utils.DayStartEndDate(startTs)
 		end = utils.ConvertTimeStampYearMonthDay(endTs)
 		start = utils.ConvertTimeStampYearMonthDay(startTs)
 		break
