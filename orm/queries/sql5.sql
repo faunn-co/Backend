@@ -1,6 +1,6 @@
 SELECT
     COALESCE(SUM(r.referral_commission),0) AS total_commission ,
-    COUNT(r.affiliate_id) AS total_active_affiliates ,
+    COUNT(DISTINCT r.affiliate_id) AS total_active_affiliates ,
     COUNT(r.referral_id) AS total_affiliate_bookings,
     COALESCE(SUM(b.citizen_ticket_total),0) AS citizen_ticket_total,
     COALESCE(SUM(b.tourist_ticket_total),0) AS tourist_ticket_total

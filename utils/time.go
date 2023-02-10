@@ -34,7 +34,7 @@ func DayStartEndDate(timestamp int64) (int64, int64) {
 func WeekStartEndDate(timestamp int64) (int64, int64) {
 	date := UnixToUTC(timestamp).In(tz)
 
-	startOffset := (int(time.Monday) - int(date.Weekday()) - 7) % 7
+	startOffset := (int(time.Sunday) - int(date.Weekday()) - 7) % 7
 	startResult := date.Add(time.Duration(startOffset*24) * time.Hour)
 	endResult := startResult.Add(time.Duration(6*24) * time.Hour)
 
