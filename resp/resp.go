@@ -18,13 +18,15 @@ func GetAvailableSlotResponseJSON(c echo.Context, date *string, slots []*pb.Book
 	})
 }
 
-func GetAffiliateListResponseJSON(c echo.Context, list []*pb.AffiliateMeta) error {
+func GetAffiliateListResponseJSON(c echo.Context, list []*pb.AffiliateMeta, start, end *int64) error {
 	return c.JSON(http.StatusOK, pb.GetAffiliateListResponse{
 		ResponseMeta: &pb.ResponseMeta{
 			ErrorCode: proto.Int64(int64(pb.GlobalErrorCode_SUCCESS)),
 			ErrorMsg:  proto.String("success"),
 		},
 		AffiliateList: list,
+		StartTime:     start,
+		EndTime:       end,
 	})
 }
 
@@ -98,5 +100,17 @@ func GetReferralRecentListResponseJSON(c echo.Context, l *pb.ReferralRecent) err
 			ErrorMsg:  proto.String("success"),
 		},
 		ReferralRecent: l,
+	})
+}
+
+func GetReferralListResponseJSON(c echo.Context, list []*pb.ReferralBasic, start, end *int64) error {
+	return c.JSON(http.StatusOK, pb.GetReferralListResponse{
+		ResponseMeta: &pb.ResponseMeta{
+			ErrorCode: proto.Int64(int64(pb.GlobalErrorCode_SUCCESS)),
+			ErrorMsg:  proto.String("success"),
+		},
+		ReferralList: list,
+		StartTime:    start,
+		EndTime:      end,
 	})
 }

@@ -12,7 +12,7 @@ SELECT
     COALESCE(
             SUM(a.referral_commission),
             0
-        ) AS total_commission
+        ) AS referral_commission
 FROM
     (
         SELECT

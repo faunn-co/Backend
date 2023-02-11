@@ -56,7 +56,6 @@ func GetStartEndTimeFromTimeSelector(t *pb.TimeSelector) (int64, int64, int64, i
 	case int64(pb.TimeSelectorPeriod_PERIOD_WEEK):
 		start, end = WeekStartEndDate(t.GetBaseTs())
 		prevStart, prevEnd = start-WEEK, start-SECOND
-
 		break
 	case int64(pb.TimeSelectorPeriod_PERIOD_MONTH):
 		//start end of month of ts

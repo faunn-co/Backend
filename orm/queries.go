@@ -139,3 +139,27 @@ func GetAffiliateListQuery() string {
 	}
 	return string(query)
 }
+
+func GetAllReferralListQuery() string {
+	query, err := os.ReadFile(openSql("sql17.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}
+
+func GetAffiliateReferralListQuery() string {
+	query, err := os.ReadFile(openSql("sql18.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}
+
+func GetAffiliateReferralListWithNameQuery() string {
+	query, err := os.ReadFile(openSql("sql19.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}

@@ -29,7 +29,7 @@ func main() {
 	e.GET("api/v1/affiliate/referral/list", cmd.GetAffiliateReferralsList)
 
 	//Referral
-	e.GET("api/v1/referral/list", cmd.GetReferralsList)
+	e.POST("api/v1/referral/list", cmd.GetReferralsList)
 	e.POST("api/v1/referral/stats", cmd.GetReferralStats)
 	e.POST("api/v1/referral/trend", cmd.GetReferralTrend)
 	e.POST("api/v1/referral/recent/list", cmd.GetReferralRecentList)

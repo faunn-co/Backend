@@ -7,6 +7,7 @@ import (
 	"github.com/aaronangxz/AffiliateManager/resp"
 	"github.com/aaronangxz/AffiliateManager/utils"
 	"github.com/labstack/echo/v4"
+	"google.golang.org/protobuf/proto"
 )
 
 type GetAffiliateList struct {
@@ -20,17 +21,17 @@ func New(c echo.Context) *GetAffiliateList {
 	return g
 }
 
-func (g *GetAffiliateList) GetAffiliateListImpl() ([]*pb.AffiliateMeta, *resp.Error) {
+func (g *GetAffiliateList) GetAffiliateListImpl() ([]*pb.AffiliateMeta, *int64, *int64, *resp.Error) {
 	if err := g.verifyGetAffiliateList(); err != nil {
-		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_INVALID_PARAMS)
+		return nil, nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_INVALID_PARAMS)
 	}
 
 	var l []*pb.AffiliateMeta
 	start, end, _, _ := utils.GetStartEndTimeFromTimeSelector(g.req.GetTimeSelector())
 	if err := orm.DbInstance(g.c).Raw(orm.GetAffiliateListQuery(), sql.Named("startTime", start), sql.Named("endTime", end)).Scan(&l).Error; err != nil {
-		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
+		return nil, nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 	}
-	return l, nil
+	return l, proto.Int64(start), proto.Int64(end), nil
 }
 
 func (g *GetAffiliateList) verifyGetAffiliateList() error {
