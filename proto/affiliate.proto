@@ -96,11 +96,14 @@ message AffiliateDetailsDb{
 
 //Joining user_table, affiliate_details_table and referral_table
 message AffiliateMeta{
-  optional int64 user_id = 1;
+  optional int64 affiliate_id = 1;
   optional string affiliate_name = 2;
   optional int64 affiliate_type = 3;
   optional string unique_referral_code = 4;
   optional int64 referral_count = 5;
+  optional int64 referral_clicks = 6;
+  optional int64 referral_commission = 7;
+  optional int64 total_revenue = 8;
 }
 
 //Direct from referral_table
@@ -261,6 +264,7 @@ message GetAffiliateTrendResponse{
 //Admin to view all affiliates
 message GetAffiliateListRequest{
   optional RequestMeta request_meta = 1;
+  optional TimeSelector time_selector = 2;
 }
 
 message GetAffiliateListResponse{

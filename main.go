@@ -16,7 +16,7 @@ func main() {
 	}))
 
 	//Affiliate
-	e.GET("api/v1/affiliate/list", cmd.GetAffiliateList)
+	e.POST("api/v1/affiliate/list", cmd.GetAffiliateList)
 	//returns details of this affiliate
 	e.GET("api/v1/affiliate/:id", cmd.GetAffiliateDetailsById)
 	//get affiliate id from token

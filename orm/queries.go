@@ -131,3 +131,11 @@ func GetReferralRecentEarningsQuery() string {
 	}
 	return string(query)
 }
+
+func GetAffiliateListQuery() string {
+	query, err := os.ReadFile(openSql("sql16.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}

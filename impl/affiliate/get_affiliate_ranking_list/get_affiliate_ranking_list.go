@@ -7,8 +7,6 @@ import (
 	"github.com/aaronangxz/AffiliateManager/utils"
 	"github.com/labstack/echo/v4"
 	"google.golang.org/protobuf/proto"
-	"strconv"
-	"time"
 )
 
 type GetAffiliateRankingList struct {
@@ -28,27 +26,7 @@ func (g *GetAffiliateRankingList) GetAffiliateRankingListImpl() (*pb.AffiliateRa
 		c []*pb.AffiliateMetaTopCommission
 	)
 
-	var (
-		start     int64
-		end       int64
-		prevStart int64
-		prevEnd   int64
-	)
-	p := g.c.QueryParam("period")
-
-	switch p {
-	case strconv.FormatInt(int64(pb.TimeSelectorPeriod_PERIOD_WEEK), 10):
-		start, end = utils.WeekStartEndDate(time.Now().Unix())
-		prevStart, prevEnd = start-utils.WEEK, start-utils.SECOND
-		break
-	case strconv.FormatInt(int64(pb.TimeSelectorPeriod_PERIOD_MONTH), 10):
-		start, end = utils.MonthStartEndDate(time.Now().Unix())
-		prevStart, prevEnd = start-utils.MONTH, start-utils.SECOND
-		break
-	}
-
-	end = utils.Min(end, time.Now().Unix())
-
+	start, end, prevStart, prevEnd := utils.GetStartEndTimeFromPeriod(g.c.QueryParam("period"))
 	if err := orm.DbInstance(g.c).Raw(orm.Sql6(), start, end).Scan(&r).Error; err != nil {
 		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 	}

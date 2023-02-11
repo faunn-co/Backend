@@ -7,8 +7,6 @@ import (
 	"github.com/aaronangxz/AffiliateManager/utils"
 	"github.com/labstack/echo/v4"
 	"google.golang.org/protobuf/proto"
-	"strconv"
-	"time"
 )
 
 type GetReferralRecentList struct {
@@ -32,25 +30,7 @@ func (g *GetReferralRecentList) GetReferralRecentListImpl() (*pb.ReferralRecent,
 		e []*pb.ReferralEarnings
 	)
 
-	var (
-		start int64
-		end   int64
-	)
-	p := g.c.QueryParam("period")
-
-	switch p {
-	case strconv.FormatInt(int64(pb.TimeSelectorPeriod_PERIOD_WEEK), 10):
-		start, end = utils.WeekStartEndDate(time.Now().Unix())
-		break
-	case strconv.FormatInt(int64(pb.TimeSelectorPeriod_PERIOD_MONTH), 10):
-		fallthrough
-	default:
-		start, end = utils.MonthStartEndDate(time.Now().Unix())
-		break
-	}
-
-	end = utils.Min(end, time.Now().Unix())
-
+	start, end, _, _ := utils.GetStartEndTimeFromPeriod(g.c.QueryParam("period"))
 	if err := orm.DbInstance(g.c).Raw(orm.GetReferralRecentClicksQuery(), g.req.GetAffiliateId(), start, end).Scan(&c).Error; err != nil {
 		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 	}
