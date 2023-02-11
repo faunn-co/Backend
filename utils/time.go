@@ -2,6 +2,7 @@ package utils
 
 import (
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -56,4 +57,9 @@ func MonthStartEndDate(timestamp int64) (int64, int64) {
 // time format: Mon Jan 2 15:04:05 -0700 MST 2006
 func ConvertTimeStampYearMonthDay(timestamp int64) string {
 	return fmt.Sprint(UnixToUTC(timestamp).In(tz).Format("2006-01-02"))
+}
+
+func TrimDateString(d string) string {
+	split := strings.Split(d, "-")
+	return fmt.Sprintf("%v-%v", split[1], split[2])
 }

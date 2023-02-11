@@ -7,9 +7,9 @@ import (
 )
 
 func GetAffiliateRankingList(c echo.Context) error {
-	if curr, prev, err := get_affiliate_ranking_list.New(c).GetAffiliateRankingListImpl(); err != nil {
+	if curr, err := get_affiliate_ranking_list.New(c).GetAffiliateRankingListImpl(); err != nil {
 		return resp.JSONResp(c, err)
 	} else {
-		return resp.GetAffiliateRankingListResponseJSON(c, curr, prev)
+		return resp.GetAffiliateRankingListResponseJSON(c, curr)
 	}
 }

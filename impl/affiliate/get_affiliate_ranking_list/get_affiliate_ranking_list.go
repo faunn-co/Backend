@@ -21,15 +21,11 @@ func New(c echo.Context) *GetAffiliateRankingList {
 	return g
 }
 
-func (g *GetAffiliateRankingList) GetAffiliateRankingListImpl() (*pb.AffiliateRanking, *pb.AffiliateRanking, *resp.Error) {
+func (g *GetAffiliateRankingList) GetAffiliateRankingListImpl() (*pb.AffiliateRanking, *resp.Error) {
 	var (
 		//Current Period
 		r []*pb.AffiliateMetaTopReferral
 		c []*pb.AffiliateMetaTopCommission
-
-		//Previous Period
-		rP []*pb.AffiliateMetaTopReferral
-		cP []*pb.AffiliateMetaTopCommission
 	)
 
 	var (
@@ -54,16 +50,16 @@ func (g *GetAffiliateRankingList) GetAffiliateRankingListImpl() (*pb.AffiliateRa
 	end = utils.Min(end, time.Now().Unix())
 
 	if err := orm.DbInstance(g.c).Raw(orm.Sql6(), start, end).Scan(&r).Error; err != nil {
-		return nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
+		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 	}
 	if err := orm.DbInstance(g.c).Raw(orm.Sql7(), start, end).Scan(&c).Error; err != nil {
-		return nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
+		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 	}
 
 	for _, curr := range r {
 		var prev *pb.AffiliateMetaTopReferral
 		if err := orm.DbInstance(g.c).Raw(orm.Sql8(), curr.GetUserId(), prevStart, prevEnd).Scan(&prev).Error; err != nil {
-			return nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
+			return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 		}
 		if prev == nil {
 			curr.PreviousCycleReferrals = proto.Int64(0)
@@ -75,7 +71,7 @@ func (g *GetAffiliateRankingList) GetAffiliateRankingListImpl() (*pb.AffiliateRa
 	for _, curr := range c {
 		var prev *pb.AffiliateMetaTopCommission
 		if err := orm.DbInstance(g.c).Raw(orm.Sql9(), curr.GetUserId(), prevStart, prevEnd).Scan(&prev).Error; err != nil {
-			return nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
+			return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 		}
 		if prev == nil {
 			curr.PreviousCycleCommission = proto.Int64(0)
@@ -84,23 +80,10 @@ func (g *GetAffiliateRankingList) GetAffiliateRankingListImpl() (*pb.AffiliateRa
 		}
 	}
 
-	if err := orm.DbInstance(g.c).Raw(orm.Sql6(), prevStart, prevEnd).Scan(&rP).Error; err != nil {
-		return nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
-	}
-
-	if err := orm.DbInstance(g.c).Raw(orm.Sql7(), prevStart, prevEnd).Scan(&cP).Error; err != nil {
-		return nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
-	}
-
 	return &pb.AffiliateRanking{
-			TopAffiliateReferralList:   r,
-			TopAffiliateCommissionList: c,
-			StartTime:                  proto.Int64(start),
-			EndTime:                    proto.Int64(end),
-		}, &pb.AffiliateRanking{
-			TopAffiliateReferralList:   rP,
-			TopAffiliateCommissionList: cP,
-			StartTime:                  proto.Int64(prevStart),
-			EndTime:                    proto.Int64(prevEnd),
-		}, nil
+		TopAffiliateReferralList:   r,
+		TopAffiliateCommissionList: c,
+		StartTime:                  proto.Int64(start),
+		EndTime:                    proto.Int64(end),
+	}, nil
 }

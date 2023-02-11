@@ -91,3 +91,43 @@ func Sql10() string {
 	}
 	return string(query)
 }
+
+func GetReferralStatsQuery() string {
+	query, err := os.ReadFile(openSql("sql11.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}
+
+func GetReferralTrendQuery() string {
+	query, err := os.ReadFile(openSql("sql12.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}
+
+func GetReferralTrendClicksQuery() string {
+	query, err := os.ReadFile(openSql("sql13.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}
+
+func GetReferralRecentClicksQuery() string {
+	query, err := os.ReadFile(openSql("sql14.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}
+
+func GetReferralRecentEarningsQuery() string {
+	query, err := os.ReadFile(openSql("sql15.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}
