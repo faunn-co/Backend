@@ -163,3 +163,11 @@ func GetAffiliateReferralListWithNameQuery() string {
 	}
 	return string(query)
 }
+
+func GetBookingListQuery() string {
+	query, err := os.ReadFile(openSql("sql20.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}

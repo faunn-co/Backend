@@ -36,7 +36,7 @@ func main() {
 	e.GET("api/v1/referral/:id", cmd.GetReferralById)
 
 	//Booking
-	e.GET("api/v1/booking/list", cmd.GetAvailableSlot)
+	e.POST("api/v1/booking/list", cmd.GetBookingList)
 	e.POST("api/v1/booking/stats", cmd.GetAvailableSlot)
 	e.POST("api/v1/booking/trend", cmd.GetAvailableSlot)
 	e.GET("api/v1/booking/recent/list", cmd.GetAvailableSlot)
