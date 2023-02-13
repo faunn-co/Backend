@@ -4,7 +4,7 @@ import (
 	"os"
 )
 
-const (
+var (
 	DIR = "orm/queries/"
 )
 
@@ -166,6 +166,22 @@ func GetAffiliateReferralListWithNameQuery() string {
 
 func GetBookingListQuery() string {
 	query, err := os.ReadFile(openSql("sql20.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}
+
+func GetReferralDetailsByIdQuery() string {
+	query, err := os.ReadFile(openSql("sql21.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}
+
+func GetReferralBookingDetailsQuery() string {
+	query, err := os.ReadFile(openSql("sql22.sql"))
 	if err != nil {
 		panic(err)
 	}

@@ -34,7 +34,7 @@ func (g *GetReferralList) GetReferralListImpl() ([]*pb.ReferralBasic, *int64, *i
 		}
 	} else {
 		if g.req.AffiliateName != nil {
-			if err := orm.DbInstance(g.c).Raw(orm.GetAffiliateReferralListWithNameQuery(), start, end, fmt.Sprintf("%%%v%%", g.req.GetAffiliateName())).Scan(&l).Error; err != nil {
+			if err := orm.DbInstance(g.c).Raw(orm.GetAffiliateReferralListWithNameQuery(), start, end, fmt.Sprintf("%%%v%%'", g.req.GetAffiliateName())).Scan(&l).Error; err != nil {
 				return nil, nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 			}
 		} else {

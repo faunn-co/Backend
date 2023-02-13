@@ -126,3 +126,13 @@ func GetBookingListResponseJSON(c echo.Context, list []*pb.BookingBasic, start, 
 		EndTime:   end,
 	})
 }
+
+func GetReferralByIdResponseJSON(c echo.Context, details *pb.ReferralDetails) error {
+	return c.JSON(http.StatusOK, pb.GetReferralDetailsByReferralIdResponse{
+		ResponseMeta: &pb.ResponseMeta{
+			ErrorCode: proto.Int64(int64(pb.GlobalErrorCode_SUCCESS)),
+			ErrorMsg:  proto.String("success"),
+		},
+		ReferralDetails: details,
+	})
+}

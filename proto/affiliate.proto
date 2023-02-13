@@ -8,6 +8,8 @@ enum GlobalErrorCode{
   ERROR_JSON_BIND =1001;
   ERROR_INVALID_PARAMS = 1002;
   ERROR_DATABASE =1003;
+  ERROR_JSON_UNMARSHAL =1004;
+  ERROR_REDIS =1005;
 }
 
 enum UserRole{
@@ -123,8 +125,9 @@ message ReferralDetails{
   optional int64 affiliate_id = 2;
   optional int64 referral_click_time = 3;
   optional int64 referral_status = 4;
-  optional BookingDetails booking_details = 5; //nil if referral is not successful
-  optional int64 referral_commission = 6;
+  optional int64 booking_id = 5;
+  optional BookingDetails booking_details = 6; //nil if referral is not successful
+  optional int64 referral_commission = 7;
 }
 
 message ReferralBasic{
