@@ -4,11 +4,25 @@ import (
 	"github.com/aaronangxz/AffiliateManager/cmd"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"go.uber.org/zap"
 	"net/http"
 )
 
 func main() {
 	e := echo.New()
+	logger, _ := zap.NewProduction()
+	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
+		LogURI:    true,
+		LogStatus: true,
+		LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
+			logger.Info("request",
+				zap.String("ID", v.RequestID),
+				zap.String("URI", v.URI),
+				zap.Int("status", v.Status),
+			)
+			return nil
+		},
+	}))
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},

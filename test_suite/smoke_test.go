@@ -1,4 +1,4 @@
-package test
+package test_suite
 
 import (
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"

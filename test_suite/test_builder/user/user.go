@@ -1,8 +1,12 @@
 package user
 
 import (
+	"fmt"
+	"github.com/aaronangxz/AffiliateManager/orm"
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
+	"github.com/labstack/gommon/log"
 	"google.golang.org/protobuf/proto"
+	"time"
 )
 
 type User struct {
@@ -80,5 +84,53 @@ func (u *User) filDefaults() *User {
 
 func (u *User) Build() *User {
 	u.filDefaults()
+
+	type User struct {
+		UserId          *int64
+		UserName        *string
+		UserEmail       *string
+		UserContact     *string
+		UserRole        *int64
+		CreateTimestamp *int64
+	}
+
+	user := User{
+		UserId:          nil,
+		UserName:        u.UserName,
+		UserEmail:       u.UserEmail,
+		UserContact:     u.UserContact,
+		UserRole:        u.UserRole,
+		CreateTimestamp: proto.Int64(time.Now().Unix()),
+	}
+
+	if err := orm.DbInstance(nil).Table(orm.USER_TABLE).Create(user).Error; err != nil {
+		log.Error(err)
+		return u
+	}
+
+	u.UserId = user.UserId
+
+	affiliate := &pb.AffiliateDetailsDb{
+		UserId:             u.UserId,
+		AffiliateType:      u.AffiliateType,
+		UniqueReferralCode: u.UniqueReferralCode,
+	}
+
+	if err := orm.DbInstance(nil).Table(orm.AFFILIATE_DETAILS_TABLE).Create(affiliate).Error; err != nil {
+		log.Error(err)
+		return u
+	}
 	return u
+}
+
+func (u *User) TearDown() error {
+	if err := orm.DbInstance(nil).Exec(fmt.Sprintf("DELETE FROM %v.%v WHERE user_id = %v", orm.AFFILIATE_MANAGER_TEST_DB, orm.USER_TABLE, u.UserId)).Error; err != nil {
+		log.Error(err)
+		return err
+	}
+	if err := orm.DbInstance(nil).Exec(fmt.Sprintf("DELETE FROM %v.%v WHERE user_id = %v", orm.AFFILIATE_MANAGER_TEST_DB, orm.AFFILIATE_DETAILS_TABLE, u.UserId)).Error; err != nil {
+		log.Error(err)
+		return err
+	}
+	return nil
 }

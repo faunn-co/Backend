@@ -1,4 +1,4 @@
-package test
+package test_suite
 
 import (
 	"bytes"
@@ -103,6 +103,7 @@ func NewMockTest(method string) *MockTest {
 	m.e.POST("api/v1/platform/register", cmd.GetAvailableSlot)
 	m.e.POST("api/v1/platform/login", cmd.GetAvailableSlot)
 	orm.DIR = "../orm/queries/"
+	orm.ENV = "TEST"
 	return m
 }
 

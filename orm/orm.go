@@ -14,8 +14,11 @@ import (
 )
 
 const (
-	AFFILIATE_MANAGER_DB = "affiliate_manager_db"
-	BOOKING_SLOTS_TABLE  = "booking_slots_table"
+	AFFILIATE_MANAGER_DB      = "affiliate_manager_db"
+	AFFILIATE_MANAGER_TEST_DB = "affiliate_manager_test_db"
+	USER_TABLE                = "user_table"
+	AFFILIATE_DETAILS_TABLE   = "affiliate_details_table"
+	BOOKING_SLOTS_TABLE       = "booking_slots_table"
 )
 
 type SQLConnection struct {
@@ -34,6 +37,13 @@ var sqlConnections = map[string]SQLConnection{
 		Password:     "Xuanze94",
 		DatabaseName: AFFILIATE_MANAGER_DB,
 	},
+	AFFILIATE_MANAGER_TEST_DB: {
+		IP:           "127.0.0.1",
+		Port:         "3306",
+		Username:     "root",
+		Password:     "Xuanze94",
+		DatabaseName: AFFILIATE_MANAGER_TEST_DB,
+	},
 }
 
 var (
@@ -47,11 +57,20 @@ var (
 			Colorful:                  true,        // Disable color
 		},
 	)
+	ENV = "PROD"
 )
 
 func DbInstance(ctx echo.Context) *gorm.DB {
 	if db == nil {
-		if err := ConnectMySQL(ctx, AFFILIATE_MANAGER_DB); err != nil {
+		switch ENV {
+		case "PROD":
+			if err := ConnectMySQL(ctx, AFFILIATE_MANAGER_DB); err != nil {
+			}
+			break
+		case "TEST":
+			if err := ConnectMySQL(ctx, AFFILIATE_MANAGER_TEST_DB); err != nil {
+			}
+			break
 		}
 	}
 	return db
