@@ -30,9 +30,9 @@ func TestGetAffiliateStats(t *testing.T) {
 	}
 
 	m := NewMockTest(GetAffiliateStats)
-	resp := m.req(reqBody).decode().respBody.(*pb.GetAffiliateStatsResponse)
+	resp := m.Req(reqBody).Decode().RespBody.(*pb.GetAffiliateStatsResponse)
 
-	assert.Equal(t, expectedHTTPCode, m.httpErr)
+	assert.Equal(t, expectedHTTPCode, m.HttpErr)
 	assert.Equal(t, expectedErrCode, resp.GetResponseMeta().GetErrorCode())
 }
 
@@ -56,9 +56,9 @@ func TestGetAffiliateList(t *testing.T) {
 	}
 
 	m := NewMockTest(GetAffiliateList)
-	resp := m.req(reqBody).decode().respBody.(*pb.GetAffiliateListResponse)
+	resp := m.Req(reqBody).Decode().RespBody.(*pb.GetAffiliateListResponse)
 
-	assert.Equal(t, expectedHTTPCode, m.httpErr)
+	assert.Equal(t, expectedHTTPCode, m.HttpErr)
 	assert.Equal(t, expectedErrCode, resp.GetResponseMeta().GetErrorCode())
 	assert.GreaterOrEqual(t, len(resp.GetAffiliateList()), 0)
 }
@@ -83,9 +83,9 @@ func TestGetAffiliateTrend(t *testing.T) {
 	}
 
 	m := NewMockTest(GetAffiliateTrend)
-	resp := m.req(reqBody).decode().respBody.(*pb.GetAffiliateTrendResponse)
+	resp := m.Req(reqBody).Decode().RespBody.(*pb.GetAffiliateTrendResponse)
 
-	assert.Equal(t, expectedHTTPCode, m.httpErr)
+	assert.Equal(t, expectedHTTPCode, m.HttpErr)
 	assert.Equal(t, expectedErrCode, resp.GetResponseMeta().GetErrorCode())
 	assert.GreaterOrEqual(t, len(resp.GetTimesStats()), 0)
 }
@@ -104,8 +104,8 @@ func TestGetAffiliateRankingList(t *testing.T) {
 	}
 
 	m := NewMockTest(GetAffiliateRankingList)
-	resp := m.queryParam("period", strconv.FormatInt(int64(pb.TimeSelectorPeriod_PERIOD_MONTH), 10)).req(reqBody).decode().respBody.(*pb.GetAffiliateRankingListResponse)
+	resp := m.queryParam("period", strconv.FormatInt(int64(pb.TimeSelectorPeriod_PERIOD_MONTH), 10)).Req(reqBody).Decode().RespBody.(*pb.GetAffiliateRankingListResponse)
 
-	assert.Equal(t, expectedHTTPCode, m.httpErr)
+	assert.Equal(t, expectedHTTPCode, m.HttpErr)
 	assert.Equal(t, expectedErrCode, resp.GetResponseMeta().GetErrorCode())
 }

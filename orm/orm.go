@@ -17,6 +17,8 @@ const (
 	AFFILIATE_MANAGER_DB      = "affiliate_manager_db"
 	AFFILIATE_MANAGER_TEST_DB = "affiliate_manager_test_db"
 	USER_TABLE                = "user_table"
+	REFERRAL_TABLE            = "referral_table"
+	BOOKING_DETAILS_TABLE     = "booking_details_table"
 	AFFILIATE_DETAILS_TABLE   = "affiliate_details_table"
 	BOOKING_SLOTS_TABLE       = "booking_slots_table"
 )

@@ -21,6 +21,7 @@ const (
 	GetAffiliateList        = "/api/v1/affiliate/list"
 	GetAffiliateTrend       = "/api/v1/affiliate/trend"
 	GetAffiliateRankingList = "/api/v1/affiliate/ranking/list"
+	GetReferralsList        = "/api/v1/referral/list"
 )
 
 type Method struct {
@@ -50,6 +51,11 @@ var methodMap = map[string]Method{
 		HTTPMethod: GET,
 		Model:      reflect.TypeOf(pb.GetAffiliateRankingListResponse{}),
 	},
+	GetReferralsList: {
+		Endpoint:   GetReferralsList,
+		HTTPMethod: POST,
+		Model:      reflect.TypeOf(pb.GetReferralListResponse{}),
+	},
 }
 
 type MockTest struct {
@@ -57,8 +63,8 @@ type MockTest struct {
 	param    map[string]string
 	r        *httptest.ResponseRecorder
 	meta     Method
-	httpErr  int
-	respBody interface{}
+	HttpErr  int
+	RespBody interface{}
 }
 
 func NewMockTest(method string) *MockTest {
@@ -102,7 +108,7 @@ func NewMockTest(method string) *MockTest {
 	//Registration
 	m.e.POST("api/v1/platform/register", cmd.GetAvailableSlot)
 	m.e.POST("api/v1/platform/login", cmd.GetAvailableSlot)
-	orm.DIR = "../orm/queries/"
+	orm.DIR = "../../orm/queries/"
 	orm.ENV = "TEST"
 	return m
 }
@@ -115,7 +121,7 @@ func (m *MockTest) queryParam(key, value string) *MockTest {
 	return m
 }
 
-func (m *MockTest) req(body interface{}) *MockTest {
+func (m *MockTest) Req(body interface{}) *MockTest {
 	requestBody, err := json.Marshal(body)
 	if err != nil {
 		log.Error(err)
@@ -137,11 +143,12 @@ func (m *MockTest) req(body interface{}) *MockTest {
 	writer := httptest.NewRecorder()
 	m.e.ServeHTTP(writer, request)
 	m.r = writer
+	m.Decode()
 	return m
 }
 
-func (m *MockTest) decode() *MockTest {
-	m.httpErr = m.r.Code
+func (m *MockTest) Decode() *MockTest {
+	m.HttpErr = m.r.Code
 	switch m.meta.Endpoint {
 	case GetAffiliateStats:
 		var dest *pb.GetAffiliateStatsResponse
@@ -150,7 +157,7 @@ func (m *MockTest) decode() *MockTest {
 			log.Error(err)
 			return m
 		}
-		m.respBody = dest
+		m.RespBody = dest
 		break
 	case GetAffiliateList:
 		var dest *pb.GetAffiliateListResponse
@@ -159,7 +166,7 @@ func (m *MockTest) decode() *MockTest {
 			log.Error(err)
 			return m
 		}
-		m.respBody = dest
+		m.RespBody = dest
 		break
 	case GetAffiliateTrend:
 		var dest *pb.GetAffiliateTrendResponse
@@ -168,7 +175,7 @@ func (m *MockTest) decode() *MockTest {
 			log.Error(err)
 			return m
 		}
-		m.respBody = dest
+		m.RespBody = dest
 		break
 	case GetAffiliateRankingList:
 		var dest *pb.GetAffiliateRankingListResponse
@@ -177,11 +184,24 @@ func (m *MockTest) decode() *MockTest {
 			log.Error(err)
 			return m
 		}
-		m.respBody = dest
+		m.RespBody = dest
+		break
+	case GetReferralsList:
+		var dest *pb.GetReferralListResponse
+		err := json.Unmarshal(m.r.Body.Bytes(), &dest)
+		if err != nil {
+			log.Error(err)
+			return m
+		}
+		m.RespBody = dest
 		break
 	}
-	val, _ := json.MarshalIndent(m.respBody, "", "    ")
+	val, _ := json.MarshalIndent(m.RespBody, "", "    ")
 	fmt.Println("************************************")
 	fmt.Println(string(val))
 	return m
+}
+
+func (m *MockTest) Response() (int, interface{}) {
+	return m.HttpErr, m.RespBody
 }
