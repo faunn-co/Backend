@@ -143,11 +143,11 @@ func (m *MockTest) Req(body interface{}) *MockTest {
 	writer := httptest.NewRecorder()
 	m.e.ServeHTTP(writer, request)
 	m.r = writer
-	m.Decode()
+	m.decode()
 	return m
 }
 
-func (m *MockTest) Decode() *MockTest {
+func (m *MockTest) decode() *MockTest {
 	m.HttpErr = m.r.Code
 	switch m.meta.Endpoint {
 	case GetAffiliateStats:
