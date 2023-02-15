@@ -173,7 +173,7 @@ func (b *Booking) filDefaults() *Booking {
 	}
 
 	if b.BookingDetails.CustomerInfo == nil {
-		b.MakeDummyCustomer(2)
+		b.MakeDummyCustomer(b.BookingDetails.GetCitizenTicketCount() + b.BookingDetails.GetTouristTicketCount())
 	}
 	return b
 }
