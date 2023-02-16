@@ -2,6 +2,7 @@ package test_suite
 
 import (
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
+	"github.com/aaronangxz/AffiliateManager/test_suite"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/protobuf/proto"
 	"net/http"
@@ -29,10 +30,10 @@ func TestGetAffiliateStats(t *testing.T) {
 		},
 	}
 
-	m := NewMockTest(GetAffiliateStats)
-	resp := m.Req(reqBody).Decode().RespBody.(*pb.GetAffiliateStatsResponse)
+	err, response := test_suite.NewMockTest(test_suite.GetAffiliateStats).Req(reqBody).Response()
+	resp := response.(*pb.GetAffiliateStatsResponse)
 
-	assert.Equal(t, expectedHTTPCode, m.HttpErr)
+	assert.Equal(t, expectedHTTPCode, err)
 	assert.Equal(t, expectedErrCode, resp.GetResponseMeta().GetErrorCode())
 }
 
@@ -55,10 +56,10 @@ func TestGetAffiliateList(t *testing.T) {
 		},
 	}
 
-	m := NewMockTest(GetAffiliateList)
-	resp := m.Req(reqBody).Decode().RespBody.(*pb.GetAffiliateListResponse)
+	err, response := test_suite.NewMockTest(test_suite.GetAffiliateList).Req(reqBody).Response()
+	resp := response.(*pb.GetAffiliateListResponse)
 
-	assert.Equal(t, expectedHTTPCode, m.HttpErr)
+	assert.Equal(t, expectedHTTPCode, err)
 	assert.Equal(t, expectedErrCode, resp.GetResponseMeta().GetErrorCode())
 	assert.GreaterOrEqual(t, len(resp.GetAffiliateList()), 0)
 }
@@ -82,10 +83,10 @@ func TestGetAffiliateTrend(t *testing.T) {
 		},
 	}
 
-	m := NewMockTest(GetAffiliateTrend)
-	resp := m.Req(reqBody).Decode().RespBody.(*pb.GetAffiliateTrendResponse)
+	err, response := test_suite.NewMockTest(test_suite.GetAffiliateTrend).Req(reqBody).Response()
+	resp := response.(*pb.GetAffiliateTrendResponse)
 
-	assert.Equal(t, expectedHTTPCode, m.HttpErr)
+	assert.Equal(t, expectedHTTPCode, err)
 	assert.Equal(t, expectedErrCode, resp.GetResponseMeta().GetErrorCode())
 	assert.GreaterOrEqual(t, len(resp.GetTimesStats()), 0)
 }
@@ -103,9 +104,9 @@ func TestGetAffiliateRankingList(t *testing.T) {
 		},
 	}
 
-	m := NewMockTest(GetAffiliateRankingList)
-	resp := m.queryParam("period", strconv.FormatInt(int64(pb.TimeSelectorPeriod_PERIOD_MONTH), 10)).Req(reqBody).Decode().RespBody.(*pb.GetAffiliateRankingListResponse)
+	err, response := test_suite.NewMockTest(test_suite.GetAffiliateRankingList).QueryParam("period", strconv.FormatInt(int64(pb.TimeSelectorPeriod_PERIOD_MONTH), 10)).Req(reqBody).Response()
+	resp := response.(*pb.GetAffiliateRankingListResponse)
 
-	assert.Equal(t, expectedHTTPCode, m.HttpErr)
+	assert.Equal(t, expectedHTTPCode, err)
 	assert.Equal(t, expectedErrCode, resp.GetResponseMeta().GetErrorCode())
 }

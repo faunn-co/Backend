@@ -113,7 +113,7 @@ func NewMockTest(method string) *MockTest {
 	return m
 }
 
-func (m *MockTest) queryParam(key, value string) *MockTest {
+func (m *MockTest) QueryParam(key, value string) *MockTest {
 	if m.param == nil {
 		m.param = make(map[string]string)
 	}

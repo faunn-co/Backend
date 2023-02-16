@@ -29,7 +29,7 @@ func (g *GetAvailableSlot) GetAvailableSlotImpl() (*string, []*pb.BookingSlot, *
 
 	var slots []*pb.BookingSlot
 	if err := orm.DbInstance(g.c).Raw(fmt.Sprintf("SELECT * FROM %v.%v WHERE date = '%v'", orm.AFFILIATE_MANAGER_DB, orm.BOOKING_SLOTS_TABLE, date)).Scan(&slots).Error; err != nil {
-		log.Error(err.Error)
+		log.Error(err)
 		return proto.String(date), nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 	}
 	return proto.String(date), slots, nil
