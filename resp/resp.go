@@ -136,3 +136,13 @@ func GetReferralByIdResponseJSON(c echo.Context, details *pb.ReferralDetails) er
 		ReferralDetails: details,
 	})
 }
+
+func TrackClickResponseJSON(c echo.Context, id *int64) error {
+	return c.JSON(http.StatusOK, pb.TrackClickResponse{
+		ResponseMeta: &pb.ResponseMeta{
+			ErrorCode: proto.Int64(int64(pb.GlobalErrorCode_SUCCESS)),
+			ErrorMsg:  proto.String("success"),
+		},
+		ReferralId: id,
+	})
+}

@@ -187,3 +187,11 @@ func GetReferralBookingDetailsQuery() string {
 	}
 	return string(query)
 }
+
+func GetAffiliateByCodeQuery() string {
+	query, err := os.ReadFile(openSql("sql23.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}

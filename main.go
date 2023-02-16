@@ -30,12 +30,9 @@ func main() {
 	}))
 
 	//Affiliate
-	e.POST("api/v1/affiliate/list", cmd.GetAffiliateList) //DONE
-	//returns details of this affiliate
-	e.GET("api/v1/affiliate/:id", cmd.GetAffiliateDetailsById)
-	//get affiliate id from token
+	e.POST("api/v1/affiliate/list", cmd.GetAffiliateList)      //DONE
+	e.GET("api/v1/affiliate/:id", cmd.GetAffiliateDetailsById) //DONE, not tested
 	e.POST("api/v1/affiliate/info", cmd.GetAffiliateInfo)
-	//get affiliate id from token
 	e.POST("api/v1/affiliate/stats", cmd.GetAffiliateStats)             //DONE
 	e.POST("api/v1/affiliate/trend", cmd.GetAffiliateTrend)             //DONE
 	e.GET("api/v1/affiliate/ranking/list", cmd.GetAffiliateRankingList) //DONE
@@ -46,7 +43,7 @@ func main() {
 	e.POST("api/v1/referral/stats", cmd.GetReferralStats)            //DONE
 	e.POST("api/v1/referral/trend", cmd.GetReferralTrend)            //DONE
 	e.POST("api/v1/referral/recent/list", cmd.GetReferralRecentList) //DONE
-	e.GET("api/v1/referral/:id", cmd.GetReferralById)
+	e.GET("api/v1/referral/:id", cmd.GetReferralById)                //DONE, not tested
 
 	//Booking
 	e.POST("api/v1/booking/list", cmd.GetBookingList) //DONE
@@ -65,6 +62,8 @@ func main() {
 	//Registration
 	e.POST("api/v1/platform/register", cmd.GetAvailableSlot)
 	e.POST("api/v1/platform/login", cmd.GetAvailableSlot)
+
+	e.POST("api/v1/tracking/click", cmd.TrackClick) //DONE, not tested
 
 	e.Logger.Fatal(e.Start(":8888"))
 }

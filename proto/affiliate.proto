@@ -441,3 +441,8 @@ message GetBookingListResponse{
   optional int64 start_time = 3;
   optional int64 end_time = 4;
 }
+
+message TrackClickResponse{
+  optional ResponseMeta response_meta = 1;
+  optional int64 referral_id = 2;
+}

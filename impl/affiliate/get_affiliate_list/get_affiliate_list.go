@@ -2,15 +2,12 @@ package get_affiliate_list
 
 import (
 	"database/sql"
-	"encoding/json"
 	"github.com/aaronangxz/AffiliateManager/orm"
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
 	"github.com/aaronangxz/AffiliateManager/resp"
 	"github.com/aaronangxz/AffiliateManager/utils"
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/gommon/log"
 	"google.golang.org/protobuf/proto"
-	"time"
 )
 
 type GetAffiliateList struct {
@@ -32,29 +29,30 @@ func (g *GetAffiliateList) GetAffiliateListImpl() ([]*pb.AffiliateMeta, *int64, 
 	}
 	start, end, _, _ := utils.GetStartEndTimeFromTimeSelector(g.req.GetTimeSelector())
 
-	if val, err := orm.GET(g.c, g.key); err != nil {
-		return nil, nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_REDIS)
-	} else if val != nil {
-		var redisResp []*pb.AffiliateMeta
-		jsonErr := json.Unmarshal(val, &redisResp)
-		if jsonErr != nil {
-			log.Warnf("GetAffiliateList | Fail to unmarshal Redis value of key %v : %v, reading from API", g.key, jsonErr)
-		} else {
-			log.Infof("GetAffiliateList | Successful | Cached %v", g.key)
-			return redisResp, proto.Int64(start), proto.Int64(end), nil
-		}
-	}
+	//TODO Cache time slot specific
+	//if val, err := orm.GET(g.c, g.key); err != nil {
+	//	return nil, nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_REDIS)
+	//} else if val != nil {
+	//	var redisResp []*pb.AffiliateMeta
+	//	jsonErr := json.Unmarshal(val, &redisResp)
+	//	if jsonErr != nil {
+	//		log.Warnf("GetAffiliateList | Fail to unmarshal Redis value of key %v : %v, reading from API", g.key, jsonErr)
+	//	} else {
+	//		log.Infof("GetAffiliateList | Successful | Cached %v", g.key)
+	//		return redisResp, proto.Int64(start), proto.Int64(end), nil
+	//	}
+	//}
 
 	var l []*pb.AffiliateMeta
 	if err := orm.DbInstance(g.c).Raw(orm.GetAffiliateListQuery(), sql.Named("startTime", start), sql.Named("endTime", end)).Scan(&l).Error; err != nil {
 		return nil, nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 	}
 
-	if err := orm.SET(g.c, g.key, l, time.Hour); err != nil {
-		log.Errorf("GetAffiliateList | Error while writing to redis: %v", err.Error())
-		return nil, nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_REDIS)
-	}
-	log.Infof("GetAffiliateList | Successful | Written %v to redis", g.key)
+	//if err := orm.SET(g.c, g.key, l, time.Hour); err != nil {
+	//	log.Errorf("GetAffiliateList | Error while writing to redis: %v", err.Error())
+	//	return nil, nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_REDIS)
+	//}
+	//log.Infof("GetAffiliateList | Successful | Written %v to redis", g.key)
 	return l, proto.Int64(start), proto.Int64(end), nil
 }
 
