@@ -63,7 +63,8 @@ func main() {
 	e.POST("api/v1/platform/register", cmd.GetAvailableSlot)
 	e.POST("api/v1/platform/login", cmd.GetAvailableSlot)
 
-	e.POST("api/v1/tracking/click", cmd.TrackClick) //DONE, not tested
+	e.POST("api/v1/tracking/click", cmd.TrackClick)    //DONE, not tested
+	e.POST("api/v1/tracking/checkout", cmd.TrackClick) //DONE, not tested
 
 	e.Logger.Fatal(e.Start(":8888"))
 }
