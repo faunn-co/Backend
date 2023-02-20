@@ -30,9 +30,9 @@ func main() {
 	}))
 
 	//Affiliate
-	e.POST("api/v1/affiliate/list", cmd.GetAffiliateList)      //DONE
-	e.GET("api/v1/affiliate/:id", cmd.GetAffiliateDetailsById) //DONE, not tested
-	e.POST("api/v1/affiliate/info", cmd.GetAffiliateInfo)
+	e.POST("api/v1/affiliate/list", cmd.GetAffiliateList)               //DONE
+	e.GET("api/v1/affiliate/:id", cmd.GetAffiliateDetailsById)          //DONE, not tested
+	e.GET("api/v1/affiliate/info", cmd.GetAffiliateInfo)                //DONE, not tested
 	e.POST("api/v1/affiliate/stats", cmd.GetAffiliateStats)             //DONE
 	e.POST("api/v1/affiliate/trend", cmd.GetAffiliateTrend)             //DONE
 	e.GET("api/v1/affiliate/ranking/list", cmd.GetAffiliateRankingList) //DONE
@@ -63,8 +63,8 @@ func main() {
 	e.POST("api/v1/platform/register", cmd.GetAvailableSlot)
 	e.POST("api/v1/platform/login", cmd.GetAvailableSlot)
 
-	e.POST("api/v1/tracking/click", cmd.TrackClick)    //DONE, not tested
-	e.POST("api/v1/tracking/checkout", cmd.TrackClick) //DONE, not tested
+	e.POST("api/v1/tracking/click", cmd.TrackClick) //DONE, not tested
+	e.POST("api/v1/tracking/checkout", cmd.TrackClick)
 
 	e.Logger.Fatal(e.Start(":8888"))
 }

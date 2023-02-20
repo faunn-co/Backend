@@ -446,3 +446,8 @@ message TrackClickResponse{
   optional ResponseMeta response_meta = 1;
   optional int64 referral_id = 2;
 }
+
+message GetAffiliateInfoResponse{
+  optional ResponseMeta response_meta = 1;
+  optional AffiliateMeta affiliate_meta = 2;
+}

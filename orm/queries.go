@@ -195,3 +195,11 @@ func GetAffiliateByCodeQuery() string {
 	}
 	return string(query)
 }
+
+func GetAffiliateInfoQuery() string {
+	query, err := os.ReadFile(openSql("sql24.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}
