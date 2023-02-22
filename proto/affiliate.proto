@@ -10,6 +10,7 @@ enum GlobalErrorCode{
   ERROR_DATABASE =1003;
   ERROR_JSON_UNMARSHAL =1004;
   ERROR_REDIS =1005;
+  ERROR_USER_NOT_FOUND =1006;
 }
 
 enum UserRole{

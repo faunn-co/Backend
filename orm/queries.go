@@ -203,3 +203,11 @@ func GetAffiliateInfoQuery() string {
 	}
 	return string(query)
 }
+
+func GetUserInfoQuery() string {
+	query, err := os.ReadFile(openSql("sql25.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}

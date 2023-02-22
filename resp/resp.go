@@ -146,3 +146,13 @@ func TrackClickResponseJSON(c echo.Context, id *int64) error {
 		ReferralId: id,
 	})
 }
+
+func GetAffiliateInfoResponseJSON(c echo.Context, meta *pb.AffiliateMeta) error {
+	return c.JSON(http.StatusOK, pb.GetAffiliateInfoResponse{
+		ResponseMeta: &pb.ResponseMeta{
+			ErrorCode: proto.Int64(int64(pb.GlobalErrorCode_SUCCESS)),
+			ErrorMsg:  proto.String("success"),
+		},
+		AffiliateMeta: meta,
+	})
+}
