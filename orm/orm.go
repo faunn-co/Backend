@@ -34,17 +34,17 @@ type SQLConnection struct {
 
 var sqlConnections = map[string]SQLConnection{
 	AFFILIATE_MANAGER_DB: {
-		IP:           "127.0.0.1",
-		Port:         "3306",
-		Username:     "root",
-		Password:     "Xuanze94",
+		IP:           os.Getenv("PROD_DB_HOST"),
+		Port:         os.Getenv("PROD_DB_PORT"),
+		Username:     os.Getenv("PROD_DB_USERNAME"),
+		Password:     os.Getenv("PROD_DB_PASS"),
 		DatabaseName: AFFILIATE_MANAGER_DB,
 	},
 	AFFILIATE_MANAGER_TEST_DB: {
-		IP:           "127.0.0.1",
-		Port:         "3306",
-		Username:     "root",
-		Password:     "Xuanze94",
+		IP:           os.Getenv("TEST_DB_HOST"),
+		Port:         os.Getenv("TEST_DB_PORT"),
+		Username:     os.Getenv("TEST_DB_USERNAME"),
+		Password:     os.Getenv("TEST_DB_PASS"),
 		DatabaseName: AFFILIATE_MANAGER_TEST_DB,
 	},
 }
