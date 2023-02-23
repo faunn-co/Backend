@@ -29,6 +29,10 @@ func main() {
 		AllowMethods: []string{http.MethodGet, http.MethodHead, http.MethodPut, http.MethodPatch, http.MethodPost, http.MethodDelete},
 	}))
 
+	e.GET("/", func(c echo.Context) error {
+		return c.String(http.StatusOK, "Hello, World!")
+	})
+
 	//Affiliate
 	e.POST("api/v1/affiliate/list", cmd.GetAffiliateList)               //DONE
 	e.GET("api/v1/affiliate/:id", cmd.GetAffiliateDetailsById)          //DONE, not tested
