@@ -3,7 +3,7 @@ SELECT
     referral_click_time,
     referral_status
 FROM
-    affiliate_manager_db.referral_table
+    referral_table
 WHERE
         affiliate_id = ?
   AND referral_click_time > ?

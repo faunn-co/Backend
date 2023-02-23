@@ -5,6 +5,7 @@ import (
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/gommon/log"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -67,10 +68,12 @@ func DbInstance(ctx echo.Context) *gorm.DB {
 		switch ENV {
 		case "PROD":
 			if err := ConnectMySQL(ctx, AFFILIATE_MANAGER_DB); err != nil {
+				log.Error(err)
 			}
 			break
 		case "TEST":
 			if err := ConnectMySQL(ctx, AFFILIATE_MANAGER_TEST_DB); err != nil {
+				log.Error(err)
 			}
 			break
 		}

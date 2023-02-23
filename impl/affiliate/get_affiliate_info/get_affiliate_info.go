@@ -20,8 +20,8 @@ func New(c echo.Context) *GetAffiliateInfo {
 
 func (g *GetAffiliateInfo) GetAffiliateInfoImpl() (*pb.AffiliateMeta, *resp.Error) {
 	id := g.c.Param("id")
-	if _, err := user_verification.New(g.c).VerifyUserId(id); err != nil {
-		return nil, err
+	if err := user_verification.New(g.c).VerifyUserId(id); err != nil {
+		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_USER_NOT_FOUND)
 	}
 
 	var a *pb.AffiliateMeta

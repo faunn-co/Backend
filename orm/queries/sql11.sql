@@ -16,15 +16,15 @@ SELECT
         SELECT
             COUNT(r.referral_id) AS total_clicks
         FROM
-            affiliate_manager_db.referral_table r
+            referral_table r
         WHERE
                 r.affiliate_id = @id
           AND r.referral_click_time >= @startTime
           AND r.referral_click_time <= @endTime
     ) AS total_clicks
 FROM
-    affiliate_manager_db.referral_table r
-        LEFT JOIN affiliate_manager_db.booking_details_table b ON r.booking_id = b.booking_id
+    referral_table r
+        LEFT JOIN booking_details_table b ON r.booking_id = b.booking_id
 WHERE
         r.referral_status = 0
   AND r.affiliate_id = @id

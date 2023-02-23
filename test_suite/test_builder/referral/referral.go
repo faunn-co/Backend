@@ -18,6 +18,8 @@ type Referral struct {
 	Booking    *booking.Booking
 }
 
+// New Initializes a new Referral struct with all the required information to have a proper referral record
+// This includes creating a new affiliate, booking and referral click.
 func New() *Referral {
 	r := new(Referral)
 	orm.ENV = "TEST"

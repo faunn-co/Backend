@@ -3,9 +3,9 @@ SELECT
     u.user_name as affiliate_name,
     COUNT(referral_id) AS total_referrals
 FROM
-    affiliate_manager_db.referral_table r,
-    affiliate_manager_db.affiliate_details_table a,
-    affiliate_manager_db.user_table u
+    referral_table r,
+    affiliate_details_table a,
+    user_table u
 WHERE
         r.referral_status = 0
   AND r.affiliate_id = a.user_id

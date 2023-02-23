@@ -2,11 +2,13 @@ package get_referrals_list
 
 import (
 	"fmt"
+	"github.com/aaronangxz/AffiliateManager/impl/verification/user_verification"
 	"github.com/aaronangxz/AffiliateManager/orm"
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
 	"github.com/aaronangxz/AffiliateManager/resp"
 	"github.com/aaronangxz/AffiliateManager/utils"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/gommon/log"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -34,7 +36,7 @@ func (g *GetReferralList) GetReferralListImpl() ([]*pb.ReferralBasic, *int64, *i
 		}
 	} else {
 		if g.req.AffiliateName != nil && g.req.GetAffiliateName() != "" {
-			if err := orm.DbInstance(g.c).Debug().Raw(orm.GetAffiliateReferralListWithNameQuery(), start, end, fmt.Sprintf("%%%v%%", g.req.GetAffiliateName())).Scan(&l).Error; err != nil {
+			if err := orm.DbInstance(g.c).Raw(orm.GetAffiliateReferralListWithNameQuery(), start, end, fmt.Sprintf("%%%v%%", g.req.GetAffiliateName())).Scan(&l).Error; err != nil {
 				return nil, nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 			}
 		} else {
@@ -43,12 +45,16 @@ func (g *GetReferralList) GetReferralListImpl() ([]*pb.ReferralBasic, *int64, *i
 			}
 		}
 	}
+	log.Print(l)
 	return l, proto.Int64(start), proto.Int64(end), nil
 }
 
 func (g *GetReferralList) verifyGetReferralList() error {
 	g.req = new(pb.GetReferralListRequest)
 	if err := g.c.Bind(g.req); err != nil {
+		return err
+	}
+	if err := user_verification.New(g.c).VerifyUserId(g.req.GetAffiliateId()); err != nil {
 		return err
 	}
 	if err := utils.VerifyTimeSelectorFields(g.req.TimeSelector); err != nil {

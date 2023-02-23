@@ -16,11 +16,11 @@ SELECT
         ) AS tourist_ticket_total,
     COUNT(r.referral_id) AS total_affiliate_bookings
 FROM
-    affiliate_manager_db.date_ref_table d
-        LEFT JOIN affiliate_manager_db.referral_table r ON d.date_string = DATE(
+    date_ref_table d
+        LEFT JOIN referral_table r ON d.date_string = DATE(
             FROM_UNIXTIME(r.booking_time)
         )
-        LEFT JOIN affiliate_manager_db.booking_details_table b ON r.booking_id = b.booking_id
+        LEFT JOIN booking_details_table b ON r.booking_id = b.booking_id
 WHERE
     d.date_string BETWEEN ?
         AND ?

@@ -4,7 +4,7 @@ SELECT
     referral_commission,
     booking_id AS booking_ref_id
 FROM
-    affiliate_manager_db.referral_table
+    referral_table
 WHERE
         affiliate_id = ?
   AND booking_time > ?

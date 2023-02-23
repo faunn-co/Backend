@@ -11,7 +11,7 @@ SELECT
                 citizen_ticket_total + tourist_ticket_total
         ) AS ticket_total
 FROM
-    affiliate_manager_db.booking_details_table
+    booking_details_table
 WHERE
         transaction_time > ?
   AND transaction_time <= ?
