@@ -18,7 +18,7 @@ availableSecrets:
   secretManager:
     - versionName: projects/561774637169/secrets/PROD_DB_HOST/versions/latest
       env: 'PROD_DB_HOST'
-    - versionName: projects/561774637169/secrets/PROD_DB_PASS/versions/latest
+    - versionName: projects/561774637169/secrets/PROD_DB_PORT/versions/latest
       env: 'PROD_DB_PORT'
     - versionName: projects/561774637169/secrets/PROD_DB_USERNAME/versions/latest
       env: 'PROD_DB_USERNAME'
