@@ -1,7 +1,6 @@
 package orm
 
 import (
-	"errors"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
@@ -25,31 +24,6 @@ const (
 	BOOKING_SLOTS_TABLE       = "booking_slots_table"
 )
 
-type SQLConnection struct {
-	IP           string
-	Port         string
-	Username     string
-	Password     string
-	DatabaseName string
-}
-
-var sqlConnections = map[string]SQLConnection{
-	AFFILIATE_MANAGER_DB: {
-		IP:           os.Getenv("PROD_DB_HOST"),
-		Port:         os.Getenv("PROD_DB_PORT"),
-		Username:     os.Getenv("PROD_DB_USERNAME"),
-		Password:     os.Getenv("PROD_DB_PASS"),
-		DatabaseName: AFFILIATE_MANAGER_DB,
-	},
-	AFFILIATE_MANAGER_TEST_DB: {
-		IP:           os.Getenv("TEST_DB_HOST"),
-		Port:         os.Getenv("TEST_DB_PORT"),
-		Username:     os.Getenv("TEST_DB_USERNAME"),
-		Password:     os.Getenv("TEST_DB_PASS"),
-		DatabaseName: AFFILIATE_MANAGER_TEST_DB,
-	},
-}
-
 var (
 	db        *gorm.DB
 	newLogger = logger.New(
@@ -61,19 +35,42 @@ var (
 			Colorful:                  true,        // Disable color
 		},
 	)
-	ENV = "PROD"
+	ENV         = "PROD"
+	DB_HOST     = ""
+	DB_PORT     = ""
+	DB_USERNAME = ""
+	DB_PASS     = ""
+	DB_NAME     = ""
 )
 
 func DbInstance(ctx echo.Context) *gorm.DB {
+	curDir, wdErr := os.Getwd()
+	if wdErr != nil {
+		log.Fatal(wdErr)
+	}
+	err := godotenv.Load(curDir + "/.env")
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 	if db == nil {
 		switch ENV {
 		case "PROD":
-			if err := ConnectMySQL(ctx, AFFILIATE_MANAGER_DB); err != nil {
+			DB_HOST = os.Getenv("PROD_DB_HOST")
+			DB_PORT = os.Getenv("PROD_DB_PORT")
+			DB_USERNAME = os.Getenv("PROD_DB_USERNAME")
+			DB_PASS = os.Getenv("PROD_DB_PASS")
+			DB_NAME = AFFILIATE_MANAGER_DB
+			if err := ConnectMySQL(ctx); err != nil {
 				log.Error(err)
 			}
 			break
 		case "TEST":
-			if err := ConnectMySQL(ctx, AFFILIATE_MANAGER_TEST_DB); err != nil {
+			DB_HOST = os.Getenv("TEST_DB_HOST")
+			DB_PORT = os.Getenv("TEST_DB_PORT")
+			DB_USERNAME = os.Getenv("TEST_DB_USERNAME")
+			DB_PASS = os.Getenv("TEST_DB_PASS")
+			DB_NAME = AFFILIATE_MANAGER_TEST_DB
+			if err := ConnectMySQL(ctx); err != nil {
 				log.Error(err)
 			}
 			break
@@ -82,18 +79,8 @@ func DbInstance(ctx echo.Context) *gorm.DB {
 	return db
 }
 
-func ConnectMySQL(ctx echo.Context, dbName string) error {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
-	var table SQLConnection
-	var exists bool
-	if table, exists = sqlConnections[dbName]; !exists {
-		return errors.New(fmt.Sprintf("db not supported | %v", table))
-	}
-	URL := fmt.Sprintf("%v:%v@tcp(%v:%v)/%v", table.Username, table.Password, table.IP, table.Port, table.DatabaseName)
-
+func ConnectMySQL(ctx echo.Context) error {
+	URL := fmt.Sprintf("%v:%v@tcp(%v:%v)/%v", DB_USERNAME, DB_PASS, DB_HOST, DB_PORT, DB_NAME)
 	openDb, err := gorm.Open(mysql.Open(URL), &gorm.Config{
 		Logger: newLogger,
 	})
@@ -103,6 +90,5 @@ func ConnectMySQL(ctx echo.Context, dbName string) error {
 	}
 
 	db = openDb
-
 	return nil
 }
