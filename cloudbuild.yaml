@@ -2,6 +2,7 @@ steps:
   - name: golang:1.19
     entrypoint: /bin/bash
     args: ["build.sh"]
+    secretEnv: [ 'PROD_DB_HOST', 'PROD_DB_PORT','PROD_DB_USERNAME','PROD_DB_PASS','TEST_DB_HOST','TEST_DB_PORT','TEST_DB_USERNAME','TEST_DB_PASS' ]
     env:
       - 'PROD_DB_HOST=${_PROD_DB_HOST}'
       - 'PROD_DB_PORT=${_PROD_DB_PORT}'
@@ -11,5 +12,23 @@ steps:
       - 'TEST_DB_PORT=${_TEST_DB_PORT}'
       - 'TEST_DB_USERNAME=${_TEST_DB_USERNAME}'
       - 'TEST_DB_PASS=${_TEST_DB_PASS}'
+    availableSecrets:
+      secretManager:
+        - versionName: projects/561774637169/secrets/affiliate_manager_secrets/versions/latest
+          env: 'PROD_DB_HOST'
+        - versionName: projects/561774637169/secrets/affiliate_manager_secrets/versions/latest
+          env: 'PROD_DB_PORT'
+        - versionName: projects/561774637169/secrets/affiliate_manager_secrets/versions/latest
+          env: 'PROD_DB_USERNAME'
+        - versionName: projects/561774637169/secrets/affiliate_manager_secrets/versions/latest
+          env: 'PROD_DB_PASS'
+        - versionName: projects/561774637169/secrets/affiliate_manager_secrets/versions/latest
+          env: 'TEST_DB_HOST'
+        - versionName: projects/561774637169/secrets/affiliate_manager_secrets/versions/latest
+          env: 'TEST_DB_PORT'
+        - versionName: projects/561774637169/secrets/affiliate_manager_secrets/versions/latest
+          env: 'TEST_DB_USERNAME'
+        - versionName: projects/561774637169/secrets/affiliate_manager_secrets/versions/latest
+          env: 'TEST_DB_PASS'
   - name: "gcr.io/cloud-builders/gcloud"
     args: [ "app", "deploy" ]
