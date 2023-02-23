@@ -3,20 +3,14 @@ package main
 import (
 	"fmt"
 	"github.com/aaronangxz/AffiliateManager/cmd"
-	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"go.uber.org/zap"
-	"log"
 	"net/http"
 	"os"
 )
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
 	e := echo.New()
 	logger, _ := zap.NewProduction()
 	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{

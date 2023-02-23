@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
 	"gorm.io/driver/mysql"
@@ -82,6 +83,10 @@ func DbInstance(ctx echo.Context) *gorm.DB {
 }
 
 func ConnectMySQL(ctx echo.Context, dbName string) error {
+	err := godotenv.Load()
+	if err != nil {
+		log.Fatal("Error loading .env file")
+	}
 	var table SQLConnection
 	var exists bool
 	if table, exists = sqlConnections[dbName]; !exists {
