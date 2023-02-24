@@ -49,20 +49,19 @@ func getEnvDir() string {
 	case "PROD":
 		curDir, wdErr := os.Getwd()
 		if wdErr != nil {
-			log.Fatal(wdErr)
+			log.Error(wdErr)
 		}
 		return curDir + "/.env"
 	case "TEST":
-		return ""
+		return root.Root + "/.env"
 	}
 	return ""
 }
 
 func DbInstance(ctx echo.Context) *gorm.DB {
 	if db == nil {
-		log.Infof("reading env from %v", root.Root+"/.env")
-		err := godotenv.Load(root.Root + "/.env")
-		if err != nil && ENV != "LOCAL" {
+		err := godotenv.Load(getEnvDir())
+		if err != nil {
 			log.Error("Error loading .env file")
 		}
 		switch ENV {
