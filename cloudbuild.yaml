@@ -11,5 +11,7 @@ steps:
       - 'TEST_DB_PORT=${_TEST_DB_PORT}'
       - 'TEST_DB_USERNAME=${_TEST_DB_USERNAME}'
       - 'TEST_DB_PASS=${_TEST_DB_PASS}'
+      - 'REDIS_HOST=${_REDIS_HOST}'
+      - 'REDIS_PASS=${_REDIS_PASS}'
   - name: "gcr.io/cloud-builders/gcloud"
     args: [ "app", "deploy" ]

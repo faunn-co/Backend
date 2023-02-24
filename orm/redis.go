@@ -6,6 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
 	"github.com/redis/go-redis/v9"
+	"os"
 	"time"
 )
 
@@ -15,9 +16,9 @@ var (
 
 func ConnectRedis() {
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     "localhost:6379",
-		Password: "", // no password set
-		DB:       0,  // use default DB
+		Addr:     os.Getenv("REDIS_HOST"),
+		Password: os.Getenv("REDIS_PASS"),
+		DB:       0,
 	})
 
 	if err := rdb.Ping(context.Background()).Err(); err != nil {
