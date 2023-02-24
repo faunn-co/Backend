@@ -22,9 +22,9 @@ type Referral struct {
 // This includes creating a new affiliate, booking and referral click.
 func New() *Referral {
 	r := new(Referral)
-	orm.ENV = "TEST"
 	r.ReferralDb = new(pb.ReferralDb)
 	r.HasBooking = false
+	orm.ENV = "TEST"
 	return r
 }
 

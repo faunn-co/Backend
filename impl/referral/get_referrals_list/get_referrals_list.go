@@ -8,7 +8,6 @@ import (
 	"github.com/aaronangxz/AffiliateManager/resp"
 	"github.com/aaronangxz/AffiliateManager/utils"
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/gommon/log"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -45,7 +44,6 @@ func (g *GetReferralList) GetReferralListImpl() ([]*pb.ReferralBasic, *int64, *i
 			}
 		}
 	}
-	log.Print(l)
 	return l, proto.Int64(start), proto.Int64(end), nil
 }
 

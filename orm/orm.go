@@ -2,6 +2,7 @@ package orm
 
 import (
 	"fmt"
+	"github.com/aaronangxz/AffiliateManager/root"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
@@ -43,16 +44,26 @@ var (
 	DB_NAME     = ""
 )
 
+func getEnvDir() string {
+	switch ENV {
+	case "PROD":
+		curDir, wdErr := os.Getwd()
+		if wdErr != nil {
+			log.Fatal(wdErr)
+		}
+		return curDir + "/.env"
+	case "TEST":
+		return ""
+	}
+	return ""
+}
+
 func DbInstance(ctx echo.Context) *gorm.DB {
-	curDir, wdErr := os.Getwd()
-	if wdErr != nil {
-		log.Fatal(wdErr)
-	}
-	err := godotenv.Load(curDir + "/.env")
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
 	if db == nil {
+		err := godotenv.Load(root.Root + "/.env")
+		if err != nil && ENV != "LOCAL" {
+			log.Error("Error loading .env file")
+		}
 		switch ENV {
 		case "PROD":
 			DB_HOST = os.Getenv("PROD_DB_HOST")
@@ -60,9 +71,7 @@ func DbInstance(ctx echo.Context) *gorm.DB {
 			DB_USERNAME = os.Getenv("PROD_DB_USERNAME")
 			DB_PASS = os.Getenv("PROD_DB_PASS")
 			DB_NAME = AFFILIATE_MANAGER_DB
-			if err := ConnectMySQL(ctx); err != nil {
-				log.Error(err)
-			}
+			log.Printf("Connecting to PROD DB")
 			break
 		case "TEST":
 			DB_HOST = os.Getenv("TEST_DB_HOST")
@@ -70,10 +79,18 @@ func DbInstance(ctx echo.Context) *gorm.DB {
 			DB_USERNAME = os.Getenv("TEST_DB_USERNAME")
 			DB_PASS = os.Getenv("TEST_DB_PASS")
 			DB_NAME = AFFILIATE_MANAGER_TEST_DB
-			if err := ConnectMySQL(ctx); err != nil {
-				log.Error(err)
-			}
+			log.Printf("Connecting to TEST DB")
 			break
+		case "LOCAL":
+			DB_HOST = "127.0.0.1"
+			DB_PORT = "3306"
+			DB_USERNAME = "root"
+			DB_PASS = "Xuanze94"
+			DB_NAME = AFFILIATE_MANAGER_TEST_DB
+			break
+		}
+		if err := ConnectMySQL(ctx); err != nil {
+			log.Error(err)
 		}
 	}
 	return db

@@ -17,8 +17,8 @@ type Booking struct {
 
 func New() *Booking {
 	b := new(Booking)
-	orm.ENV = "TEST"
 	b.BookingDetails = new(pb.BookingDetails)
+	orm.ENV = "TEST"
 	return b
 }
 

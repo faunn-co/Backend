@@ -16,9 +16,9 @@ type User struct {
 
 func New() *User {
 	u := new(User)
-	orm.ENV = "TEST"
 	u.UserInfo = new(pb.User)
 	u.AffiliateInfo = new(pb.AffiliateDetailsDb)
+	orm.ENV = "TEST"
 	return u
 }
 
