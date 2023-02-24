@@ -60,6 +60,7 @@ func getEnvDir() string {
 
 func DbInstance(ctx echo.Context) *gorm.DB {
 	if db == nil {
+		log.Infof("reading env from %v", root.Root+"/.env")
 		err := godotenv.Load(root.Root + "/.env")
 		if err != nil && ENV != "LOCAL" {
 			log.Error("Error loading .env file")
