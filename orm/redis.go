@@ -21,7 +21,7 @@ func ConnectRedis() {
 	})
 
 	if err := rdb.Ping(context.Background()).Err(); err != nil {
-		log.Error("Error while establishing Live Redis client: %v", err)
+		log.Errorf("Error while establishing Live Redis client: %v", err.Error())
 	}
 	cache = rdb
 }
