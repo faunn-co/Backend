@@ -80,7 +80,7 @@ func DbInstance(ctx context.Context) *gorm.DB {
 			DB_USERNAME = os.Getenv("TEST_DB_USERNAME")
 			DB_PASS = os.Getenv("TEST_DB_PASS")
 			DB_NAME = AFFILIATE_MANAGER_TEST_DB
-			logger.Info(ctx, "Connecting to TEST DB")
+			//logger.Info(ctx, "Connecting to TEST DB")
 			break
 		case "LOCAL":
 			DB_HOST = "127.0.0.1"

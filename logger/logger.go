@@ -40,6 +40,9 @@ func WithRqID(ctx context.Context, rqID string) context.Context {
 
 // Logger returns a zap logger with as much context as possible
 func Logger(ctx context.Context) *zap.Logger {
+	if log == nil {
+		InitializeLogger()
+	}
 	newLogger := log
 	if ctx != nil {
 		if ctxRqID, ok := ctx.Value(requestIDKey).(string); ok {
