@@ -1,7 +1,9 @@
 package get_referral_trend
 
 import (
+	"context"
 	"database/sql"
+	"github.com/aaronangxz/AffiliateManager/logger"
 	"github.com/aaronangxz/AffiliateManager/orm"
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
 	"github.com/aaronangxz/AffiliateManager/resp"
@@ -12,12 +14,15 @@ import (
 
 type GetReferralTrend struct {
 	c   echo.Context
+	ctx context.Context
 	req *pb.GetReferralTrendRequest
 }
 
 func New(c echo.Context) *GetReferralTrend {
 	g := new(GetReferralTrend)
 	g.c = c
+	g.ctx = logger.NewCtx(g.c)
+	logger.Info(g.ctx, "GetReferralTrend Initialized")
 	return g
 }
 
@@ -28,7 +33,7 @@ func (g *GetReferralTrend) GetReferralTrendImpl() ([]*pb.ReferralCoreTimedStats,
 
 	var s []*pb.ReferralCoreTimedStats
 	start, end := utils.GetStartEndTimeStampFromTimeSelector(g.req.GetTimeSelector())
-	if err := orm.DbInstance(g.c).Raw(orm.GetReferralTrendQuery(), sql.Named("id", g.req.GetAffiliateId()), sql.Named("startTime", start), sql.Named("endTime", end)).Scan(&s).Error; err != nil {
+	if err := orm.DbInstance(g.ctx).Raw(orm.GetReferralTrendQuery(), sql.Named("id", g.req.GetAffiliateId()), sql.Named("startTime", start), sql.Named("endTime", end)).Scan(&s).Error; err != nil {
 		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 	}
 	//TODO Too expensive, to optimize
@@ -37,7 +42,7 @@ func (g *GetReferralTrend) GetReferralTrendImpl() ([]*pb.ReferralCoreTimedStats,
 			TotalClicks *int64 `json:"total_clicks,omitempty"`
 		}
 		var c click
-		if err := orm.DbInstance(g.c).Raw(orm.GetReferralTrendClicksQuery(), sql.Named("id", g.req.GetAffiliateId()), sql.Named("startTime", trend.DateString), sql.Named("endTime", trend.DateString)).Scan(&c).Error; err != nil {
+		if err := orm.DbInstance(g.ctx).Raw(orm.GetReferralTrendClicksQuery(), sql.Named("id", g.req.GetAffiliateId()), sql.Named("startTime", trend.DateString), sql.Named("endTime", trend.DateString)).Scan(&c).Error; err != nil {
 			return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 		}
 		trend.TotalClicks = c.TotalClicks

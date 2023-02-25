@@ -1,36 +1,27 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"github.com/aaronangxz/AffiliateManager/cmd"
+	"github.com/aaronangxz/AffiliateManager/logger"
+	"github.com/aaronangxz/AffiliateManager/orm"
+	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	"go.uber.org/zap"
 	"net/http"
 	"os"
 )
 
 func main() {
+	logger.InitializeLogger()
+	loadEnv()
 	e := echo.New()
-	logger, _ := zap.NewProduction()
-	e.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
-		LogURI:    true,
-		LogStatus: true,
-		LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
-			logger.Info("request",
-				zap.String("ID", v.RequestID),
-				zap.String("URI", v.URI),
-				zap.Int("status", v.Status),
-			)
-			return nil
-		},
-	}))
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
 		AllowMethods: []string{http.MethodGet, http.MethodHead, http.MethodPut, http.MethodPatch, http.MethodPost, http.MethodDelete},
 	}))
-
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
@@ -81,4 +72,15 @@ func getPort() string {
 		return "8888"
 	}
 	return p
+}
+
+func loadEnv() {
+	err := godotenv.Load()
+	if err != nil {
+		logger.Warn(context.Background(), "Error loading .env file")
+	}
+
+	if os.Getenv("ENV") == "LOCAL" {
+		orm.ENV = "LOCAL"
+	}
 }

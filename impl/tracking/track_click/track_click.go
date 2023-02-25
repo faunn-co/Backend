@@ -1,6 +1,8 @@
 package track_click
 
 import (
+	"context"
+	"github.com/aaronangxz/AffiliateManager/logger"
 	"github.com/aaronangxz/AffiliateManager/orm"
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
 	"github.com/aaronangxz/AffiliateManager/resp"
@@ -12,12 +14,15 @@ import (
 )
 
 type TrackClick struct {
-	c echo.Context
+	c   echo.Context
+	ctx context.Context
 }
 
 func New(c echo.Context) *TrackClick {
 	t := new(TrackClick)
 	t.c = c
+	t.ctx = logger.NewCtx(t.c)
+	logger.Info(t.ctx, "TrackClick Initialized")
 	return t
 }
 
@@ -31,7 +36,7 @@ func (t *TrackClick) TrackClickImpl() (*int64, *resp.Error) {
 	}
 
 	var affiliate *pb.AffiliateDetailsDb
-	if err := orm.DbInstance(t.c).Raw(orm.GetAffiliateByCodeQuery(), t.c.QueryParam("ref")).Scan(&affiliate).Error; err != nil {
+	if err := orm.DbInstance(t.ctx).Raw(orm.GetAffiliateByCodeQuery(), t.c.QueryParam("ref")).Scan(&affiliate).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
 			log.Warn("referral code not found")
 		} else {
@@ -53,7 +58,7 @@ func (t *TrackClick) TrackClickImpl() (*int64, *resp.Error) {
 		ReferralStatus:    proto.Int64(int64(pb.ReferralStatus_REFERRAL_STATUS_PENDING)),
 	}
 
-	if err := orm.DbInstance(t.c).Table(orm.REFERRAL_TABLE).Create(&r).Error; err != nil {
+	if err := orm.DbInstance(t.ctx).Table(orm.REFERRAL_TABLE).Create(&r).Error; err != nil {
 		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 	}
 	return r.ReferralId, nil

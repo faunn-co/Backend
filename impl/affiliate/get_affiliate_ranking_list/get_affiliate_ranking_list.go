@@ -1,6 +1,8 @@
 package get_affiliate_ranking_list
 
 import (
+	"context"
+	"github.com/aaronangxz/AffiliateManager/logger"
 	"github.com/aaronangxz/AffiliateManager/orm"
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
 	"github.com/aaronangxz/AffiliateManager/resp"
@@ -10,12 +12,15 @@ import (
 )
 
 type GetAffiliateRankingList struct {
-	c echo.Context
+	c   echo.Context
+	ctx context.Context
 }
 
 func New(c echo.Context) *GetAffiliateRankingList {
 	g := new(GetAffiliateRankingList)
 	g.c = c
+	g.ctx = logger.NewCtx(g.c)
+	logger.Info(g.ctx, "GetAffiliateRankingList Initialized")
 	return g
 }
 
@@ -27,16 +32,16 @@ func (g *GetAffiliateRankingList) GetAffiliateRankingListImpl() (*pb.AffiliateRa
 	)
 
 	start, end, prevStart, prevEnd := utils.GetStartEndTimeFromPeriod(g.c.QueryParam("period"))
-	if err := orm.DbInstance(g.c).Raw(orm.Sql6(), start, end).Scan(&r).Error; err != nil {
+	if err := orm.DbInstance(g.ctx).Raw(orm.Sql6(), start, end).Scan(&r).Error; err != nil {
 		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 	}
-	if err := orm.DbInstance(g.c).Raw(orm.Sql7(), start, end).Scan(&c).Error; err != nil {
+	if err := orm.DbInstance(g.ctx).Raw(orm.Sql7(), start, end).Scan(&c).Error; err != nil {
 		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 	}
 
 	for _, curr := range r {
 		var prev *pb.AffiliateMetaTopReferral
-		if err := orm.DbInstance(g.c).Raw(orm.Sql8(), curr.GetUserId(), prevStart, prevEnd).Scan(&prev).Error; err != nil {
+		if err := orm.DbInstance(g.ctx).Raw(orm.Sql8(), curr.GetUserId(), prevStart, prevEnd).Scan(&prev).Error; err != nil {
 			return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 		}
 		if prev == nil {
@@ -48,7 +53,7 @@ func (g *GetAffiliateRankingList) GetAffiliateRankingListImpl() (*pb.AffiliateRa
 
 	for _, curr := range c {
 		var prev *pb.AffiliateMetaTopCommission
-		if err := orm.DbInstance(g.c).Raw(orm.Sql9(), curr.GetUserId(), prevStart, prevEnd).Scan(&prev).Error; err != nil {
+		if err := orm.DbInstance(g.ctx).Raw(orm.Sql9(), curr.GetUserId(), prevStart, prevEnd).Scan(&prev).Error; err != nil {
 			return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 		}
 		if prev == nil {

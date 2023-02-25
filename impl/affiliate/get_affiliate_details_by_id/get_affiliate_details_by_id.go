@@ -1,8 +1,10 @@
 package get_affiliate_details_by_id
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"github.com/aaronangxz/AffiliateManager/logger"
 	"github.com/aaronangxz/AffiliateManager/orm"
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
 	"github.com/aaronangxz/AffiliateManager/resp"
@@ -10,12 +12,15 @@ import (
 )
 
 type GetAffiliateDetailsById struct {
-	c echo.Context
+	c   echo.Context
+	ctx context.Context
 }
 
 func New(c echo.Context) *GetAffiliateDetailsById {
 	g := new(GetAffiliateDetailsById)
 	g.c = c
+	g.ctx = logger.NewCtx(g.c)
+	logger.Info(g.ctx, "GetAffiliateDetailsById Initialized")
 	return g
 }
 
@@ -33,23 +38,21 @@ func (g *GetAffiliateDetailsById) GetAffiliateDetailsByIdImpl() (*pb.AffiliateMe
 	)
 
 	//get affiliate meta
-	if err := orm.DbInstance(g.c).Raw(orm.Sql2(), id).Scan(&meta).Error; err != nil {
+	if err := orm.DbInstance(g.ctx).Raw(orm.Sql2(), id).Scan(&meta).Error; err != nil {
 		return nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 	}
-	fmt.Println(meta)
 
 	//get ref list
-	if err := orm.DbInstance(g.c).Raw(orm.Sql3(), id).Scan(&refList).Error; err != nil {
+	if err := orm.DbInstance(g.ctx).Raw(orm.Sql3(), id).Scan(&refList).Error; err != nil {
 		return nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 	}
-	fmt.Println(refList)
 
 	//TODO could be a bit redundant, dont need to show in this api call?
 	for _, r := range refList {
 		var bookingDetails *pb.BookingDetails
 		if r.BookingId != nil {
 			var b *pb.BookingDetailsDb
-			if err := orm.DbInstance(g.c).Raw(orm.Sql4(), r.GetBookingId()).Scan(&b).Error; err != nil {
+			if err := orm.DbInstance(g.ctx).Raw(orm.Sql4(), r.GetBookingId()).Scan(&b).Error; err != nil {
 				return nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 			}
 			fmt.Println(b)
@@ -64,8 +67,6 @@ func (g *GetAffiliateDetailsById) GetAffiliateDetailsByIdImpl() (*pb.AffiliateMe
 			ReferralCommission: r.ReferralCommission,
 		})
 	}
-	fmt.Println(finalList)
-
 	return meta, finalList, nil
 }
 

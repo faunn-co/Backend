@@ -11,6 +11,10 @@ enum GlobalErrorCode{
   ERROR_JSON_UNMARSHAL =1004;
   ERROR_REDIS =1005;
   ERROR_USER_NOT_FOUND =1006;
+  ERROR_USER_NAME_EXISTS = 1007;
+  ERROR_USER_EMAIL_EXISTS = 1008;
+  ERROR_ENTITY_NAME_EXISTS = 1009;
+  ERROR_REFERRAL_CODE_EXISTS = 1010;
 }
 
 enum UserRole{
@@ -93,8 +97,9 @@ message User{
 //Direct from affiliate_details_table
 message AffiliateDetailsDb{
   optional int64 user_id = 1;
-  optional int64 affiliate_type = 2;
-  optional string unique_referral_code = 3;
+  optional string entity_name = 2;
+  optional int64 affiliate_type = 3;
+  optional string unique_referral_code = 4;
 }
 
 //Joining user_table, affiliate_details_table and referral_table
@@ -451,4 +456,30 @@ message TrackClickResponse{
 message GetAffiliateInfoResponse{
   optional ResponseMeta response_meta = 1;
   optional AffiliateMeta affiliate_meta = 2;
+}
+
+message UserRegistrationRequest{
+  optional RequestMeta request_meta = 1;
+  optional string entity_name = 2;
+  optional string entity_identifier = 3;
+  optional string user_name = 4;
+  optional string user_email = 5;
+  optional string user_contact = 6;
+  optional int64 affiliate_type = 7;
+  optional string preferred_referral_code = 8;
+}
+
+message UserRegistrationResponse{
+  optional ResponseMeta response_meta = 1;
+}
+
+message UserAuthenticationRequest{
+  optional RequestMeta request_meta = 1;
+  optional string user_name = 2;
+  optional string user_password = 3;
+}
+
+message UserAuthenticationResponse{
+  optional ResponseMeta response_meta = 1;
+  optional string auth_cookie = 2;
 }

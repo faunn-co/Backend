@@ -1,8 +1,10 @@
 package get_available_slot
 
 import (
+	"context"
 	"errors"
 	"fmt"
+	"github.com/aaronangxz/AffiliateManager/logger"
 	"github.com/aaronangxz/AffiliateManager/orm"
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
 	"github.com/aaronangxz/AffiliateManager/resp"
@@ -12,12 +14,16 @@ import (
 )
 
 type GetAvailableSlot struct {
-	c echo.Context
+	c         echo.Context
+	ctx       context.Context
+	requestId string
 }
 
 func New(c echo.Context) *GetAvailableSlot {
 	d := new(GetAvailableSlot)
 	d.c = c
+	d.ctx = logger.NewCtx(d.c)
+	logger.Info(d.ctx, "GetAvailableSlot Initialized")
 	return d
 }
 
@@ -26,9 +32,8 @@ func (g *GetAvailableSlot) GetAvailableSlotImpl() (*string, []*pb.BookingSlot, *
 		return nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_INVALID_PARAMS)
 	}
 	date := g.c.QueryParam("date")
-
 	var slots []*pb.BookingSlot
-	if err := orm.DbInstance(g.c).Raw(fmt.Sprintf("SELECT * FROM %v.%v WHERE date = '%v'", orm.AFFILIATE_MANAGER_DB, orm.BOOKING_SLOTS_TABLE, date)).Scan(&slots).Error; err != nil {
+	if err := orm.DbInstance(g.ctx).Raw(fmt.Sprintf("SELECT * FROM %v.%v WHERE date = '%v'", orm.AFFILIATE_MANAGER_DB, orm.BOOKING_SLOTS_TABLE, date)).Scan(&slots).Error; err != nil {
 		log.Error(err)
 		return proto.String(date), nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 	}

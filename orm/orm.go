@@ -1,15 +1,16 @@
 package orm
 
 import (
+	"context"
 	"fmt"
+	"github.com/aaronangxz/AffiliateManager/logger"
 	"github.com/aaronangxz/AffiliateManager/root"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
-	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
-	"gorm.io/gorm/logger"
+	gormLogger "gorm.io/gorm/logger"
 	defaultLog "log"
 	"os"
 	"time"
@@ -27,13 +28,13 @@ const (
 
 var (
 	db        *gorm.DB
-	newLogger = logger.New(
+	newLogger = gormLogger.New(
 		defaultLog.New(os.Stdout, "\r\n", defaultLog.LstdFlags), // io writer
-		logger.Config{
-			SlowThreshold:             time.Second, // Slow SQL threshold
-			LogLevel:                  logger.Warn, // Log level
-			IgnoreRecordNotFoundError: false,       // Ignore ErrRecordNotFound error for logger
-			Colorful:                  true,        // Disable color
+		gormLogger.Config{
+			SlowThreshold:             time.Second,     // Slow SQL threshold
+			LogLevel:                  gormLogger.Warn, // Log level
+			IgnoreRecordNotFoundError: false,           // Ignore ErrRecordNotFound error for logger
+			Colorful:                  true,            // Disable color
 		},
 	)
 	ENV         = "PROD"
@@ -58,11 +59,11 @@ func getEnvDir() string {
 	return ""
 }
 
-func DbInstance(ctx echo.Context) *gorm.DB {
+func DbInstance(ctx context.Context) *gorm.DB {
 	if db == nil {
 		err := godotenv.Load(getEnvDir())
 		if err != nil {
-			log.Error("Error loading .env file")
+			logger.Warn(ctx, "Error loading .env file")
 		}
 		switch ENV {
 		case "PROD":
@@ -71,7 +72,7 @@ func DbInstance(ctx echo.Context) *gorm.DB {
 			DB_USERNAME = os.Getenv("PROD_DB_USERNAME")
 			DB_PASS = os.Getenv("PROD_DB_PASS")
 			DB_NAME = AFFILIATE_MANAGER_DB
-			log.Printf("Connecting to PROD DB")
+			logger.Info(ctx, "Connecting to PROD DB")
 			break
 		case "TEST":
 			DB_HOST = os.Getenv("TEST_DB_HOST")
@@ -79,7 +80,7 @@ func DbInstance(ctx echo.Context) *gorm.DB {
 			DB_USERNAME = os.Getenv("TEST_DB_USERNAME")
 			DB_PASS = os.Getenv("TEST_DB_PASS")
 			DB_NAME = AFFILIATE_MANAGER_TEST_DB
-			log.Printf("Connecting to TEST DB")
+			logger.Info(ctx, "Connecting to TEST DB")
 			break
 		case "LOCAL":
 			DB_HOST = "127.0.0.1"
@@ -87,25 +88,25 @@ func DbInstance(ctx echo.Context) *gorm.DB {
 			DB_USERNAME = "root"
 			DB_PASS = "Xuanze94"
 			DB_NAME = AFFILIATE_MANAGER_TEST_DB
+			logger.Info(ctx, "Connecting to LOCAL DB")
 			break
 		}
 		if err := ConnectMySQL(ctx); err != nil {
-			log.Error(err)
+			logger.Error(ctx, err.Error())
 		}
 	}
 	return db
 }
 
-func ConnectMySQL(ctx echo.Context) error {
+func ConnectMySQL(ctx context.Context) error {
 	URL := fmt.Sprintf("%v:%v@tcp(%v:%v)/%v", DB_USERNAME, DB_PASS, DB_HOST, DB_PORT, DB_NAME)
 	openDb, err := gorm.Open(mysql.Open(URL), &gorm.Config{
 		Logger: newLogger,
 	})
-
 	if err != nil {
+		logger.Error(ctx, err.Error())
 		return err
 	}
-
 	db = openDb
 	return nil
 }

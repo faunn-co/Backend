@@ -1,7 +1,9 @@
 package get_referral_stats
 
 import (
+	"context"
 	"database/sql"
+	"github.com/aaronangxz/AffiliateManager/logger"
 	"github.com/aaronangxz/AffiliateManager/orm"
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
 	"github.com/aaronangxz/AffiliateManager/resp"
@@ -12,12 +14,15 @@ import (
 
 type GetReferralStats struct {
 	c   echo.Context
+	ctx context.Context
 	req *pb.GetReferralStatsRequest
 }
 
 func New(c echo.Context) *GetReferralStats {
 	g := new(GetReferralStats)
 	g.c = c
+	g.ctx = logger.NewCtx(g.c)
+	logger.Info(g.ctx, "GetReferralStats Initialized")
 	return g
 }
 
@@ -34,10 +39,10 @@ func (g *GetReferralStats) GetReferralStatsImpl() (*pb.ReferralStats, *pb.Referr
 	)
 
 	start, end, prevStart, prevEnd := utils.GetStartEndTimeFromTimeSelector(g.req.GetTimeSelector())
-	if err := orm.DbInstance(g.c).Raw(orm.GetReferralStatsQuery(), sql.Named("id", g.req.GetAffiliateId()), sql.Named("startTime", start), sql.Named("endTime", end)).Scan(&s).Error; err != nil {
+	if err := orm.DbInstance(g.ctx).Raw(orm.GetReferralStatsQuery(), sql.Named("id", g.req.GetAffiliateId()), sql.Named("startTime", start), sql.Named("endTime", end)).Scan(&s).Error; err != nil {
 		return nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 	}
-	if err := orm.DbInstance(g.c).Raw(orm.GetReferralStatsQuery(), sql.Named("id", g.req.GetAffiliateId()), sql.Named("startTime", prevStart), sql.Named("endTime", prevEnd)).Scan(&sP).Error; err != nil {
+	if err := orm.DbInstance(g.ctx).Raw(orm.GetReferralStatsQuery(), sql.Named("id", g.req.GetAffiliateId()), sql.Named("startTime", prevStart), sql.Named("endTime", prevEnd)).Scan(&sP).Error; err != nil {
 		return nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 	}
 	return &pb.ReferralStats{
