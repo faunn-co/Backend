@@ -458,15 +458,21 @@ message GetAffiliateInfoResponse{
   optional AffiliateMeta affiliate_meta = 2;
 }
 
+message UserAuth{
+  optional int64 user_id = 1;
+  optional string user_password = 2;
+}
+
 message UserRegistrationRequest{
   optional RequestMeta request_meta = 1;
   optional string entity_name = 2;
   optional string entity_identifier = 3;
   optional string user_name = 4;
-  optional string user_email = 5;
-  optional string user_contact = 6;
-  optional int64 affiliate_type = 7;
-  optional string preferred_referral_code = 8;
+  optional string user_password = 5;
+  optional string user_email = 6;
+  optional string user_contact = 7;
+  optional int64 affiliate_type = 8;
+  optional string preferred_referral_code = 9;
 }
 
 message UserRegistrationResponse{

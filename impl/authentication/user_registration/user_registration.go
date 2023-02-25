@@ -6,9 +6,12 @@ import (
 	"github.com/aaronangxz/AffiliateManager/impl/verification/affiliate_verification"
 	"github.com/aaronangxz/AffiliateManager/impl/verification/user_verification"
 	"github.com/aaronangxz/AffiliateManager/logger"
+	"github.com/aaronangxz/AffiliateManager/orm"
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
 	"github.com/aaronangxz/AffiliateManager/resp"
 	"github.com/labstack/echo/v4"
+	"google.golang.org/protobuf/proto"
+	"time"
 )
 
 const (
@@ -50,6 +53,47 @@ func (u *UserRegistration) UserRegistrationImpl() *resp.Error {
 
 	if err := u.verifyReferralCode(); err != nil {
 		return resp.BuildError(err, pb.GlobalErrorCode_ERROR_REFERRAL_CODE_EXISTS)
+	}
+
+	type User struct {
+		UserId          *int64 `gorm:"primary_key"`
+		UserName        *string
+		UserEmail       *string
+		UserContact     *string
+		UserRole        *int64
+		CreateTimestamp *int64
+	}
+
+	user := User{
+		UserName:        u.req.UserName,
+		UserEmail:       u.req.UserEmail,
+		UserContact:     u.req.UserContact,
+		UserRole:        proto.Int64(int64(pb.UserRole_ROLE_AFFILIATE)),
+		CreateTimestamp: proto.Int64(time.Now().Unix()),
+	}
+
+	if err := orm.DbInstance(u.ctx).Table(orm.USER_TABLE).Create(&user).Error; err != nil {
+		return resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
+	}
+
+	auth := &pb.UserAuth{
+		UserId:       user.UserId,
+		UserPassword: u.req.UserPassword,
+	}
+
+	if err := orm.DbInstance(u.ctx).Table(orm.USER_AUTH_TABLE).Create(&auth).Error; err != nil {
+		return resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
+	}
+
+	affiliate := &pb.AffiliateDetailsDb{
+		UserId:             user.UserId,
+		EntityName:         u.req.EntityName,
+		AffiliateType:      u.req.AffiliateType,
+		UniqueReferralCode: u.req.PreferredReferralCode,
+	}
+
+	if err := orm.DbInstance(u.ctx).Table(orm.AFFILIATE_DETAILS_TABLE).Create(affiliate).Error; err != nil {
+		return resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 	}
 
 	return nil
@@ -104,6 +148,10 @@ func (u *UserRegistration) verifyUserRegistration() error {
 		return errors.New("user name is required")
 	}
 
+	if u.req.UserPassword == nil {
+		return errors.New("user password is required")
+	}
+
 	if u.req.UserEmail == nil {
 		return errors.New("user email is required")
 	}
@@ -134,6 +182,10 @@ func (u *UserRegistration) verifyUserRegistration() error {
 
 	if isContainsSpecialChar(u.req.GetUserName()) || isContainsSpace(u.req.GetUserName()) {
 		return errors.New("user name contains illegal characters")
+	}
+
+	if isContainsSpace(u.req.GetUserPassword()) {
+		return errors.New("user password cannot contain spaces")
 	}
 
 	if isContainsAtSign(u.req.GetUserEmail()) {

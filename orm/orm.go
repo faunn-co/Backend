@@ -20,6 +20,7 @@ const (
 	AFFILIATE_MANAGER_DB      = "affiliate_manager_db"
 	AFFILIATE_MANAGER_TEST_DB = "affiliate_manager_test_db"
 	USER_TABLE                = "user_table"
+	USER_AUTH_TABLE           = "user_auth_table"
 	REFERRAL_TABLE            = "referral_table"
 	BOOKING_DETAILS_TABLE     = "booking_details_table"
 	AFFILIATE_DETAILS_TABLE   = "affiliate_details_table"
@@ -90,7 +91,7 @@ func DbInstance(ctx context.Context) *gorm.DB {
 			DB_PORT = "3306"
 			DB_USERNAME = "root"
 			DB_PASS = "Xuanze94"
-			DB_NAME = AFFILIATE_MANAGER_TEST_DB
+			DB_NAME = AFFILIATE_MANAGER_DB
 			logger.Info(ctx, "Connecting to LOCAL DB")
 			break
 		}
