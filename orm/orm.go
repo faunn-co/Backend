@@ -90,6 +90,7 @@ func DbInstance(ctx echo.Context) *gorm.DB {
 			DB_USERNAME = "root"
 			DB_PASS = "Xuanze94"
 			DB_NAME = AFFILIATE_MANAGER_TEST_DB
+			log.Printf("Connecting to LOCAL DB")
 			break
 		}
 		if err := ConnectMySQL(ctx); err != nil {
