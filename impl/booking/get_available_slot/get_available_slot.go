@@ -32,8 +32,9 @@ func (g *GetAvailableSlot) GetAvailableSlotImpl() (*string, []*pb.BookingSlot, *
 		return nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_INVALID_PARAMS)
 	}
 	date := g.c.QueryParam("date")
+
 	var slots []*pb.BookingSlot
-	if err := orm.DbInstance(g.ctx).Raw(fmt.Sprintf("SELECT * FROM %v.%v WHERE date = '%v'", orm.AFFILIATE_MANAGER_DB, orm.BOOKING_SLOTS_TABLE, date)).Scan(&slots).Error; err != nil {
+	if err := orm.DbInstance(g.ctx).Raw(fmt.Sprintf("SELECT * FROM %v WHERE date = '%v'", orm.BOOKING_SLOTS_TABLE, date)).Scan(&slots).Error; err != nil {
 		log.Error(err)
 		return proto.String(date), nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 	}
