@@ -57,7 +57,7 @@ func main() {
 	e.POST("api/v1/booking/transaction/complete", cmd.GetAvailableSlot)
 
 	//Registration
-	e.POST("api/v1/platform/register", cmd.GetAvailableSlot)
+	e.POST("api/v1/platform/register", cmd.UserRegistration) //DONE, not tested
 	e.POST("api/v1/platform/login", cmd.GetAvailableSlot)
 
 	e.POST("api/v1/tracking/click", cmd.TrackClick) //DONE, not tested

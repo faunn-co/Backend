@@ -30,7 +30,7 @@ func New(c echo.Context) *UserRegistration {
 	u := new(UserRegistration)
 	u.c = c
 	u.ctx = logger.NewCtx(u.c)
-	logger.Info(u.ctx, "GetAffiliateTrend Initialized")
+	logger.Info(u.ctx, "UserRegistration Initialized")
 	return u
 }
 

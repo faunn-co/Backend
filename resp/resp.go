@@ -156,3 +156,12 @@ func GetAffiliateInfoResponseJSON(c echo.Context, meta *pb.AffiliateMeta) error 
 		AffiliateMeta: meta,
 	})
 }
+
+func UserRegistrationResponseJSON(c echo.Context) error {
+	return c.JSON(http.StatusOK, pb.UserRegistrationResponse{
+		ResponseMeta: &pb.ResponseMeta{
+			ErrorCode: proto.Int64(int64(pb.GlobalErrorCode_SUCCESS)),
+			ErrorMsg:  proto.String("success"),
+		},
+	})
+}
