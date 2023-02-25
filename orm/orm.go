@@ -64,6 +64,7 @@ func DbInstance(ctx echo.Context) *gorm.DB {
 		if err != nil {
 			log.Error("Error loading .env file")
 		}
+		ENV = os.Getenv("ENV")
 		switch ENV {
 		case "PROD":
 			DB_HOST = os.Getenv("PROD_DB_HOST")
@@ -74,12 +75,14 @@ func DbInstance(ctx echo.Context) *gorm.DB {
 			log.Printf("Connecting to PROD DB")
 			break
 		case "TEST":
+			fallthrough
+		case "STAGING":
 			DB_HOST = os.Getenv("TEST_DB_HOST")
 			DB_PORT = os.Getenv("TEST_DB_PORT")
 			DB_USERNAME = os.Getenv("TEST_DB_USERNAME")
 			DB_PASS = os.Getenv("TEST_DB_PASS")
 			DB_NAME = AFFILIATE_MANAGER_TEST_DB
-			log.Printf("Connecting to TEST DB")
+			log.Printf("Connecting to STAGING/TEST DB")
 			break
 		case "LOCAL":
 			DB_HOST = "127.0.0.1"
