@@ -204,8 +204,48 @@ func GetAffiliateInfoQuery() string {
 	return string(query)
 }
 
-func GetUserInfoQuery() string {
+func GetUserInfoWithUserIdQuery() string {
 	query, err := os.ReadFile(openSql("sql25.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}
+
+func GetUserInfoWithUserNameQuery() string {
+	query, err := os.ReadFile(openSql("sql26.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}
+
+func GetUserInfoWithUserEmailQuery() string {
+	query, err := os.ReadFile(openSql("sql27.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}
+
+func GetAffiliateInfoWithEntityNameQuery() string {
+	query, err := os.ReadFile(openSql("sql28.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}
+
+func GetAffiliateInfoWithReferralCodeQuery() string {
+	query, err := os.ReadFile(openSql("sql29.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}
+
+func GetUserInfoWithAuthQuery() string {
+	query, err := os.ReadFile(openSql("sql30.sql"))
 	if err != nil {
 		panic(err)
 	}

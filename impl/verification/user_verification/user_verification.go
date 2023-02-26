@@ -1,6 +1,7 @@
 package user_verification
 
 import (
+	"context"
 	"errors"
 	"github.com/aaronangxz/AffiliateManager/orm"
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
@@ -9,12 +10,14 @@ import (
 )
 
 type UserVerification struct {
-	c echo.Context
+	c   echo.Context
+	ctx context.Context
 }
 
-func New(c echo.Context) *UserVerification {
+func New(c echo.Context, ctx context.Context) *UserVerification {
 	u := new(UserVerification)
 	u.c = c
+	u.ctx = ctx
 	return u
 }
 
@@ -37,7 +40,35 @@ func (u *UserVerification) VerifyUserId(id interface{}) error {
 		return nil
 	}
 	var user *pb.User
-	if err := orm.DbInstance(u.c).Raw(orm.GetUserInfoQuery(), userId).Scan(&user).Error; err != nil {
+	if err := orm.DbInstance(u.ctx).Raw(orm.GetUserInfoWithUserIdQuery(), userId).Scan(&user).Error; err != nil {
+		return err
+	}
+	if user == nil {
+		return errors.New("user not found")
+	}
+	return nil
+}
+
+func (u *UserVerification) VerifyUserName(name string) error {
+	if name == "" {
+		return nil
+	}
+	var user *pb.User
+	if err := orm.DbInstance(u.ctx).Raw(orm.GetUserInfoWithUserNameQuery(), name).Scan(&user).Error; err != nil {
+		return err
+	}
+	if user == nil {
+		return errors.New("user not found")
+	}
+	return nil
+}
+
+func (u *UserVerification) VerifyUserEmail(email string) error {
+	if email == "" {
+		return nil
+	}
+	var user *pb.User
+	if err := orm.DbInstance(u.ctx).Raw(orm.GetUserInfoWithUserEmailQuery(), email).Scan(&user).Error; err != nil {
 		return err
 	}
 	if user == nil {

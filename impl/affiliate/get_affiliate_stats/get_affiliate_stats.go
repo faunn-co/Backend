@@ -1,6 +1,8 @@
 package get_affiliate_stats
 
 import (
+	"context"
+	"github.com/aaronangxz/AffiliateManager/logger"
 	"github.com/aaronangxz/AffiliateManager/orm"
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
 	"github.com/aaronangxz/AffiliateManager/resp"
@@ -11,12 +13,15 @@ import (
 
 type GetAffiliateStats struct {
 	c   echo.Context
+	ctx context.Context
 	req *pb.GetAffiliateStatsRequest
 }
 
 func New(c echo.Context) *GetAffiliateStats {
 	g := new(GetAffiliateStats)
 	g.c = c
+	g.ctx = logger.NewCtx(g.c)
+	logger.Info(g.ctx, "GetAffiliateStats Initialized")
 	return g
 }
 
@@ -33,10 +38,10 @@ func (g *GetAffiliateStats) GetAffiliateStatsImpl() (*pb.AffiliateStats, *pb.Aff
 	)
 
 	start, end, prevStart, prevEnd := utils.GetStartEndTimeFromTimeSelector(g.req.GetTimeSelector())
-	if err := orm.DbInstance(g.c).Raw(orm.Sql5(), start, end).Scan(&s).Error; err != nil {
+	if err := orm.DbInstance(g.ctx).Raw(orm.Sql5(), start, end).Scan(&s).Error; err != nil {
 		return nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 	}
-	if err := orm.DbInstance(g.c).Raw(orm.Sql5(), prevStart, prevEnd).Scan(&sP).Error; err != nil {
+	if err := orm.DbInstance(g.ctx).Raw(orm.Sql5(), prevStart, prevEnd).Scan(&sP).Error; err != nil {
 		return nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 	}
 	return &pb.AffiliateStats{

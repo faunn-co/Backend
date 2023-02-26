@@ -28,3 +28,4 @@ jobs:
           TEST_DB_PORT: ${{secrets.TEST_DB_PORT}}
           TEST_DB_USERNAME: ${{secrets.TEST_DB_USERNAME}}
           TEST_DB_PASS: ${{secrets.TEST_DB_PASS}}
+          ENV: ${{secrets.ENV}}

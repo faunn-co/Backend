@@ -1,6 +1,7 @@
 package booking
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/aaronangxz/AffiliateManager/orm"
@@ -214,7 +215,7 @@ func (b *Booking) Build() *Booking {
 		CustomerInfo:       info,
 	}
 
-	if err := orm.DbInstance(nil).Table(orm.BOOKING_DETAILS_TABLE).Create(&booking).Error; err != nil {
+	if err := orm.DbInstance(context.Background()).Table(orm.BOOKING_DETAILS_TABLE).Create(&booking).Error; err != nil {
 		log.Error(err)
 		return nil
 	}
@@ -223,7 +224,7 @@ func (b *Booking) Build() *Booking {
 }
 
 func (b *Booking) TearDown() {
-	if err := orm.DbInstance(nil).Exec(fmt.Sprintf("DELETE FROM %v.%v WHERE booking_id = %v", orm.AFFILIATE_MANAGER_TEST_DB, orm.BOOKING_DETAILS_TABLE, b.BookingDetails.GetBookingId())).Error; err != nil {
+	if err := orm.DbInstance(context.Background()).Exec(fmt.Sprintf("DELETE FROM %v.%v WHERE booking_id = %v", orm.AFFILIATE_MANAGER_TEST_DB, orm.BOOKING_DETAILS_TABLE, b.BookingDetails.GetBookingId())).Error; err != nil {
 		log.Error(err)
 	}
 }

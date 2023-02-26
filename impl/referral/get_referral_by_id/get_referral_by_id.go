@@ -1,8 +1,10 @@
 package get_referral_by_id
 
 import (
+	"context"
 	"encoding/json"
 	"errors"
+	"github.com/aaronangxz/AffiliateManager/logger"
 	"github.com/aaronangxz/AffiliateManager/orm"
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
 	"github.com/aaronangxz/AffiliateManager/resp"
@@ -10,12 +12,15 @@ import (
 )
 
 type GetReferralById struct {
-	c echo.Context
+	c   echo.Context
+	ctx context.Context
 }
 
 func New(c echo.Context) *GetReferralById {
 	g := new(GetReferralById)
 	g.c = c
+	g.ctx = logger.NewCtx(g.c)
+	logger.Info(g.ctx, "GetReferralById Initialized")
 	return g
 }
 
@@ -32,7 +37,7 @@ func (g *GetReferralById) GetReferralByIdImpl() (*pb.ReferralDetails, *resp.Erro
 		b   *pb.BookingDetailsDb
 	)
 
-	if err := orm.DbInstance(g.c).Raw(orm.GetReferralDetailsByIdQuery(), g.c.Param("id")).Scan(&rDb).Error; err != nil {
+	if err := orm.DbInstance(g.ctx).Raw(orm.GetReferralDetailsByIdQuery(), g.c.Param("id")).Scan(&rDb).Error; err != nil {
 		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 	}
 
@@ -54,7 +59,7 @@ func (g *GetReferralById) GetReferralByIdImpl() (*pb.ReferralDetails, *resp.Erro
 		return r, nil
 	}
 
-	if err := orm.DbInstance(g.c).Raw(orm.GetReferralBookingDetailsQuery(), rDb.GetBookingId()).Scan(&b).Error; err != nil {
+	if err := orm.DbInstance(g.ctx).Raw(orm.GetReferralBookingDetailsQuery(), rDb.GetBookingId()).Scan(&b).Error; err != nil {
 		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 	}
 
