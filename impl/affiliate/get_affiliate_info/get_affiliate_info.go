@@ -2,6 +2,7 @@ package get_affiliate_info
 
 import (
 	"context"
+	"fmt"
 	"github.com/aaronangxz/AffiliateManager/impl/verification/user_verification"
 	"github.com/aaronangxz/AffiliateManager/logger"
 	"github.com/aaronangxz/AffiliateManager/orm"
@@ -23,15 +24,22 @@ func New(c echo.Context) *GetAffiliateInfo {
 	return g
 }
 
-func (g *GetAffiliateInfo) GetAffiliateInfoImpl() (*pb.AffiliateMeta, *resp.Error) {
-	id := g.c.Param("id")
+func (g *GetAffiliateInfo) GetAffiliateInfoImpl() (*pb.AffiliateProfileMeta, *pb.User, *resp.Error) {
+	id := g.c.QueryParam("id")
+	fmt.Println(id)
 	if err := user_verification.New(g.c, g.ctx).VerifyUserId(id); err != nil {
-		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_USER_NOT_FOUND)
+		return nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_USER_NOT_FOUND)
 	}
 
-	var a *pb.AffiliateMeta
+	var a *pb.AffiliateProfileMeta
 	if err := orm.DbInstance(g.ctx).Raw(orm.GetAffiliateInfoQuery(), id).Scan(&a).Error; err != nil {
-		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
+		return nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 	}
-	return a, nil
+
+	var u *pb.User
+	if err := orm.DbInstance(g.ctx).Raw(orm.GetUserInfoWithUserIdQuery(), id).Scan(&u).Error; err != nil {
+		return nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
+	}
+
+	return a, u, nil
 }

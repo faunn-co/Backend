@@ -96,7 +96,7 @@ func DbInstance(ctx context.Context) *gorm.DB {
 			break
 		}
 		if err := ConnectMySQL(ctx); err != nil {
-			logger.Error(ctx, err.Error())
+			logger.Error(ctx, err)
 		}
 	}
 	return db

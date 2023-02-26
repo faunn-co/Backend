@@ -36,22 +36,27 @@ func New(c echo.Context) *UserRegistration {
 
 func (u *UserRegistration) UserRegistrationImpl() *resp.Error {
 	if err := u.verifyUserRegistration(); err != nil {
+		logger.Error(u.ctx, err)
 		return resp.BuildError(err, pb.GlobalErrorCode_ERROR_INVALID_PARAMS)
 	}
 
+	if err := u.verifyEntityName(); err != nil {
+		logger.Error(u.ctx, err)
+		return resp.BuildError(err, pb.GlobalErrorCode_ERROR_ENTITY_NAME_EXISTS)
+	}
+
 	if err := u.verifyUserName(); err != nil {
+		logger.Error(u.ctx, err)
 		return resp.BuildError(err, pb.GlobalErrorCode_ERROR_USER_NAME_EXISTS)
 	}
 
 	if err := u.verifyUserEmail(); err != nil {
+		logger.Error(u.ctx, err)
 		return resp.BuildError(err, pb.GlobalErrorCode_ERROR_USER_EMAIL_EXISTS)
 	}
 
-	if err := u.verifyEntityName(); err != nil {
-		return resp.BuildError(err, pb.GlobalErrorCode_ERROR_ENTITY_NAME_EXISTS)
-	}
-
 	if err := u.verifyReferralCode(); err != nil {
+		logger.Error(u.ctx, err)
 		return resp.BuildError(err, pb.GlobalErrorCode_ERROR_REFERRAL_CODE_EXISTS)
 	}
 
@@ -88,6 +93,7 @@ func (u *UserRegistration) UserRegistrationImpl() *resp.Error {
 	affiliate := &pb.AffiliateDetailsDb{
 		UserId:             user.UserId,
 		EntityName:         u.req.EntityName,
+		EntityIdentifier:   u.req.EntityIdentifier,
 		AffiliateType:      u.req.AffiliateType,
 		UniqueReferralCode: u.req.PreferredReferralCode,
 	}
@@ -188,7 +194,7 @@ func (u *UserRegistration) verifyUserRegistration() error {
 		return errors.New("user password cannot contain spaces")
 	}
 
-	if isContainsAtSign(u.req.GetUserEmail()) {
+	if !isContainsAtSign(u.req.GetUserEmail()) {
 		return errors.New("user email format is incorrect")
 	}
 

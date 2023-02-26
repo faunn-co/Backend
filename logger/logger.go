@@ -63,7 +63,11 @@ func Warn(ctx context.Context, msg string, value ...interface{}) {
 }
 
 // Error Logs message with Error level
-func Error(ctx context.Context, msg string, value ...interface{}) {
+func Error(ctx context.Context, err error) {
+	Logger(ctx).Sugar().Errorf(err.Error())
+}
+
+func ErrorMsg(ctx context.Context, msg string, value ...interface{}) {
 	Logger(ctx).Sugar().Errorf(fmt.Sprintf(msg, value...))
 }
 

@@ -15,6 +15,7 @@ enum GlobalErrorCode{
   ERROR_USER_EMAIL_EXISTS = 1008;
   ERROR_ENTITY_NAME_EXISTS = 1009;
   ERROR_REFERRAL_CODE_EXISTS = 1010;
+  ERROR_LOGIN_FAIL = 1011;
 }
 
 enum UserRole{
@@ -98,8 +99,9 @@ message User{
 message AffiliateDetailsDb{
   optional int64 user_id = 1;
   optional string entity_name = 2;
-  optional int64 affiliate_type = 3;
-  optional string unique_referral_code = 4;
+  optional string entity_identifier = 3;
+  optional int64 affiliate_type = 4;
+  optional string unique_referral_code = 5;
 }
 
 //Joining user_table, affiliate_details_table and referral_table
@@ -455,7 +457,8 @@ message TrackClickResponse{
 
 message GetAffiliateInfoResponse{
   optional ResponseMeta response_meta = 1;
-  optional AffiliateMeta affiliate_meta = 2;
+  optional AffiliateProfileMeta affiliate_meta = 2;
+  optional User user_info = 3;
 }
 
 message UserAuth{
@@ -485,7 +488,27 @@ message UserAuthenticationRequest{
   optional string user_password = 3;
 }
 
+message AuthCookie{
+  optional int64 user_id = 1;
+  optional string user_name = 2;
+  optional string user_email = 3;
+  optional int64 user_role = 4;
+  optional string cookie = 5;
+}
+
 message UserAuthenticationResponse{
   optional ResponseMeta response_meta = 1;
-  optional string auth_cookie = 2;
+  optional AuthCookie auth_cookie = 2;
+}
+
+message AffiliateProfileMeta{
+  optional int64 affiliate_id = 1;
+  optional string entity_name = 2;
+  optional string entity_identifier = 3;
+  optional int64 affiliate_type = 4;
+  optional string unique_referral_code = 5;
+  optional int64 referral_count = 6;
+  optional int64 referral_clicks = 7;
+  optional int64 referral_commission = 8;
+  optional int64 total_revenue = 9;
 }

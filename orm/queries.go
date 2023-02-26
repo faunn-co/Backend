@@ -243,3 +243,11 @@ func GetAffiliateInfoWithReferralCodeQuery() string {
 	}
 	return string(query)
 }
+
+func GetUserInfoWithAuthQuery() string {
+	query, err := os.ReadFile(openSql("sql30.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}

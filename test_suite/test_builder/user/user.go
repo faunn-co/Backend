@@ -48,6 +48,11 @@ func (u *User) SetEntityName(name string) *User {
 	return u
 }
 
+func (u *User) SetEntityIdentifier(identifier string) *User {
+	u.AffiliateInfo.EntityIdentifier = proto.String(identifier)
+	return u
+}
+
 func (u *User) SetAffiliateType(affiliateType int64) *User {
 	u.AffiliateInfo.AffiliateType = proto.Int64(affiliateType)
 	return u
@@ -77,6 +82,10 @@ func (u *User) filDefaults() *User {
 
 	if u.AffiliateInfo.EntityName == nil {
 		u.SetEntityName("RandomEntityName")
+	}
+
+	if u.AffiliateInfo.EntityIdentifier == nil {
+		u.SetEntityIdentifier("RandomEntityIdentifier")
 	}
 
 	if u.AffiliateInfo.AffiliateType == nil {

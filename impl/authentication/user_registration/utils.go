@@ -17,7 +17,7 @@ func isContainsSpecialChar(a string) bool {
 		}
 	}
 	for _, char := range a {
-		if !unicode.IsLetter(char) && !unicode.IsNumber(char) {
+		if !unicode.IsLetter(char) && !unicode.IsNumber(char) && !unicode.IsSpace(char) {
 			return true
 		}
 	}

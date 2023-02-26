@@ -7,9 +7,9 @@ import (
 )
 
 func GetAffiliateInfo(c echo.Context) error {
-	if a, err := get_affiliate_info.New(c).GetAffiliateInfoImpl(); err != nil {
+	if a, u, err := get_affiliate_info.New(c).GetAffiliateInfoImpl(); err != nil {
 		return resp.JSONResp(c, err)
 	} else {
-		return resp.GetAffiliateInfoResponseJSON(c, a)
+		return resp.GetAffiliateInfoResponseJSON(c, a, u)
 	}
 }

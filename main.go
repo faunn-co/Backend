@@ -58,7 +58,7 @@ func main() {
 
 	//Registration
 	e.POST("api/v1/platform/register", cmd.UserRegistration) //DONE, not tested
-	e.POST("api/v1/platform/login", cmd.GetAvailableSlot)
+	e.POST("api/v1/platform/login", cmd.UserAuthentication)  //DONE, not tested
 
 	e.POST("api/v1/tracking/click", cmd.TrackClick) //DONE, not tested
 	e.POST("api/v1/tracking/checkout", cmd.TrackClick)
@@ -82,5 +82,6 @@ func loadEnv() {
 
 	if os.Getenv("ENV") == "LOCAL" {
 		orm.ENV = "LOCAL"
+		logger.Info(context.Background(), "Running on LOCAL")
 	}
 }
