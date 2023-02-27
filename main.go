@@ -63,6 +63,8 @@ func main() {
 	e.POST("api/v1/tracking/click", cmd.TrackClick) //DONE, not tested
 	e.POST("api/v1/tracking/checkout", cmd.TrackClick)
 
+	e.POST("api/v1/payment/create-payment-intent", cmd.CreatePaymentIntent)
+
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%v", getPort())))
 }
 

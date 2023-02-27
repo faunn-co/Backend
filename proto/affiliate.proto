@@ -512,3 +512,17 @@ message AffiliateProfileMeta{
   optional int64 referral_commission = 8;
   optional int64 total_revenue = 9;
 }
+
+message Items{
+  optional string id = 1;
+}
+
+message CreatePaymentIntentRequest{
+  optional RequestMeta request_meta = 1;
+  repeated Items items = 2;
+}
+
+message CreatePaymentIntentResponse{
+  optional ResponseMeta response_meta = 1;
+  optional string client_secret = 2;
+}
