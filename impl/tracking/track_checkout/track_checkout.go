@@ -45,6 +45,7 @@ func (t *TrackCheckOut) verifyTrackCheckOut() error {
 }
 
 func (t *TrackCheckOut) startCheckOutTx() error {
+	//TODO
 	tx := orm.DbInstance(t.ctx).Begin()
 	defer func() {
 		if r := recover(); r != nil {

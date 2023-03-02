@@ -2,6 +2,8 @@ package track_click
 
 import (
 	"context"
+	"encoding/json"
+	"fmt"
 	"github.com/aaronangxz/AffiliateManager/logger"
 	"github.com/aaronangxz/AffiliateManager/orm"
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
@@ -9,7 +11,6 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
 	"google.golang.org/protobuf/proto"
-	"gorm.io/gorm"
 	"time"
 )
 
@@ -31,19 +32,16 @@ func (t *TrackClick) TrackClickImpl() (*int64, *resp.Error) {
 		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_INVALID_PARAMS)
 	}
 
-	if t.c.QueryParam("ref") == "" || t.c.QueryParam("ref") == "null" {
+	code := t.c.QueryParam("ref")
+	if code == "" || code == "null" {
 		return nil, nil
 	}
 
-	var affiliate *pb.AffiliateDetailsDb
-	if err := orm.DbInstance(t.ctx).Raw(orm.GetAffiliateByCodeQuery(), t.c.QueryParam("ref")).Scan(&affiliate).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
-			log.Warn("referral code not found")
-		} else {
-			return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
-		}
+	id, err := t.getAffiliateWithCodeUsingCache(code)
+	if err != nil {
+		return nil, err
 	}
-	logger.Info(t.ctx, "referral_code: %v referral id: %v", t.c.QueryParam("ref"), affiliate.GetUserId())
+	logger.Info(t.ctx, "referral_code: %v referral id: %v", code, id)
 
 	type Referral struct {
 		ReferralId        *int64 `gorm:"primary_key"`
@@ -54,7 +52,7 @@ func (t *TrackClick) TrackClickImpl() (*int64, *resp.Error) {
 
 	r := Referral{
 		ReferralId:        nil,
-		AffiliateId:       proto.Int64(affiliate.GetUserId()),
+		AffiliateId:       id,
 		ReferralClickTime: proto.Int64(time.Now().Unix()),
 		ReferralStatus:    proto.Int64(int64(pb.ReferralStatus_REFERRAL_STATUS_PENDING)),
 	}
@@ -69,4 +67,36 @@ func (t *TrackClick) verifyTrackClick() error {
 		log.Warn("no ref id")
 	}
 	return nil
+}
+
+func (t *TrackClick) makeCacheKey(code string) string {
+	return fmt.Sprintf("ref_code:%v", code)
+}
+
+func (t *TrackClick) getAffiliateWithCodeUsingCache(code string) (*int64, *resp.Error) {
+	k := t.makeCacheKey(code)
+	if val, err := orm.GET(t.c, t.ctx, k); err != nil {
+		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_REDIS)
+	} else if val != nil {
+		var redisResp *pb.AffiliateDetailsDb
+		jsonErr := json.Unmarshal(val, &redisResp)
+		if jsonErr != nil {
+			logger.Warn(t.ctx, "getAffiliateWithCodeUsingCache | Fail to unmarshal Redis value of key %v : %v, reading from DB", k, jsonErr)
+		} else {
+			logger.Warn(t.ctx, "getAffiliateWithCodeUsingCache | Successful | Cached %v", k)
+			return redisResp.UserId, nil
+		}
+	}
+
+	var affiliate *pb.AffiliateDetailsDb
+	if err := orm.DbInstance(t.ctx).Raw(orm.GetAffiliateByCodeQuery(), code).Scan(&affiliate).Error; err != nil {
+		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
+	}
+
+	if affiliate.UserId != nil {
+		if err := orm.SET(t.ctx, k, affiliate.UserId, 24*time.Hour); err != nil {
+			return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_REDIS)
+		}
+	}
+	return affiliate.UserId, nil
 }

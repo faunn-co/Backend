@@ -34,22 +34,22 @@ func RedisInstance() *redis.Client {
 	return cache
 }
 
-func SET(e echo.Context, key string, data interface{}, ttlSeconds time.Duration) error {
+func SET(c context.Context, key string, data interface{}, ttlSeconds time.Duration) error {
 	data, jsonErr := json.Marshal(data)
 	if jsonErr != nil {
 		log.Errorf("Failed to marshal JSON results: %v\n", jsonErr.Error())
 		return jsonErr
 	}
 
-	if err := RedisInstance().Set(e.Request().Context(), key, data, ttlSeconds*time.Minute).Err(); err != nil {
+	if err := RedisInstance().Set(c, key, data, ttlSeconds*time.Minute).Err(); err != nil {
 		log.Errorf(" Error while writing to redis: %v", err.Error())
 		return err
 	}
 	return nil
 }
 
-func GET(e echo.Context, key string) ([]byte, error) {
-	val, redisErr := RedisInstance().Get(e.Request().Context(), key).Result()
+func GET(e echo.Context, c context.Context, key string) ([]byte, error) {
+	val, redisErr := RedisInstance().Get(c, key).Result()
 	if redisErr != nil {
 		if redisErr == redis.Nil {
 			log.Warnf("No result of %v in Redis, reading from API", key)
