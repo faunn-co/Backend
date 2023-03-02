@@ -31,7 +31,7 @@ func (t *TrackClick) TrackClickImpl() (*int64, *resp.Error) {
 		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_INVALID_PARAMS)
 	}
 
-	if t.c.QueryParam("ref") == "" {
+	if t.c.QueryParam("ref") == "" || t.c.QueryParam("ref") == "null" {
 		return nil, nil
 	}
 
@@ -43,6 +43,7 @@ func (t *TrackClick) TrackClickImpl() (*int64, *resp.Error) {
 			return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 		}
 	}
+	logger.Info(t.ctx, "referral_code: %v referral id: %v", t.c.QueryParam("ref"), affiliate.GetUserId())
 
 	type Referral struct {
 		ReferralId        *int64 `gorm:"primary_key"`
@@ -57,7 +58,6 @@ func (t *TrackClick) TrackClickImpl() (*int64, *resp.Error) {
 		ReferralClickTime: proto.Int64(time.Now().Unix()),
 		ReferralStatus:    proto.Int64(int64(pb.ReferralStatus_REFERRAL_STATUS_PENDING)),
 	}
-
 	if err := orm.DbInstance(t.ctx).Table(orm.REFERRAL_TABLE).Create(&r).Error; err != nil {
 		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 	}
@@ -65,7 +65,7 @@ func (t *TrackClick) TrackClickImpl() (*int64, *resp.Error) {
 }
 
 func (t *TrackClick) verifyTrackClick() error {
-	if t.c.QueryParam("ref") == "" {
+	if t.c.QueryParam("ref") == "" || t.c.QueryParam("ref") == "null" {
 		log.Warn("no ref id")
 	}
 	return nil
