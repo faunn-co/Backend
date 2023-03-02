@@ -526,3 +526,19 @@ message CreatePaymentIntentResponse{
   optional ResponseMeta response_meta = 1;
   optional string client_secret = 2;
 }
+
+message TrackCheckOutRequest{
+  optional RequestMeta request_meta = 1;
+  optional int64 referral_id = 2;
+  optional string booking_day = 3;
+  optional int64 booking_slot = 4;
+  optional int64 citizen_ticket_count = 5;
+  optional int64 tourist_ticket_count = 6;
+  repeated CustomerInfo customer_info = 7;
+}
+
+message TrackCheckOutResponse{
+  optional ResponseMeta response_meta = 1;
+  optional int64 booking_id = 2;
+  optional int64 booking_status = 3;
+}
