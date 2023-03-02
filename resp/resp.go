@@ -176,3 +176,13 @@ func UserAuthenticationResponseJSON(c echo.Context, a *pb.AuthCookie) error {
 		AuthCookie: a,
 	})
 }
+
+func CreatePaymentIntentResponseJSON(c echo.Context, secret *string) error {
+	return c.JSON(http.StatusOK, pb.CreatePaymentIntentResponse{
+		ResponseMeta: &pb.ResponseMeta{
+			ErrorCode: proto.Int64(int64(pb.GlobalErrorCode_SUCCESS)),
+			ErrorMsg:  proto.String("success"),
+		},
+		ClientSecret: secret,
+	})
+}

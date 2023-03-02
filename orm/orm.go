@@ -18,7 +18,7 @@ import (
 
 const (
 	AFFILIATE_MANAGER_DB      = "affiliate_manager_db"
-	AFFILIATE_MANAGER_TEST_DB = "affiliate_manager_test_db"
+	AFFILIATE_MANAGER_TEST_DB = "affiliate_manager_db"
 	USER_TABLE                = "user_table"
 	USER_AUTH_TABLE           = "user_auth_table"
 	REFERRAL_TABLE            = "referral_table"
