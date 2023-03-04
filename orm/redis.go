@@ -7,7 +7,6 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/redis/go-redis/v9"
-	"log"
 	"os"
 	"time"
 )
@@ -24,17 +23,24 @@ func ConnectRedis() {
 		logger.Warn(context.Background(), "Error loading .env file")
 	}
 
-	REDIS_HOST = os.Getenv("REDIS_HOST")
-	REDIS_PASS = os.Getenv("REDIS_PASS")
-	log.Print(REDIS_HOST, REDIS_PASS)
+	ENV = os.Getenv("ENV")
+	switch ENV {
+	case "PROD":
+		REDIS_HOST = os.Getenv("PROD_DB_HOST")
+		REDIS_PASS = os.Getenv("PROD_DB_PORT")
+		logger.Info(context.Background(), "Connecting to PROD Redis")
+		break
+	default:
+		REDIS_HOST = os.Getenv("TEST_DB_HOST")
+		REDIS_PASS = os.Getenv("TEST_DB_PORT")
+		logger.Info(context.Background(), "Connecting to TEST Redis")
+	}
 
-	o := &redis.Options{
+	rdb := redis.NewClient(&redis.Options{
 		Addr:     REDIS_HOST,
 		Password: REDIS_PASS,
 		DB:       0,
-	}
-	log.Print(o)
-	rdb := redis.NewClient(o)
+	})
 
 	if err := rdb.Ping(context.Background()).Err(); err != nil {
 		logger.ErrorMsg(context.Background(), "Error while establishing Live Redis client: %v", err.Error())
