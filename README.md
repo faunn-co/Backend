@@ -1,5 +1,7 @@
 <h1 align = "center"> AffiliateManager </h1>
 
+<h1 align = "center"> <img src="asset/icon.png"> </h1>
+
 <div align="center">
 
 [![Test Suite](https://github.com/aaronangxz/AffiliateManager/actions/workflows/test.yml/badge.svg)](https://github.com/aaronangxz/AffiliateManager/actions/workflows/test.yml)
