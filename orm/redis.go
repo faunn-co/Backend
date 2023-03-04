@@ -26,13 +26,13 @@ func ConnectRedis() {
 	ENV = os.Getenv("ENV")
 	switch ENV {
 	case "PROD":
-		REDIS_HOST = os.Getenv("PROD_DB_HOST")
-		REDIS_PASS = os.Getenv("PROD_DB_PASS")
+		REDIS_HOST = os.Getenv("PROD_REDIS_HOST")
+		REDIS_PASS = os.Getenv("PROD_REDIS_PASS")
 		logger.Info(context.Background(), "Connecting to PROD Redis")
 		break
 	default:
-		REDIS_HOST = os.Getenv("TEST_DB_HOST")
-		REDIS_PASS = os.Getenv("TEST_DB_PASS")
+		REDIS_HOST = os.Getenv("TEST_REDIS_HOST")
+		REDIS_PASS = os.Getenv("TEST_REDIS_PASS")
 		logger.Info(context.Background(), "Connecting to TEST Redis")
 	}
 
