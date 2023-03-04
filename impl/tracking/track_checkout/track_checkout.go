@@ -12,6 +12,11 @@ import (
 	"time"
 )
 
+const (
+	CitizenTicket = 8800
+	TouristTicket = 9800
+)
+
 type TrackCheckOut struct {
 	c   echo.Context
 	ctx context.Context
@@ -57,7 +62,14 @@ func (t *TrackCheckOut) startCheckOutTx() error {
 		return err
 	}
 
-	type Booking struct {
+	marshaledInfo, jErr := json.Marshal(t.req.GetCustomerInfo())
+	if jErr != nil {
+		logger.Warn(t.ctx, jErr.Error())
+	}
+
+	citizen, tourist := t.calculateTicket()
+
+	b := struct {
 		BookingId          *int64 `gorm:"primary_key"`
 		BookingStatus      *int64
 		BookingDay         *string
@@ -69,14 +81,7 @@ func (t *TrackCheckOut) startCheckOutTx() error {
 		CitizenTicketTotal *int64
 		TouristTicketTotal *int64
 		CustomerInfo       []byte
-	}
-
-	marshaledInfo, jErr := json.Marshal(t.req.GetCustomerInfo())
-	if jErr != nil {
-		logger.Warn(t.ctx, jErr.Error())
-	}
-
-	b := Booking{
+	}{
 		BookingId:          nil,
 		BookingStatus:      proto.Int64(int64(pb.BookingStatus_BOOKING_STATUS_SUCCESS)),
 		BookingDay:         t.req.BookingDay,
@@ -85,20 +90,21 @@ func (t *TrackCheckOut) startCheckOutTx() error {
 		PaymentStatus:      proto.Int64(int64(pb.PaymentStatus_PAYMENT_STATUS_SUCCESS)),
 		CitizenTicketCount: t.req.CitizenTicketCount,
 		TouristTicketCount: t.req.TouristTicketCount,
-		CitizenTicketTotal: nil,
-		TouristTicketTotal: nil,
+		CitizenTicketTotal: citizen,
+		TouristTicketTotal: tourist,
 		CustomerInfo:       marshaledInfo,
 	}
 
 	//Insert into booking_table
 	if err := tx.Create(&b).Error; err != nil {
-		logger.Warn(t.ctx, "Error during startCheckOutTx:updateWalletTransaction: %v", err.Error())
+		logger.Warn(t.ctx, "Error during startCheckOutTx:create booking: %v", err.Error())
 		tx.Rollback()
 		return err
 	}
 	//Update referral_table using referral_id
-	if err := tx.Raw("UPDATE %v SET WHERE referral_id = %v", orm.REFERRAL_TABLE).Error; err != nil {
-		logger.Warn(t.ctx, "Error during startCheckOutTx:updateWalletTransaction: %v", err.Error())
+	//TODO commission calculation
+	if err := tx.Exec(orm.UpdateReferralBookingInfoQuery(), pb.ReferralStatus_REFERRAL_STATUS_SUCCESS, b.BookingId, b.TransactionTime, "??", t.req.GetReferralId()).Error; err != nil {
+		logger.Warn(t.ctx, "Error during startCheckOutTx:update referral: %v", err.Error())
 		tx.Rollback()
 		return err
 	}
@@ -106,5 +112,13 @@ func (t *TrackCheckOut) startCheckOutTx() error {
 	if err := tx.Commit().Error; err != nil {
 		return err
 	}
+	return nil
+}
+
+func (t *TrackCheckOut) calculateTicket() (*int64, *int64) {
+	return proto.Int64(t.req.GetCitizenTicketCount() * CitizenTicket), proto.Int64(t.req.GetTouristTicketCount() * TouristTicket)
+}
+
+func (t *TrackCheckOut) calculateCommission() *int64 {
 	return nil
 }
