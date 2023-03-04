@@ -53,15 +53,19 @@ To run locally, `go test -v ./...`
 
 <h3>Production</h3>
 
-1. Server: Google Cloud Platform App Engine
-2. Database: AWS RDS
-3. Cache: Redis Cloud
+| Resource | Method                                          | 
+|----------|-------------------------------------------------|
+| Server   | <img src="asset/gcloud.svg"><br/>GCP App Engine |
+| Database | <img src="asset/aws.svg"><br/>AWS RDS           |
+| Cache    | <img src="asset/redis.svg"><br/>Redis Cloud     |
 
 <h3>Staging</h3>
 
-1. Server: Google Cloud Platform App Engine
-2. Database: Azure MySQL
-3. Cache: Redis Cloud
+| Resource | Method                                          | 
+|----------|-------------------------------------------------|
+| Server   | <img src="asset/gcloud.svg"><br/>GCP App Engine |
+| Database | <img src="asset/azure.svg"><br/>Azure SQL       |
+| Cache    | <img src="asset/redis.svg"><br/>Redis Cloud     |
 
 <h2> Endpoints </h2>
 
