@@ -27,12 +27,12 @@ func ConnectRedis() {
 	switch ENV {
 	case "PROD":
 		REDIS_HOST = os.Getenv("PROD_DB_HOST")
-		REDIS_PASS = os.Getenv("PROD_DB_PORT")
+		REDIS_PASS = os.Getenv("PROD_DB_PASS")
 		logger.Info(context.Background(), "Connecting to PROD Redis")
 		break
 	default:
 		REDIS_HOST = os.Getenv("TEST_DB_HOST")
-		REDIS_PASS = os.Getenv("TEST_DB_PORT")
+		REDIS_PASS = os.Getenv("TEST_DB_PASS")
 		logger.Info(context.Background(), "Connecting to TEST Redis")
 	}
 
@@ -43,7 +43,7 @@ func ConnectRedis() {
 	})
 
 	if err := rdb.Ping(context.Background()).Err(); err != nil {
-		logger.ErrorMsg(context.Background(), "Error while establishing Live Redis client: %v", err.Error())
+		logger.ErrorMsg(context.Background(), "Error while establishing Redis client: %v", err.Error())
 	} else {
 		logger.Info(context.Background(), "Successfully connected to redis")
 	}
