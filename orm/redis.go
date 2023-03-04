@@ -13,7 +13,9 @@ import (
 )
 
 var (
-	cache *redis.Client
+	cache      *redis.Client
+	REDIS_HOST string
+	REDIS_PASS string
 )
 
 func ConnectRedis() {
@@ -22,9 +24,13 @@ func ConnectRedis() {
 		logger.Warn(context.Background(), "Error loading .env file")
 	}
 
+	REDIS_HOST = os.Getenv("REDIS_HOST")
+	REDIS_PASS = os.Getenv("REDIS_PASS")
+	log.Print(REDIS_HOST, REDIS_PASS)
+
 	o := &redis.Options{
-		Addr:     os.Getenv("REDIS_HOST"),
-		Password: os.Getenv("REDIS_PASS"),
+		Addr:     REDIS_HOST,
+		Password: REDIS_PASS,
 		DB:       0,
 	}
 	log.Print(o)
