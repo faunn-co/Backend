@@ -1,6 +1,5 @@
 <h1 align = "center"> AffiliateManager </h1>
-
-<h1 align = "center"> <img src="asset/icon.png"> </h1>
+<p align="center"><img src="asset/icon.png"></p>
 
 <div align="center">
 
@@ -18,12 +17,15 @@
     PROD_DB_PORT=
     PROD_DB_USERNAME=
     PROD_DB_PASS=
+    PROD_REDIS_HOST=
+    PROD_REDIS_PASS=
     TEST_DB_HOST=
     TEST_DB_PORT=
     TEST_DB_USERNAME=
     TEST_DB_PASS=
-    REDIS_HOST=
-    REDIS_PASS=
+    TEST_REDIS_HOST=
+    TEST_REDIS_PASS=
+    ENV=
     ```
 2. `go mod download` to download dependencies.
 3. `go run main.go` to start server.
@@ -55,7 +57,7 @@ To run locally, `go test -v ./...`
 
 <h3>Production</h3>
 
-| Resource | Method                                          | 
+| Resource | Platform                                        | 
 |----------|-------------------------------------------------|
 | Server   | <img src="asset/gcloud.svg"><br/>GCP App Engine |
 | Database | <img src="asset/aws.svg"><br/>AWS RDS           |
@@ -63,7 +65,7 @@ To run locally, `go test -v ./...`
 
 <h3>Staging</h3>
 
-| Resource | Method                                          | 
+| Resource | Platform                                        | 
 |----------|-------------------------------------------------|
 | Server   | <img src="asset/gcloud.svg"><br/>GCP App Engine |
 | Database | <img src="asset/azure.svg"><br/>Azure SQL       |
