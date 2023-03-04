@@ -28,6 +28,9 @@
 4. Server can be access from `localhost:8888`
 
 <h2> Deployment </h2>
+
+<img src="asset/deployment_diagram.png">
+
 <h3> Default Deployment </h3>
 
 Automated deployment to GCP App Engine has been configured, and will be triggered on every push to `master`
@@ -48,8 +51,16 @@ To run locally, `go test -v ./...`
 
 <h2> Resources </h2>
 
+<h3>Production</h3>
+
 1. Server: Google Cloud Platform App Engine
 2. Database: AWS RDS
+3. Cache: Redis Cloud
+
+<h3>Staging</h3>
+
+1. Server: Google Cloud Platform App Engine
+2. Database: Azure MySQL
 3. Cache: Redis Cloud
 
 <h2> Endpoints </h2>
