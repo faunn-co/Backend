@@ -6,8 +6,8 @@ import (
 	"github.com/aaronangxz/AffiliateManager/logger"
 	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/gommon/log"
 	"github.com/redis/go-redis/v9"
+	"log"
 	"os"
 	"time"
 )
@@ -19,18 +19,21 @@ var (
 func ConnectRedis() {
 	err := godotenv.Load(getEnvDir())
 	if err != nil {
-		log.Warnf("Error loading .env file")
+		logger.Warn(context.Background(), "Error loading .env file")
 	}
-	rdb := redis.NewClient(&redis.Options{
+
+	o := &redis.Options{
 		Addr:     os.Getenv("REDIS_HOST"),
 		Password: os.Getenv("REDIS_PASS"),
 		DB:       0,
-	})
+	}
+	log.Print(o)
+	rdb := redis.NewClient(o)
 
 	if err := rdb.Ping(context.Background()).Err(); err != nil {
-		log.Errorf("Error while establishing Live Redis client: %v", err.Error())
+		logger.ErrorMsg(context.Background(), "Error while establishing Live Redis client: %v", err.Error())
 	} else {
-		log.Infof("Successfully connected to redis")
+		logger.Info(context.Background(), "Successfully connected to redis")
 	}
 	cache = rdb
 }
