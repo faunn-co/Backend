@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"github.com/aaronangxz/AffiliateManager/logger"
+	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
 	"github.com/redis/go-redis/v9"
@@ -16,6 +17,10 @@ var (
 )
 
 func ConnectRedis() {
+	err := godotenv.Load(getEnvDir())
+	if err != nil {
+		log.Warnf("Error loading .env file")
+	}
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     os.Getenv("REDIS_HOST"),
 		Password: os.Getenv("REDIS_PASS"),
