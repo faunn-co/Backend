@@ -21,8 +21,8 @@ func New(c echo.Context, ctx context.Context) *AffiliateVerification {
 	a := new(AffiliateVerification)
 	a.c = c
 	a.ctx = ctx
-	a.entityName = "entity_name:"
-	a.referralCode = "ref_code:"
+	a.entityName = "entity_name"
+	a.referralCode = "ref_code"
 	return a
 }
 

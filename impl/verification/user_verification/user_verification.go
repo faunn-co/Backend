@@ -23,9 +23,9 @@ func New(c echo.Context, ctx context.Context) *UserVerification {
 	u := new(UserVerification)
 	u.c = c
 	u.ctx = ctx
-	u.userIdKey = "user_id:"
-	u.userNameKey = "user_name:"
-	u.userEmailKey = "user_email:"
+	u.userIdKey = "user_id"
+	u.userNameKey = "user_name"
+	u.userEmailKey = "user_email"
 	return u
 }
 
