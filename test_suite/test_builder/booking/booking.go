@@ -224,7 +224,7 @@ func (b *Booking) Build() *Booking {
 }
 
 func (b *Booking) TearDown() {
-	if err := orm.DbInstance(context.Background()).Exec(fmt.Sprintf("DELETE FROM %v.%v WHERE booking_id = %v", orm.AFFILIATE_MANAGER_TEST_DB, orm.BOOKING_DETAILS_TABLE, b.BookingDetails.GetBookingId())).Error; err != nil {
+	if err := orm.DbInstance(context.Background()).Exec(fmt.Sprintf("DELETE FROM %v WHERE booking_id = %v", orm.BOOKING_DETAILS_TABLE, b.BookingDetails.GetBookingId())).Error; err != nil {
 		log.Error(err)
 	}
 }

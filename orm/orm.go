@@ -17,14 +17,14 @@ import (
 )
 
 const (
-	AFFILIATE_MANAGER_DB      = "affiliate_manager_db"
-	AFFILIATE_MANAGER_TEST_DB = "affiliate_manager_db"
-	USER_TABLE                = "user_table"
-	USER_AUTH_TABLE           = "user_auth_table"
-	REFERRAL_TABLE            = "referral_table"
-	BOOKING_DETAILS_TABLE     = "booking_details_table"
-	AFFILIATE_DETAILS_TABLE   = "affiliate_details_table"
-	BOOKING_SLOTS_TABLE       = "booking_slots_table"
+	AFFILIATE_MANAGER_DB         = "affiliate_manager_db"
+	AFFILIATE_MANAGER_STAGING_DB = "affiliate_manager_staging_db"
+	USER_TABLE                   = "user_table"
+	USER_AUTH_TABLE              = "user_auth_table"
+	REFERRAL_TABLE               = "referral_table"
+	BOOKING_DETAILS_TABLE        = "booking_details_table"
+	AFFILIATE_DETAILS_TABLE      = "affiliate_details_table"
+	BOOKING_SLOTS_TABLE          = "booking_slots_table"
 )
 
 var (
@@ -83,7 +83,7 @@ func DbInstance(ctx context.Context) *gorm.DB {
 			DB_PORT = os.Getenv("TEST_DB_PORT")
 			DB_USERNAME = os.Getenv("TEST_DB_USERNAME")
 			DB_PASS = os.Getenv("TEST_DB_PASS")
-			DB_NAME = AFFILIATE_MANAGER_TEST_DB
+			DB_NAME = AFFILIATE_MANAGER_STAGING_DB
 			logger.Info(ctx, "Connecting to TEST DB")
 			break
 		case "LOCAL":

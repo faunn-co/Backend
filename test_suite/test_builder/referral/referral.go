@@ -118,7 +118,7 @@ func (r *Referral) Build() *Referral {
 }
 
 func (r *Referral) TearDown() {
-	if err := orm.DbInstance(context.Background()).Exec(fmt.Sprintf("DELETE FROM %v.%v WHERE referral_id = %v", orm.AFFILIATE_MANAGER_TEST_DB, orm.REFERRAL_TABLE, r.ReferralDb.GetReferralId())).Error; err != nil {
+	if err := orm.DbInstance(context.Background()).Exec(fmt.Sprintf("DELETE FROM %v WHERE referral_id = %v", orm.REFERRAL_TABLE, r.ReferralDb.GetReferralId())).Error; err != nil {
 		log.Error(err)
 	}
 
