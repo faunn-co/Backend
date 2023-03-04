@@ -3,6 +3,7 @@ package orm
 import (
 	"context"
 	"encoding/json"
+	"github.com/aaronangxz/AffiliateManager/logger"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/gommon/log"
 	"github.com/redis/go-redis/v9"
@@ -37,29 +38,32 @@ func RedisInstance() *redis.Client {
 func SET(c context.Context, key string, data interface{}, ttlSeconds time.Duration) error {
 	data, jsonErr := json.Marshal(data)
 	if jsonErr != nil {
-		log.Errorf("Failed to marshal JSON results: %v\n", jsonErr.Error())
+		logger.ErrorMsg(c, "Failed to marshal JSON results: %v\n", jsonErr.Error())
 		return jsonErr
 	}
 
 	if err := RedisInstance().Set(c, key, data, ttlSeconds*time.Minute).Err(); err != nil {
-		log.Errorf(" Error while writing to redis: %v", err.Error())
+		logger.ErrorMsg(c, " Error while writing to redis: %v", err.Error())
 		return err
 	}
+	logger.Info(c, "Successfully written to redis: %v", key)
 	return nil
 }
 
-func GET(e echo.Context, c context.Context, key string) ([]byte, error) {
+func GET(e echo.Context, c context.Context, key string, needResponseHeader bool) ([]byte, error) {
 	val, redisErr := RedisInstance().Get(c, key).Result()
 	if redisErr != nil {
 		if redisErr == redis.Nil {
-			log.Warnf("No result of %v in Redis, reading from API", key)
+			logger.Warn(c, "No result of %v in Redis, reading from API", key)
 			return nil, nil
 		} else {
-			log.Errorf("Error while reading from redis: %v", redisErr.Error())
+			logger.ErrorMsg(c, "Error while reading from redis: %v", redisErr.Error())
 			return nil, redisErr
 		}
 	}
-	log.Infof("Successful | Cached %v", key)
-	e.Response().Header().Set("cache", "1")
+	logger.Info(c, "Successful | Cached %v", key)
+	if needResponseHeader {
+		e.Response().Header().Set("cache", "1")
+	}
 	return []byte(val), nil
 }

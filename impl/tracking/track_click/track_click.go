@@ -75,7 +75,7 @@ func (t *TrackClick) makeCacheKey(code string) string {
 
 func (t *TrackClick) getAffiliateWithCodeUsingCache(code string) (*int64, *resp.Error) {
 	k := t.makeCacheKey(code)
-	if val, err := orm.GET(t.c, t.ctx, k); err != nil {
+	if val, err := orm.GET(t.c, t.ctx, k, true); err != nil {
 		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_REDIS)
 	} else if val != nil {
 		var redisResp *pb.AffiliateDetailsDb
