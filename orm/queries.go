@@ -251,3 +251,19 @@ func GetUserInfoWithAuthQuery() string {
 	}
 	return string(query)
 }
+
+func UpdateReferralBookingInfoQuery() string {
+	query, err := os.ReadFile(openSql("sql31.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}
+
+func GetReferralClickInfo() string {
+	query, err := os.ReadFile(openSql("sql32.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}

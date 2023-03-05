@@ -134,10 +134,10 @@ func (u *User) Build() *User {
 }
 
 func (u *User) TearDown() {
-	if err := orm.DbInstance(nil).Exec(fmt.Sprintf("DELETE FROM %v.%v WHERE user_id = %v", orm.AFFILIATE_MANAGER_TEST_DB, orm.USER_TABLE, u.UserInfo.GetUserId())).Error; err != nil {
+	if err := orm.DbInstance(nil).Exec(fmt.Sprintf("DELETE FROM %v WHERE user_id = %v", orm.USER_TABLE, u.UserInfo.GetUserId())).Error; err != nil {
 		log.Error(err)
 	}
-	if err := orm.DbInstance(nil).Exec(fmt.Sprintf("DELETE FROM %v.%v WHERE user_id = %v", orm.AFFILIATE_MANAGER_TEST_DB, orm.AFFILIATE_DETAILS_TABLE, u.UserInfo.GetUserId())).Error; err != nil {
+	if err := orm.DbInstance(nil).Exec(fmt.Sprintf("DELETE FROM %v WHERE user_id = %v", orm.AFFILIATE_DETAILS_TABLE, u.UserInfo.GetUserId())).Error; err != nil {
 		log.Error(err)
 	}
 }

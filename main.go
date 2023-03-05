@@ -29,7 +29,7 @@ func main() {
 	//Affiliate
 	e.POST("api/v1/affiliate/list", cmd.GetAffiliateList)               //DONE
 	e.GET("api/v1/affiliate/:id", cmd.GetAffiliateDetailsById)          //DONE, not tested
-	e.GET("api/v1/affiliate/info", cmd.GetAffiliateInfo)                //DONE, not tested
+	e.GET("api/v1/affiliate/info", cmd.GetAffiliateInfo)                //DONE
 	e.POST("api/v1/affiliate/stats", cmd.GetAffiliateStats)             //DONE
 	e.POST("api/v1/affiliate/trend", cmd.GetAffiliateTrend)             //DONE
 	e.GET("api/v1/affiliate/ranking/list", cmd.GetAffiliateRankingList) //DONE
@@ -53,17 +53,15 @@ func main() {
 
 	//Landing Page
 	e.GET("api/v1/booking/slots/available", cmd.GetAvailableSlot) //DONE
-	e.POST("api/v1/booking/transaction/begin", cmd.GetAvailableSlot)
-	e.POST("api/v1/booking/transaction/complete", cmd.GetAvailableSlot)
 
 	//Registration
-	e.POST("api/v1/platform/register", cmd.UserRegistration) //DONE, not tested
-	e.POST("api/v1/platform/login", cmd.UserAuthentication)  //DONE, not tested
+	e.POST("api/v1/platform/register", cmd.UserRegistration) //DONE
+	e.POST("api/v1/platform/login", cmd.UserAuthentication)  //DONE
 
-	e.POST("api/v1/tracking/click", cmd.TrackClick) //DONE, not tested
-	e.POST("api/v1/tracking/checkout", cmd.TrackClick)
+	e.POST("api/v1/tracking/click", cmd.TrackClick)       //DONE
+	e.POST("api/v1/tracking/checkout", cmd.TrackCheckout) //DONE
 
-	e.POST("api/v1/payment/create-payment-intent", cmd.CreatePaymentIntent)
+	e.POST("api/v1/payment/create-payment-intent", cmd.CreatePaymentIntent) //DONE
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%v", getPort())))
 }

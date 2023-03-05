@@ -186,3 +186,13 @@ func CreatePaymentIntentResponseJSON(c echo.Context, secret *string) error {
 		ClientSecret: secret,
 	})
 }
+
+func TrackCheckoutResponseJSON(c echo.Context, details *pb.BookingDetails) error {
+	return c.JSON(http.StatusOK, pb.TrackCheckOutResponse{
+		ResponseMeta: &pb.ResponseMeta{
+			ErrorCode: proto.Int64(int64(pb.GlobalErrorCode_SUCCESS)),
+			ErrorMsg:  proto.String("success"),
+		},
+		BookingDetails: details,
+	})
+}
