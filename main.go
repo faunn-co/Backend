@@ -60,8 +60,8 @@ func main() {
 	e.POST("api/v1/platform/register", cmd.UserRegistration) //DONE
 	e.POST("api/v1/platform/login", cmd.UserAuthentication)  //DONE
 
-	e.POST("api/v1/tracking/click", cmd.TrackClick) //DONE
-	e.POST("api/v1/tracking/checkout", cmd.TrackClick)
+	e.POST("api/v1/tracking/click", cmd.TrackClick)       //DONE
+	e.POST("api/v1/tracking/checkout", cmd.TrackCheckout) //DONE
 
 	e.POST("api/v1/payment/create-payment-intent", cmd.CreatePaymentIntent)
 
