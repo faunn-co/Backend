@@ -1,4 +1,4 @@
-package get_affiliate_info
+package get_user_info
 
 import (
 	"context"
@@ -11,20 +11,20 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
-type GetAffiliateInfo struct {
+type GetUserInfo struct {
 	c   echo.Context
 	ctx context.Context
 }
 
-func New(c echo.Context) *GetAffiliateInfo {
-	g := new(GetAffiliateInfo)
+func New(c echo.Context) *GetUserInfo {
+	g := new(GetUserInfo)
 	g.c = c
 	g.ctx = logger.NewCtx(g.c)
-	logger.Info(g.ctx, "GetAffiliateInfo Initialized")
+	logger.Info(g.ctx, "GetUserInfo Initialized")
 	return g
 }
 
-func (g *GetAffiliateInfo) GetAffiliateInfoImpl() (*pb.AffiliateProfileMeta, *pb.User, *resp.Error) {
+func (g *GetUserInfo) GetUserInfoImpl() (*pb.AffiliateProfileMeta, *pb.User, *resp.Error) {
 	id := g.c.QueryParam("id")
 	fmt.Println(id)
 	if err := user_verification.New(g.c, g.ctx).VerifyUserId(id); err != nil {

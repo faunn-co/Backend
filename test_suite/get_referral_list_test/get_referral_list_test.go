@@ -28,7 +28,7 @@ func TestGetReferralList_Affiliate_ValidAffiliateId(t *testing.T) {
 		AffiliateId: r.Affiliate.UserInfo.UserId,
 	}
 
-	err, resp := run(reqBody)
+	err, resp := run(reqBody, r.Affiliate.Token)
 
 	assert.Equal(t, expectedHTTPCode, err)
 	if assert.Equal(t, expectedErrCode, resp.GetResponseMeta().GetErrorCode()) {
@@ -61,7 +61,7 @@ func TestGetReferralList_Affiliate_ValidAffiliateName(t *testing.T) {
 		AffiliateName: r.Affiliate.UserInfo.UserName,
 	}
 
-	err, resp := run(reqBody)
+	err, resp := run(reqBody, r.Affiliate.Token)
 
 	assert.Equal(t, expectedHTTPCode, err)
 	if assert.Equal(t, expectedErrCode, resp.GetResponseMeta().GetErrorCode()) {
@@ -77,6 +77,9 @@ func TestGetReferralList_Affiliate_ValidAffiliateName(t *testing.T) {
 }
 
 func TestGetReferralList_Affiliate_InvalidAffiliateId(t *testing.T) {
+	r := referral.New().Build()
+	defer r.TearDown()
+
 	var (
 		reqBody          *pb.GetReferralListRequest
 		expectedHTTPCode = http.StatusOK
@@ -91,7 +94,7 @@ func TestGetReferralList_Affiliate_InvalidAffiliateId(t *testing.T) {
 		AffiliateId: proto.Int64(69420),
 	}
 
-	err, resp := run(reqBody)
+	err, resp := run(reqBody, r.Affiliate.Token)
 
 	assert.Equal(t, expectedHTTPCode, err)
 	assert.Equal(t, expectedErrCode, resp.GetResponseMeta().GetErrorCode())

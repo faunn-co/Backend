@@ -16,5 +16,7 @@ steps:
       - 'TEST_REDIS_HOST=${_TEST_REDIS_HOST}'
       - 'TEST_REDIS_PASS=${_TEST_REDIS_PASS}'
       - 'ENV=${_ENV}'
+      - 'ACCESS_SECRET=${_ACCESS_SECRET}'
+      - 'REFRESH_SECRET=${_REFRESH_SECRET}'
   - name: "gcr.io/cloud-builders/gcloud"
     args: [ "app", "deploy" ]

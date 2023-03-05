@@ -3,12 +3,14 @@ package user_authentication
 import (
 	"context"
 	"errors"
+	"github.com/aaronangxz/AffiliateManager/auth_middleware"
 	"github.com/aaronangxz/AffiliateManager/impl/verification/user_verification"
 	"github.com/aaronangxz/AffiliateManager/logger"
 	"github.com/aaronangxz/AffiliateManager/orm"
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
 	"github.com/aaronangxz/AffiliateManager/resp"
 	"github.com/labstack/echo/v4"
+	"google.golang.org/protobuf/proto"
 )
 
 type UserAuthentication struct {
@@ -54,12 +56,26 @@ func (u *UserAuthentication) executeLogin() (*pb.AuthCookie, error) {
 	if user == nil {
 		return nil, errors.New("login credentials are incorrect")
 	}
+
+	token, err := auth_middleware.CreateToken(u.ctx, user.GetUserId(), user.GetUserRole())
+	if err != nil {
+		return nil, err
+	}
+
+	saveErr := auth_middleware.CreateAuth(u.ctx, user.GetUserId(), token)
+	if saveErr != nil {
+		return nil, saveErr
+	}
+
 	return &pb.AuthCookie{
 		UserId:    user.UserId,
 		UserName:  user.UserName,
 		UserEmail: user.UserEmail,
 		UserRole:  user.UserRole,
-		Cookie:    nil,
+		Tokens: &pb.Tokens{
+			AccessToken:  proto.String(token.AccessToken),
+			RefreshToken: proto.String(token.RefreshToken),
+		},
 	}, nil
 }
 

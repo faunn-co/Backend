@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"github.com/aaronangxz/AffiliateManager/auth_middleware"
 	"github.com/aaronangxz/AffiliateManager/cmd"
 	"github.com/aaronangxz/AffiliateManager/orm"
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
@@ -71,43 +72,47 @@ func NewMockTest(method string) *MockTest {
 	m := new(MockTest)
 	m.meta = methodMap[method]
 	m.e = echo.New()
-	//Affiliate
-	m.e.POST("api/v1/affiliate/list", cmd.GetAffiliateList)
-	//returns details of this affiliate
-	m.e.GET("api/v1/affiliate/:id", cmd.GetAffiliateDetailsById)
-	//get affiliate id from token
-	m.e.POST("api/v1/affiliate/info", cmd.GetAffiliateInfo)
-	//get affiliate id from token
-	m.e.POST("api/v1/affiliate/stats", cmd.GetAffiliateStats)             //DONE
-	m.e.POST("api/v1/affiliate/trend", cmd.GetAffiliateTrend)             //DONE
-	m.e.GET("api/v1/affiliate/ranking/list", cmd.GetAffiliateRankingList) //DONE
-	//Use by Affiliates to see their referrals
-	m.e.GET("api/v1/affiliate/referral/list", cmd.GetAffiliateReferralsList)
+	//Allows admin / dev only
+	a := m.e.Group("api/v1/affiliate")
+	a.Use(auth_middleware.AdminAuthorization)
+	a.POST("/list", cmd.GetAffiliateList)               //DONE
+	a.GET("/:id", cmd.GetAffiliateDetailsById)          //DONE, not tested
+	a.POST("/stats", cmd.GetAffiliateStats)             //DONE
+	a.POST("/trend", cmd.GetAffiliateTrend)             //DONE
+	a.GET("/ranking/list", cmd.GetAffiliateRankingList) //DONE
 
 	//Referral
-	m.e.POST("api/v1/referral/list", cmd.GetReferralsList)
-	m.e.POST("api/v1/referral/stats", cmd.GetReferralStats)
-	m.e.POST("api/v1/referral/trend", cmd.GetReferralTrend)
-	m.e.POST("api/v1/referral/recent/list", cmd.GetReferralRecentList)
-	m.e.GET("api/v1/referral/:id", cmd.GetReferralById)
+	//Allows admin / affiliate / dev
+	r := m.e.Group("api/v1/referral")
+	r.Use(auth_middleware.AffiliateAuthorization)
+	r.POST("/list", cmd.GetReferralsList)             //DONE
+	r.POST("/stats", cmd.GetReferralStats)            //DONE
+	r.POST("/trend", cmd.GetReferralTrend)            //DONE
+	r.POST("/recent/list", cmd.GetReferralRecentList) //DONE
+	r.GET("/:id", cmd.GetReferralById)                //DONE, not tested
 
 	//Booking
-	m.e.POST("api/v1/booking/list", cmd.GetBookingList)
-	m.e.POST("api/v1/booking/stats", cmd.GetAvailableSlot)
-	m.e.POST("api/v1/booking/trend", cmd.GetAvailableSlot)
-	m.e.GET("api/v1/booking/recent/list", cmd.GetAvailableSlot)
-	m.e.GET("api/v1/booking/:id", cmd.GetAvailableSlot)
-	m.e.PUT("api/v1/booking/:id", cmd.GetAvailableSlot)
-	m.e.DELETE("api/v1/booking/:id", cmd.GetAvailableSlot)
+	//Allows admin / dev only
+	b := m.e.Group("api/v1/booking")
+	b.Use(auth_middleware.AdminAuthorization)
+	b.POST("api/v1/booking/list", cmd.GetBookingList) //DONE
+
+	//Endpoints below require no Auth
+	m.e.GET("api/v1/user/info", cmd.GetUserInfo) //DONE
 
 	//Landing Page
-	m.e.GET("api/v1/booking/slots/available", cmd.GetAvailableSlot)
-	m.e.POST("api/v1/booking/transaction/begin", cmd.GetAvailableSlot)
-	m.e.POST("api/v1/booking/transaction/complete", cmd.GetAvailableSlot)
+	m.e.GET("api/v1/booking/slots/available", cmd.GetAvailableSlot) //DONE
 
 	//Registration
-	m.e.POST("api/v1/platform/register", cmd.GetAvailableSlot)
-	m.e.POST("api/v1/platform/login", cmd.GetAvailableSlot)
+	m.e.POST("api/v1/platform/register", cmd.UserRegistration) //DONE
+	m.e.POST("api/v1/platform/login", cmd.UserAuthentication)  //DONE
+
+	//Tracking
+	m.e.POST("api/v1/tracking/click", cmd.TrackClick)       //DONE
+	m.e.POST("api/v1/tracking/checkout", cmd.TrackCheckout) //DONE
+
+	//Stripe
+	m.e.POST("api/v1/payment/create-payment-intent", cmd.CreatePaymentIntent) //DONE
 	orm.DIR = "../../orm/queries/"
 	orm.ENV = "TEST"
 	return m
@@ -121,7 +126,7 @@ func (m *MockTest) QueryParam(key, value string) *MockTest {
 	return m
 }
 
-func (m *MockTest) Req(body interface{}) *MockTest {
+func (m *MockTest) Req(body interface{}, tokens *pb.Tokens) *MockTest {
 	requestBody, err := json.Marshal(body)
 	if err != nil {
 		log.Error(err)
@@ -136,10 +141,12 @@ func (m *MockTest) Req(body interface{}) *MockTest {
 			url += fmt.Sprintf("%v=%v", k, v)
 		}
 	}
-	fmt.Println(m.meta.HTTPMethod, url)
-	fmt.Println(string(val))
 	request, _ := http.NewRequest(m.meta.HTTPMethod, url, bytes.NewBuffer(requestBody))
 	request.Header.Set("Content-Type", "application/json")
+	request.Header.Set("Authorization", fmt.Sprintf("Bearer %v", tokens.GetAccessToken()))
+	fmt.Println(m.meta.HTTPMethod, url)
+	fmt.Println("Token:", request.Header.Get("Authorization"))
+	fmt.Println(string(val))
 	writer := httptest.NewRecorder()
 	m.e.ServeHTTP(writer, request)
 	m.r = writer
