@@ -1,7 +1,9 @@
 package get_affiliate_list
 
 import (
+	"context"
 	"database/sql"
+	"github.com/aaronangxz/AffiliateManager/logger"
 	"github.com/aaronangxz/AffiliateManager/orm"
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
 	"github.com/aaronangxz/AffiliateManager/resp"
@@ -12,6 +14,7 @@ import (
 
 type GetAffiliateList struct {
 	c   echo.Context
+	ctx context.Context
 	req *pb.GetAffiliateListRequest
 	key string
 }
@@ -20,6 +23,8 @@ func New(c echo.Context) *GetAffiliateList {
 	g := new(GetAffiliateList)
 	g.c = c
 	g.key = "get_affiliate_list"
+	g.ctx = logger.NewCtx(g.c)
+	logger.Info(g.ctx, "GetAffiliateList Initialized")
 	return g
 }
 
@@ -44,7 +49,7 @@ func (g *GetAffiliateList) GetAffiliateListImpl() ([]*pb.AffiliateMeta, *int64, 
 	//}
 
 	var l []*pb.AffiliateMeta
-	if err := orm.DbInstance(g.c).Raw(orm.GetAffiliateListQuery(), sql.Named("startTime", start), sql.Named("endTime", end)).Scan(&l).Error; err != nil {
+	if err := orm.DbInstance(g.ctx).Raw(orm.GetAffiliateListQuery(), sql.Named("startTime", start), sql.Named("endTime", end)).Scan(&l).Error; err != nil {
 		return nil, nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 	}
 

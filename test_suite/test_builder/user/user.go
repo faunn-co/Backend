@@ -1,6 +1,7 @@
 package user
 
 import (
+	"context"
 	"fmt"
 	"github.com/aaronangxz/AffiliateManager/orm"
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
@@ -42,6 +43,16 @@ func (u *User) SetUserRole(role int64) *User {
 	return u
 }
 
+func (u *User) SetEntityName(name string) *User {
+	u.AffiliateInfo.EntityName = proto.String(name)
+	return u
+}
+
+func (u *User) SetEntityIdentifier(identifier string) *User {
+	u.AffiliateInfo.EntityIdentifier = proto.String(identifier)
+	return u
+}
+
 func (u *User) SetAffiliateType(affiliateType int64) *User {
 	u.AffiliateInfo.AffiliateType = proto.Int64(affiliateType)
 	return u
@@ -67,6 +78,14 @@ func (u *User) filDefaults() *User {
 
 	if u.UserInfo.UserRole == nil {
 		u.SetUserRole(int64(pb.UserRole_ROLE_AFFILIATE))
+	}
+
+	if u.AffiliateInfo.EntityName == nil {
+		u.SetEntityName("RandomEntityName")
+	}
+
+	if u.AffiliateInfo.EntityIdentifier == nil {
+		u.SetEntityIdentifier("RandomEntityIdentifier")
 	}
 
 	if u.AffiliateInfo.AffiliateType == nil {
@@ -99,7 +118,7 @@ func (u *User) Build() *User {
 		CreateTimestamp: time.Now().Unix(),
 	}
 
-	if err := orm.DbInstance(nil).Table(orm.USER_TABLE).Create(&user).Error; err != nil {
+	if err := orm.DbInstance(context.Background()).Table(orm.USER_TABLE).Create(&user).Error; err != nil {
 		log.Error(err)
 		return nil
 	}
@@ -115,10 +134,10 @@ func (u *User) Build() *User {
 }
 
 func (u *User) TearDown() {
-	if err := orm.DbInstance(nil).Exec(fmt.Sprintf("DELETE FROM %v.%v WHERE user_id = %v", orm.AFFILIATE_MANAGER_TEST_DB, orm.USER_TABLE, u.UserInfo.GetUserId())).Error; err != nil {
+	if err := orm.DbInstance(nil).Exec(fmt.Sprintf("DELETE FROM %v WHERE user_id = %v", orm.USER_TABLE, u.UserInfo.GetUserId())).Error; err != nil {
 		log.Error(err)
 	}
-	if err := orm.DbInstance(nil).Exec(fmt.Sprintf("DELETE FROM %v.%v WHERE user_id = %v", orm.AFFILIATE_MANAGER_TEST_DB, orm.AFFILIATE_DETAILS_TABLE, u.UserInfo.GetUserId())).Error; err != nil {
+	if err := orm.DbInstance(nil).Exec(fmt.Sprintf("DELETE FROM %v WHERE user_id = %v", orm.AFFILIATE_DETAILS_TABLE, u.UserInfo.GetUserId())).Error; err != nil {
 		log.Error(err)
 	}
 }

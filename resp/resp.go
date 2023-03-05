@@ -147,12 +147,52 @@ func TrackClickResponseJSON(c echo.Context, id *int64) error {
 	})
 }
 
-func GetAffiliateInfoResponseJSON(c echo.Context, meta *pb.AffiliateMeta) error {
+func GetAffiliateInfoResponseJSON(c echo.Context, meta *pb.AffiliateProfileMeta, user *pb.User) error {
 	return c.JSON(http.StatusOK, pb.GetAffiliateInfoResponse{
 		ResponseMeta: &pb.ResponseMeta{
 			ErrorCode: proto.Int64(int64(pb.GlobalErrorCode_SUCCESS)),
 			ErrorMsg:  proto.String("success"),
 		},
 		AffiliateMeta: meta,
+		UserInfo:      user,
+	})
+}
+
+func UserRegistrationResponseJSON(c echo.Context) error {
+	return c.JSON(http.StatusOK, pb.UserRegistrationResponse{
+		ResponseMeta: &pb.ResponseMeta{
+			ErrorCode: proto.Int64(int64(pb.GlobalErrorCode_SUCCESS)),
+			ErrorMsg:  proto.String("success"),
+		},
+	})
+}
+
+func UserAuthenticationResponseJSON(c echo.Context, a *pb.AuthCookie) error {
+	return c.JSON(http.StatusOK, pb.UserAuthenticationResponse{
+		ResponseMeta: &pb.ResponseMeta{
+			ErrorCode: proto.Int64(int64(pb.GlobalErrorCode_SUCCESS)),
+			ErrorMsg:  proto.String("success"),
+		},
+		AuthCookie: a,
+	})
+}
+
+func CreatePaymentIntentResponseJSON(c echo.Context, secret *string) error {
+	return c.JSON(http.StatusOK, pb.CreatePaymentIntentResponse{
+		ResponseMeta: &pb.ResponseMeta{
+			ErrorCode: proto.Int64(int64(pb.GlobalErrorCode_SUCCESS)),
+			ErrorMsg:  proto.String("success"),
+		},
+		ClientSecret: secret,
+	})
+}
+
+func TrackCheckoutResponseJSON(c echo.Context, details *pb.BookingDetails) error {
+	return c.JSON(http.StatusOK, pb.TrackCheckOutResponse{
+		ResponseMeta: &pb.ResponseMeta{
+			ErrorCode: proto.Int64(int64(pb.GlobalErrorCode_SUCCESS)),
+			ErrorMsg:  proto.String("success"),
+		},
+		BookingDetails: details,
 	})
 }

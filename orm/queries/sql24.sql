@@ -1,6 +1,7 @@
 SELECT
     a.user_id as affiliate_id,
-    u.user_name,
+    a.entity_name,
+    a.entity_identifier,
     a.affiliate_type,
     a.unique_referral_code,
     COUNT(r.referral_click_time) AS referral_clicks,
@@ -20,3 +21,4 @@ FROM
         LEFT JOIN booking_details_table b ON b.booking_id = r.booking_id
 WHERE
         a.user_id = ?
+GROUP BY a.user_id

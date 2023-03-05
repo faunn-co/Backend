@@ -2,9 +2,9 @@ name: Test Suite
 
 on:
   push:
-    branches: [ master ]
+    branches: [ master, staging ]
   pull_request:
-    branches: [ master ]
+    branches: [ master, staging ]
 
 jobs:
   build:
@@ -28,3 +28,6 @@ jobs:
           TEST_DB_PORT: ${{secrets.TEST_DB_PORT}}
           TEST_DB_USERNAME: ${{secrets.TEST_DB_USERNAME}}
           TEST_DB_PASS: ${{secrets.TEST_DB_PASS}}
+          TEST_REDIS_HOST: ${{secrets.TEST_REDIS_HOST}}
+          TEST_REDIS_PASS: ${{secrets.TEST_REDIS_PASS}}
+          ENV: ${{secrets.ENV}}

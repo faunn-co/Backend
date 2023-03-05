@@ -1,6 +1,7 @@
 package referral
 
 import (
+	"context"
 	"fmt"
 	"github.com/aaronangxz/AffiliateManager/orm"
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
@@ -107,7 +108,7 @@ func (r *Referral) Build() *Referral {
 		ReferralCommission: r.ReferralDb.ReferralCommission,
 	}
 
-	if err := orm.DbInstance(nil).Table(orm.REFERRAL_TABLE).Create(&ref).Error; err != nil {
+	if err := orm.DbInstance(context.Background()).Table(orm.REFERRAL_TABLE).Create(&ref).Error; err != nil {
 		log.Error(err)
 		return nil
 	}
@@ -117,7 +118,7 @@ func (r *Referral) Build() *Referral {
 }
 
 func (r *Referral) TearDown() {
-	if err := orm.DbInstance(nil).Exec(fmt.Sprintf("DELETE FROM %v.%v WHERE referral_id = %v", orm.AFFILIATE_MANAGER_TEST_DB, orm.REFERRAL_TABLE, r.ReferralDb.GetReferralId())).Error; err != nil {
+	if err := orm.DbInstance(context.Background()).Exec(fmt.Sprintf("DELETE FROM %v WHERE referral_id = %v", orm.REFERRAL_TABLE, r.ReferralDb.GetReferralId())).Error; err != nil {
 		log.Error(err)
 	}
 

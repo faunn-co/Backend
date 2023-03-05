@@ -7,11 +7,14 @@ steps:
       - 'PROD_DB_PORT=${_PROD_DB_PORT}'
       - 'PROD_DB_USERNAME=${_PROD_DB_USERNAME}'
       - 'PROD_DB_PASS=${_PROD_DB_PASS}'
+      - 'PROD_REDIS_HOST=${_PROD_REDIS_HOST}'
+      - 'PROD_REDIS_PASS=${_PROD_REDIS_PASS}'
       - 'TEST_DB_HOST=${_TEST_DB_HOST}'
       - 'TEST_DB_PORT=${_TEST_DB_PORT}'
       - 'TEST_DB_USERNAME=${_TEST_DB_USERNAME}'
       - 'TEST_DB_PASS=${_TEST_DB_PASS}'
-      - 'REDIS_HOST=${_REDIS_HOST}'
-      - 'REDIS_PASS=${_REDIS_PASS}'
+      - 'TEST_REDIS_HOST=${_TEST_REDIS_HOST}'
+      - 'TEST_REDIS_PASS=${_TEST_REDIS_PASS}'
+      - 'ENV=${_ENV}'
   - name: "gcr.io/cloud-builders/gcloud"
     args: [ "app", "deploy" ]
