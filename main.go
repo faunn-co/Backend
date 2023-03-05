@@ -53,8 +53,6 @@ func main() {
 
 	//Landing Page
 	e.GET("api/v1/booking/slots/available", cmd.GetAvailableSlot) //DONE
-	e.POST("api/v1/booking/transaction/begin", cmd.GetAvailableSlot)
-	e.POST("api/v1/booking/transaction/complete", cmd.GetAvailableSlot)
 
 	//Registration
 	e.POST("api/v1/platform/register", cmd.UserRegistration) //DONE
@@ -63,7 +61,7 @@ func main() {
 	e.POST("api/v1/tracking/click", cmd.TrackClick)       //DONE
 	e.POST("api/v1/tracking/checkout", cmd.TrackCheckout) //DONE
 
-	e.POST("api/v1/payment/create-payment-intent", cmd.CreatePaymentIntent)
+	e.POST("api/v1/payment/create-payment-intent", cmd.CreatePaymentIntent) //DONE
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%v", getPort())))
 }
