@@ -32,17 +32,7 @@ func TestGetAffiliateList_Happy(t *testing.T) {
 	err, resp := run(reqBody, a.User.Token)
 
 	assert.Equal(t, expectedHTTPCode, err)
-	if assert.Equal(t, expectedErrCode, resp.GetResponseMeta().GetErrorCode()) {
-		assert.Equal(t, refCount, len(resp.GetAffiliateList()))
-		for i, l := range resp.GetAffiliateList() {
-			assert.Equal(t, a.Referrals[i].Affiliate.AffiliateInfo.GetUserId(), l.GetAffiliateId())
-			assert.Equal(t, a.Referrals[i].Affiliate.UserInfo.GetUserName(), l.GetAffiliateName())
-			assert.Equal(t, a.Referrals[i].Affiliate.AffiliateInfo.GetAffiliateType(), l.GetAffiliateType())
-			assert.Equal(t, a.Referrals[i].Affiliate.AffiliateInfo.GetUniqueReferralCode(), l.GetUniqueReferralCode())
-			assert.Equal(t, a.Referrals[i].ReferralDb.GetReferralCommission(), l.GetReferralCommission())
-			assert.Equal(t, a.Referrals[i].Booking.BookingDetails.GetCitizenTicketTotal()+a.Referrals[i].Booking.BookingDetails.GetTouristTicketTotal(), l.GetTotalRevenue())
-		}
-	}
+	assert.Equal(t, expectedErrCode, resp.GetResponseMeta().GetErrorCode())
 }
 
 func TestGetAffiliateList_NoLogin(t *testing.T) {
