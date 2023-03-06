@@ -196,3 +196,12 @@ func TrackCheckoutResponseJSON(c echo.Context, details *pb.BookingDetails) error
 		BookingDetails: details,
 	})
 }
+
+func UserDeAuthenticationResponseJSON(c echo.Context) error {
+	return c.JSON(http.StatusOK, pb.UserDeAuthenticationResponse{
+		ResponseMeta: &pb.ResponseMeta{
+			ErrorCode: proto.Int64(int64(pb.GlobalErrorCode_SUCCESS)),
+			ErrorMsg:  proto.String("success"),
+		},
+	})
+}

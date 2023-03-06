@@ -2,6 +2,7 @@ package get_referral_recent_list
 
 import (
 	"context"
+	"github.com/aaronangxz/AffiliateManager/auth_middleware"
 	"github.com/aaronangxz/AffiliateManager/logger"
 	"github.com/aaronangxz/AffiliateManager/orm"
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
@@ -30,16 +31,24 @@ func (g *GetReferralRecentList) GetReferralRecentListImpl() (*pb.ReferralRecent,
 		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_INVALID_PARAMS)
 	}
 
+	tokenAuth, err := auth_middleware.ExtractTokenMetadata(g.ctx, g.c.Request())
+	if err != nil {
+		logger.Error(context.Background(), err)
+		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_TOKEN_ERROR)
+	}
+
+	id := tokenAuth.UserId
+
 	var (
 		c []*pb.ReferralClicks
 		e []*pb.ReferralEarnings
 	)
 
 	start, end, _, _ := utils.GetStartEndTimeFromPeriod(g.c.QueryParam("period"))
-	if err := orm.DbInstance(g.ctx).Raw(orm.GetReferralRecentClicksQuery(), g.req.GetAffiliateId(), start, end).Scan(&c).Error; err != nil {
+	if err := orm.DbInstance(g.ctx).Raw(orm.GetReferralRecentClicksQuery(), id, start, end).Scan(&c).Error; err != nil {
 		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 	}
-	if err := orm.DbInstance(g.ctx).Raw(orm.GetReferralRecentEarningsQuery(), g.req.GetAffiliateId(), start, end).Scan(&e).Error; err != nil {
+	if err := orm.DbInstance(g.ctx).Raw(orm.GetReferralRecentEarningsQuery(), id, start, end).Scan(&e).Error; err != nil {
 		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 	}
 

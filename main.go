@@ -21,13 +21,13 @@ func main() {
 	e := echo.New()
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
-		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept},
+		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
 		AllowMethods: []string{http.MethodGet, http.MethodHead, http.MethodPut, http.MethodPatch, http.MethodPost, http.MethodDelete},
 	}))
 	e.Use(middleware.RateLimiterWithConfig(middleware.RateLimiterConfig{
 		Skipper: middleware.DefaultSkipper,
 		Store: middleware.NewRateLimiterMemoryStoreWithConfig(
-			middleware.RateLimiterMemoryStoreConfig{Rate: 10, Burst: 30, ExpiresIn: 3 * time.Minute},
+			middleware.RateLimiterMemoryStoreConfig{Rate: 10, Burst: 20, ExpiresIn: 3 * time.Minute},
 		),
 		IdentifierExtractor: func(ctx echo.Context) (string, error) {
 			id := ctx.RealIP()
@@ -59,17 +59,17 @@ func main() {
 	//Allows admin / affiliate / dev
 	r := e.Group("api/v1/referral")
 	r.Use(auth_middleware.AffiliateAuthorization)
-	r.POST("/list", cmd.GetReferralsList)             //DONE
-	r.POST("/stats", cmd.GetReferralStats)            //DONE
-	r.POST("/trend", cmd.GetReferralTrend)            //DONE
-	r.POST("/recent/list", cmd.GetReferralRecentList) //DONE
-	r.GET("/:id", cmd.GetReferralById)                //DONE, not tested
+	r.POST("/list", cmd.GetReferralsList)            //DONE
+	r.POST("/stats", cmd.GetReferralStats)           //DONE
+	r.POST("/trend", cmd.GetReferralTrend)           //DONE
+	r.GET("/recent/list", cmd.GetReferralRecentList) //DONE
+	r.GET("/:id", cmd.GetReferralById)               //DONE, not tested
 
 	//Booking
 	//Allows admin / dev only
 	b := e.Group("api/v1/booking")
 	b.Use(auth_middleware.AdminAuthorization)
-	b.POST("api/v1/booking/list", cmd.GetBookingList) //DONE
+	b.POST("/list", cmd.GetBookingList) //DONE
 	//e.POST("api/v1/booking/list", cmd.GetBookingList) //DONE
 	//e.POST("api/v1/booking/stats", cmd.GetAvailableSlot)
 	//e.POST("api/v1/booking/trend", cmd.GetAvailableSlot)
@@ -85,8 +85,9 @@ func main() {
 	e.GET("api/v1/booking/slots/available", cmd.GetAvailableSlot) //DONE
 
 	//Registration
-	e.POST("api/v1/platform/register", cmd.UserRegistration) //DONE
-	e.POST("api/v1/platform/login", cmd.UserAuthentication)  //DONE
+	e.POST("api/v1/platform/register", cmd.UserRegistration)     //DONE
+	e.POST("api/v1/platform/login", cmd.UserAuthentication)      //DONE
+	e.DELETE("api/v1/platform/logout", cmd.UserDeAuthentication) //DONE
 
 	//Tracking
 	e.POST("api/v1/tracking/click", cmd.TrackClick)       //DONE

@@ -179,7 +179,7 @@ func FetchAuth(ctx context.Context, authD *AccessDetails) (int64, error) {
 		logger.ErrorMsg(ctx, "Error during FetchAuth: %v", err)
 		return 0, err
 	}
-	logger.Info(ctx, "Fetched from Redis: %v", userid)
+	logger.Info(ctx, "Fetched from Redis: user_id: %v", userid)
 	userID, _ := strconv.ParseInt(userid, 10, 64)
 	return userID, nil
 }
@@ -189,6 +189,9 @@ func DeleteAuth(ctx context.Context, givenUuid string) (int64, error) {
 	if err != nil {
 		logger.Error(ctx, err)
 		return 0, err
+	}
+	if deleted != 0 {
+		logger.Info(ctx, "Successfully deleted auth token")
 	}
 	return deleted, nil
 }

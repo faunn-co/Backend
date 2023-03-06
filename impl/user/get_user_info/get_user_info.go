@@ -2,7 +2,7 @@ package get_user_info
 
 import (
 	"context"
-	"fmt"
+	"github.com/aaronangxz/AffiliateManager/auth_middleware"
 	"github.com/aaronangxz/AffiliateManager/impl/verification/user_verification"
 	"github.com/aaronangxz/AffiliateManager/logger"
 	"github.com/aaronangxz/AffiliateManager/orm"
@@ -25,15 +25,27 @@ func New(c echo.Context) *GetUserInfo {
 }
 
 func (g *GetUserInfo) GetUserInfoImpl() (*pb.AffiliateProfileMeta, *pb.User, *resp.Error) {
-	id := g.c.QueryParam("id")
-	fmt.Println(id)
+	tokenAuth, err := auth_middleware.ExtractTokenMetadata(g.ctx, g.c.Request())
+	if err != nil {
+		logger.Error(g.ctx, err)
+		return nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_TOKEN_ERROR)
+	}
+
+	id := tokenAuth.UserId
+
 	if err := user_verification.New(g.c, g.ctx).VerifyUserId(id); err != nil {
 		return nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_USER_NOT_FOUND)
 	}
 
 	var a *pb.AffiliateProfileMeta
-	if err := orm.DbInstance(g.ctx).Raw(orm.GetAffiliateInfoQuery(), id).Scan(&a).Error; err != nil {
-		return nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
+	if tokenAuth.Role == int64(pb.UserRole_ROLE_ADMIN) {
+		if err := orm.DbInstance(g.ctx).Raw(orm.GetAdminInfoQuery()).Scan(&a).Error; err != nil {
+			return nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
+		}
+	} else {
+		if err := orm.DbInstance(g.ctx).Raw(orm.GetAffiliateInfoQuery(), id).Scan(&a).Error; err != nil {
+			return nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
+		}
 	}
 
 	var u *pb.User

@@ -18,6 +18,8 @@ enum GlobalErrorCode{
   ERROR_LOGIN_FAIL = 1011;
   ERROR_NOT_AUTHORISED = 1012;
   ERROR_NO_ACCESS = 1013;
+  ERROR_LOGOUT_FAIL = 1014;
+  ERROR_TOKEN_ERROR = 1015;
 }
 
 enum UserRole{
@@ -547,4 +549,8 @@ message TrackCheckOutRequest{
 message TrackCheckOutResponse{
   optional ResponseMeta response_meta = 1;
   optional BookingDetails booking_details = 2;
+}
+
+message UserDeAuthenticationResponse{
+  optional ResponseMeta response_meta = 1;
 }
