@@ -18,7 +18,7 @@ func TestGetAffiliateList_Happy(t *testing.T) {
 		expectedErrCode  = int64(pb.GlobalErrorCode_SUCCESS)
 		refCount         = 2
 	)
-	a := admin.New().GenerateReferrals(refCount).Build()
+	a := admin.New().GenerateReferrals(int32(refCount)).Build()
 	defer a.TearDown()
 
 	reqBody = &pb.GetAffiliateListRequest{
