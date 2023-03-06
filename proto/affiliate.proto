@@ -16,6 +16,10 @@ enum GlobalErrorCode{
   ERROR_ENTITY_NAME_EXISTS = 1009;
   ERROR_REFERRAL_CODE_EXISTS = 1010;
   ERROR_LOGIN_FAIL = 1011;
+  ERROR_NOT_AUTHORISED = 1012;
+  ERROR_NO_ACCESS = 1013;
+  ERROR_LOGOUT_FAIL = 1014;
+  ERROR_TOKEN_ERROR = 1015;
 }
 
 enum UserRole{
@@ -488,12 +492,17 @@ message UserAuthenticationRequest{
   optional string user_password = 3;
 }
 
+message Tokens{
+  optional string access_token = 1;
+  optional string refresh_token = 2;
+}
+
 message AuthCookie{
   optional int64 user_id = 1;
   optional string user_name = 2;
   optional string user_email = 3;
   optional int64 user_role = 4;
-  optional string cookie = 5;
+  optional Tokens tokens = 5;
 }
 
 message UserAuthenticationResponse{
@@ -540,4 +549,8 @@ message TrackCheckOutRequest{
 message TrackCheckOutResponse{
   optional ResponseMeta response_meta = 1;
   optional BookingDetails booking_details = 2;
+}
+
+message UserDeAuthenticationResponse{
+  optional ResponseMeta response_meta = 1;
 }

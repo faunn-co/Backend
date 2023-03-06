@@ -147,7 +147,7 @@ func TrackClickResponseJSON(c echo.Context, id *int64) error {
 	})
 }
 
-func GetAffiliateInfoResponseJSON(c echo.Context, meta *pb.AffiliateProfileMeta, user *pb.User) error {
+func GetUserInfoResponseJSON(c echo.Context, meta *pb.AffiliateProfileMeta, user *pb.User) error {
 	return c.JSON(http.StatusOK, pb.GetAffiliateInfoResponse{
 		ResponseMeta: &pb.ResponseMeta{
 			ErrorCode: proto.Int64(int64(pb.GlobalErrorCode_SUCCESS)),
@@ -194,5 +194,14 @@ func TrackCheckoutResponseJSON(c echo.Context, details *pb.BookingDetails) error
 			ErrorMsg:  proto.String("success"),
 		},
 		BookingDetails: details,
+	})
+}
+
+func UserDeAuthenticationResponseJSON(c echo.Context) error {
+	return c.JSON(http.StatusOK, pb.UserDeAuthenticationResponse{
+		ResponseMeta: &pb.ResponseMeta{
+			ErrorCode: proto.Int64(int64(pb.GlobalErrorCode_SUCCESS)),
+			ErrorMsg:  proto.String("success"),
+		},
 	})
 }

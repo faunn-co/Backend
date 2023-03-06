@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"fmt"
+	"github.com/aaronangxz/AffiliateManager/auth_middleware"
 	"github.com/aaronangxz/AffiliateManager/orm"
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
 	"github.com/labstack/gommon/log"
@@ -13,12 +14,14 @@ import (
 type User struct {
 	UserInfo      *pb.User
 	AffiliateInfo *pb.AffiliateDetailsDb
+	Token         *pb.Tokens
 }
 
 func New() *User {
 	u := new(User)
 	u.UserInfo = new(pb.User)
 	u.AffiliateInfo = new(pb.AffiliateDetailsDb)
+	u.Token = new(pb.Tokens)
 	orm.ENV = "TEST"
 	return u
 }
@@ -129,6 +132,23 @@ func (u *User) Build() *User {
 	if err := orm.DbInstance(nil).Table(orm.AFFILIATE_DETAILS_TABLE).Create(u.AffiliateInfo).Error; err != nil {
 		log.Error(err)
 		return nil
+	}
+
+	token, err := auth_middleware.CreateToken(context.Background(), u.UserInfo.GetUserId(), u.UserInfo.GetUserRole())
+	if err != nil {
+		log.Error(err)
+		return nil
+	}
+
+	saveErr := auth_middleware.CreateAuth(context.Background(), u.UserInfo.GetUserId(), token)
+	if saveErr != nil {
+		log.Error(err)
+		return nil
+	}
+
+	u.Token = &pb.Tokens{
+		AccessToken:  proto.String(token.AccessToken),
+		RefreshToken: proto.String(token.RefreshToken),
 	}
 	return u
 }
