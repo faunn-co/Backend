@@ -32,9 +32,9 @@ func (a *Admin) filDefaults() *Admin {
 	}
 
 	if a.Referrals == nil {
-		a.Referrals = make([]*referral.Referral, 0)
+		a.Referrals = make([]*referral.Referral, a.NumberOfReferrals)
 		for i := 0; i < a.NumberOfReferrals; i++ {
-			a.Referrals = append(a.Referrals, referral.New().Build())
+			a.Referrals[i] = referral.New().Build()
 		}
 	}
 	return a
