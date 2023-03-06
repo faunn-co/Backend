@@ -6,10 +6,16 @@ import (
 	"fmt"
 	"github.com/aaronangxz/AffiliateManager/orm"
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
+	u "github.com/aaronangxz/AffiliateManager/test_suite/test_builder/utils"
 	"github.com/aaronangxz/AffiliateManager/utils"
 	"github.com/labstack/gommon/log"
 	"google.golang.org/protobuf/proto"
 	"time"
+)
+
+const (
+	CitizenTicket = 8800
+	TouristTicket = 9800
 )
 
 type Booking struct {
@@ -120,10 +126,10 @@ func (b *Booking) SetTicketPrice(price int64) *Booking {
 func (b *Booking) MakeDummyCustomer(count int64) *Booking {
 	for i := 0; i < int(count); i++ {
 		var ticketType = pb.TicketType_TICKET_TYPE_CITIZEN
-		var ticketPrice = int64(10000)
+		var ticketPrice = int64(CitizenTicket)
 		if i%2 != 0 {
 			ticketType = pb.TicketType_TICKET_TYPE_TOURIST
-			ticketPrice = int64(5000)
+			ticketPrice = int64(TouristTicket)
 		}
 		b.SetCustomerInfo(&pb.CustomerInfo{
 			CustomerName:   proto.String(fmt.Sprintf("Customer %v", i)),
@@ -158,19 +164,19 @@ func (b *Booking) filDefaults() *Booking {
 	}
 
 	if b.BookingDetails.CitizenTicketCount == nil {
-		b.BookingDetails.CitizenTicketCount = proto.Int64(1)
+		b.BookingDetails.CitizenTicketCount = proto.Int64(u.RandomRange(1, 10))
 	}
 
 	if b.BookingDetails.CitizenTicketTotal == nil {
-		b.BookingDetails.CitizenTicketTotal = proto.Int64(10000)
+		b.BookingDetails.CitizenTicketTotal = proto.Int64(CitizenTicket * b.BookingDetails.GetCitizenTicketTotal())
 	}
 
 	if b.BookingDetails.TouristTicketCount == nil {
-		b.BookingDetails.TouristTicketCount = proto.Int64(1)
+		b.BookingDetails.TouristTicketCount = proto.Int64(u.RandomRange(1, 5))
 	}
 
 	if b.BookingDetails.TouristTicketTotal == nil {
-		b.BookingDetails.TouristTicketTotal = proto.Int64(5000)
+		b.BookingDetails.TouristTicketTotal = proto.Int64(TouristTicket * b.BookingDetails.GetTouristTicketCount())
 	}
 
 	if b.BookingDetails.CustomerInfo == nil {

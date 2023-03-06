@@ -459,7 +459,7 @@ message TrackClickResponse{
   optional int64 referral_id = 2;
 }
 
-message GetAffiliateInfoResponse{
+message GetUserInfoResponse{
   optional ResponseMeta response_meta = 1;
   optional AffiliateProfileMeta affiliate_meta = 2;
   optional User user_info = 3;

@@ -148,7 +148,7 @@ func TrackClickResponseJSON(c echo.Context, id *int64) error {
 }
 
 func GetUserInfoResponseJSON(c echo.Context, meta *pb.AffiliateProfileMeta, user *pb.User) error {
-	return c.JSON(http.StatusOK, pb.GetAffiliateInfoResponse{
+	return c.JSON(http.StatusOK, pb.GetUserInfoResponse{
 		ResponseMeta: &pb.ResponseMeta{
 			ErrorCode: proto.Int64(int64(pb.GlobalErrorCode_SUCCESS)),
 			ErrorMsg:  proto.String("success"),

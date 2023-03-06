@@ -12,6 +12,10 @@ import (
 	"time"
 )
 
+const (
+	commissionPercentage = 5
+)
+
 type Referral struct {
 	ReferralDb *pb.ReferralDb
 	HasBooking bool
@@ -80,7 +84,7 @@ func (r *Referral) filDefaults() *Referral {
 	}
 
 	if r.ReferralDb.ReferralCommission == nil {
-		r.ReferralDb.ReferralCommission = proto.Int64(100)
+		r.ReferralDb.ReferralCommission = proto.Int64((r.Booking.BookingDetails.GetTouristTicketTotal() + r.Booking.BookingDetails.GetCitizenTicketTotal()) / 100 * commissionPercentage)
 	}
 	return r
 }

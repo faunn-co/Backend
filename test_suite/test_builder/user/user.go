@@ -6,6 +6,7 @@ import (
 	"github.com/aaronangxz/AffiliateManager/auth_middleware"
 	"github.com/aaronangxz/AffiliateManager/orm"
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
+	"github.com/aaronangxz/AffiliateManager/test_suite/test_builder/utils"
 	"github.com/labstack/gommon/log"
 	"google.golang.org/protobuf/proto"
 	"time"
@@ -15,6 +16,7 @@ type User struct {
 	UserInfo      *pb.User
 	AffiliateInfo *pb.AffiliateDetailsDb
 	Token         *pb.Tokens
+	token         *auth_middleware.TokenDetails
 }
 
 func New() *User {
@@ -68,15 +70,15 @@ func (u *User) SetUniqueReferralCode(code string) *User {
 
 func (u *User) filDefaults() *User {
 	if u.UserInfo.UserName == nil {
-		u.SetUserName("RandomName")
+		u.SetUserName(utils.RandomStringWithCharset(10))
 	}
 
 	if u.UserInfo.UserEmail == nil {
-		u.SetUserEmail("random@random.com")
+		u.SetUserEmail(fmt.Sprintf("%v@random.com", u.UserInfo.GetUserName()))
 	}
 
 	if u.UserInfo.UserContact == nil {
-		u.SetUserContact("+6012345678")
+		u.SetUserContact(fmt.Sprintf("+60%v", utils.RandomRange(1000000, 9999999)))
 	}
 
 	if u.UserInfo.UserRole == nil {
@@ -84,19 +86,21 @@ func (u *User) filDefaults() *User {
 	}
 
 	if u.AffiliateInfo.EntityName == nil {
-		u.SetEntityName("RandomEntityName")
+		u.SetEntityName(utils.RandomStringWithCharset(10))
 	}
 
 	if u.AffiliateInfo.EntityIdentifier == nil {
-		u.SetEntityIdentifier("RandomEntityIdentifier")
+		u.SetEntityIdentifier(utils.RandomStringWithCharset(15))
 	}
 
 	if u.AffiliateInfo.AffiliateType == nil {
-		u.SetAffiliateType(int64(pb.AffiliateType_AFFILIATE_TYPE_ACCOMMODATION))
+		if u.UserInfo.UserRole != nil && u.UserInfo.GetUserRole() == int64(pb.UserRole_ROLE_AFFILIATE) {
+			u.SetAffiliateType(int64(pb.AffiliateType_AFFILIATE_TYPE_ACCOMMODATION))
+		}
 	}
 
 	if u.AffiliateInfo.UniqueReferralCode == nil {
-		u.SetUniqueReferralCode("CODE")
+		u.SetUniqueReferralCode(utils.RandomStringWithCharset(5))
 	}
 	return u
 }
@@ -129,9 +133,11 @@ func (u *User) Build() *User {
 	u.UserInfo.UserId = proto.Int64(user.UserId)
 	u.AffiliateInfo.UserId = proto.Int64(user.UserId)
 
-	if err := orm.DbInstance(nil).Table(orm.AFFILIATE_DETAILS_TABLE).Create(u.AffiliateInfo).Error; err != nil {
-		log.Error(err)
-		return nil
+	if u.UserInfo.GetUserRole() == int64(pb.UserRole_ROLE_AFFILIATE) {
+		if err := orm.DbInstance(nil).Table(orm.AFFILIATE_DETAILS_TABLE).Create(u.AffiliateInfo).Error; err != nil {
+			log.Error(err)
+			return nil
+		}
 	}
 
 	token, err := auth_middleware.CreateToken(context.Background(), u.UserInfo.GetUserId(), u.UserInfo.GetUserRole())
@@ -145,7 +151,7 @@ func (u *User) Build() *User {
 		log.Error(err)
 		return nil
 	}
-
+	u.token = token
 	u.Token = &pb.Tokens{
 		AccessToken:  proto.String(token.AccessToken),
 		RefreshToken: proto.String(token.RefreshToken),
@@ -158,6 +164,11 @@ func (u *User) TearDown() {
 		log.Error(err)
 	}
 	if err := orm.DbInstance(nil).Exec(fmt.Sprintf("DELETE FROM %v WHERE user_id = %v", orm.AFFILIATE_DETAILS_TABLE, u.UserInfo.GetUserId())).Error; err != nil {
+		log.Error(err)
+	}
+
+	_, err := auth_middleware.DeleteAuth(context.Background(), u.token.AccessUuid)
+	if err != nil {
 		log.Error(err)
 	}
 }

@@ -1,5 +1,5 @@
 SELECT
-    a.affiliate_id,
+    a.user_id AS affiliate_id,
     a.user_name AS affiliate_name,
     a.affiliate_type,
     a.unique_referral_code,
@@ -21,7 +21,7 @@ FROM
             u.user_name,
             u.user_email,
             u.user_contact,
-            r.affiliate_id,
+            a.user_id,
             IF(
                             r.referral_click_time <= @startTime
                         OR r.referral_click_time > @endTime,
@@ -65,7 +65,7 @@ FROM
             r.referral_id
     ) AS a
 GROUP BY
-    a.affiliate_id,
+    a.user_id,
     a.user_name,
     a.user_email,
     a.user_contact,
