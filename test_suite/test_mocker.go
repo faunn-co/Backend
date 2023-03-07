@@ -29,14 +29,14 @@ const (
 	GetReferralTrend        = "/api/v1/referral/trend"
 	GetReferralRecentList   = "/api/v1/referral/recent/list"
 	GetReferralById         = "/api/v1/referral/:id"
-	GetBookingList          = "api/v1/booking/list"
-	GetUserInfo             = "api/v1/user/info"
-	GetAvailableSlot        = "api/v1/booking/slots/available"
-	UserRegistration        = "api/v1/platform/register"
-	UserAuthentication      = "api/v1/platform/login"
-	UserDeAuthentication    = "api/v1/platform/logout"
-	TrackClick              = "api/v1/tracking/click"
-	TrackCheckout           = "api/v1/tracking/checkout"
+	GetBookingList          = "/api/v1/booking/list"
+	GetUserInfo             = "/api/v1/user/info"
+	GetAvailableSlot        = "/api/v1/booking/slots/available"
+	UserRegistration        = "/api/v1/platform/register"
+	UserAuthentication      = "/api/v1/platform/login"
+	UserDeAuthentication    = "/api/v1/platform/logout"
+	TrackClick              = "/api/v1/tracking/click"
+	TrackCheckout           = "/api/v1/tracking/checkout"
 )
 
 type Method struct {
@@ -184,8 +184,10 @@ func NewMockTest(method string) *MockTest {
 	//e.PUT("api/v1/booking/:id", cmd.GetAvailableSlot)
 	//e.DELETE("api/v1/booking/:id", cmd.GetAvailableSlot)
 
-	//Endpoints below require no Auth
-	m.e.GET("api/v1/user/info", cmd.GetUserInfo) //DONE
+	//User
+	u := m.e.Group("api/v1/user")
+	u.Use(auth_middleware.AffiliateAuthorization)
+	u.GET("/info", cmd.GetUserInfo) //DONE
 
 	//Landing Page
 	m.e.GET("api/v1/booking/slots/available", cmd.GetAvailableSlot) //DONE
@@ -215,13 +217,6 @@ func (m *MockTest) QueryParam(key, value string) *MockTest {
 }
 
 func (m *MockTest) Req(body interface{}, tokens *pb.Tokens) *MockTest {
-	requestBody, err := json.Marshal(body)
-	if err != nil {
-		log.Error(err)
-		return m
-	}
-	val, _ := json.MarshalIndent(body, "", "    ")
-
 	url := m.meta.Endpoint
 	if m.param != nil {
 		url += "?"
@@ -229,6 +224,13 @@ func (m *MockTest) Req(body interface{}, tokens *pb.Tokens) *MockTest {
 			url += fmt.Sprintf("%v=%v", k, v)
 		}
 	}
+
+	requestBody, err := json.Marshal(body)
+	if err != nil {
+		log.Error(err)
+		return m
+	}
+	val, _ := json.MarshalIndent(body, "", "    ")
 	request, _ := http.NewRequest(m.meta.HTTPMethod, url, bytes.NewBuffer(requestBody))
 	request.Header.Set("Content-Type", "application/json")
 	request.Header.Set("Authorization", fmt.Sprintf("Bearer %v", tokens.GetAccessToken()))

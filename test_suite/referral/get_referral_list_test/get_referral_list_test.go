@@ -339,7 +339,7 @@ func TestGetReferralList_Admin_Period_Month(t *testing.T) {
 	}
 }
 
-//TODO Empty response when run via GH actions
+// TODO Empty response when run via GH actions
 func Skip_TestGetReferralList_Admin_Period_Last7Days(t *testing.T) {
 	a := admin.New().Build()
 	defer a.TearDown()

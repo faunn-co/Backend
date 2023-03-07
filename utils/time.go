@@ -1,7 +1,9 @@
 package utils
 
 import (
+	"errors"
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -62,4 +64,25 @@ func ConvertTimeStampYearMonthDay(timestamp int64) string {
 func TrimDateString(d string) string {
 	split := strings.Split(d, "-")
 	return fmt.Sprintf("%v-%v", split[1], split[2])
+}
+
+func GetDayTSWithDate(date string) (int64, error) {
+	splitDate := strings.Split(date, "-")
+	if len(splitDate) < 3 {
+		return 0, errors.New("invalid date format")
+	}
+	year, err := strconv.Atoi(splitDate[0])
+	if err != nil {
+		return 0, err
+	}
+	month, err := strconv.Atoi(splitDate[1])
+	if err != nil {
+		return 0, err
+	}
+	day, err := strconv.Atoi(splitDate[2])
+	if err != nil {
+		return 0, err
+	}
+	m := time.Month(month)
+	return time.Date(year, m, day, 0, 0, 0, 0, tz).Unix(), nil
 }
