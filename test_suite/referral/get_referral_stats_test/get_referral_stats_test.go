@@ -40,7 +40,7 @@ func TestGetReferralStats_NoLogin(t *testing.T) {
 	assert.Equal(t, expectedHTTPCode, err)
 	assert.Equal(t, expectedErrCode, resp.GetResponseMeta().GetErrorCode())
 	assert.Nil(t, resp.GetReferralStats())
-	assert.NotNil(t, resp.GetReferralStatsPreviousCycle())
+	assert.Nil(t, resp.GetReferralStatsPreviousCycle())
 }
 
 func TestGetReferralStats_Period_None(t *testing.T) {
@@ -57,7 +57,7 @@ func TestGetReferralStats_Period_None(t *testing.T) {
 	assert.Equal(t, expectedHTTPCode, err)
 	assert.Equal(t, expectedErrCode, resp.GetResponseMeta().GetErrorCode())
 	assert.Nil(t, resp.GetReferralStats())
-	assert.NotNil(t, resp.GetReferralStatsPreviousCycle())
+	assert.Nil(t, resp.GetReferralStatsPreviousCycle())
 }
 
 func TestGetReferralStats_Period_Day(t *testing.T) {
@@ -184,5 +184,5 @@ func TestGetReferralStats_Period_Range_StartBeforeEnd(t *testing.T) {
 	assert.Equal(t, expectedHTTPCode, err)
 	assert.Equal(t, expectedErrCode, resp.GetResponseMeta().GetErrorCode())
 	assert.Nil(t, resp.GetReferralStats())
-	assert.NotNil(t, resp.GetReferralStatsPreviousCycle())
+	assert.Nil(t, resp.GetReferralStatsPreviousCycle())
 }
