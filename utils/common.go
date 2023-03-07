@@ -38,6 +38,10 @@ func VerifyTimeSelectorFields(t *pb.TimeSelector) error {
 	if t.EndTs == nil && t.StartTs != nil {
 		return errors.New("end_ts is required")
 	}
+
+	if t.StartTs != nil && t.EndTs != nil && t.GetEndTs() < t.GetStartTs() {
+		return errors.New("end_ts must be after start_ts")
+	}
 	return nil
 }
 

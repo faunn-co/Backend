@@ -9,6 +9,10 @@ import (
 	"time"
 )
 
+const (
+	DefaultNumberOfReferrals = 2
+)
+
 type Admin struct {
 	User              *user.User
 	NumberOfReferrals *int32
@@ -34,7 +38,7 @@ func (a *Admin) filDefaults() *Admin {
 	}
 
 	if a.NumberOfReferrals == nil {
-		a.GenerateReferrals(2)
+		a.GenerateReferrals(DefaultNumberOfReferrals)
 	}
 
 	if a.Referrals == nil {
