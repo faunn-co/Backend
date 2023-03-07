@@ -156,7 +156,7 @@ func (b *Booking) filDefaults() *Booking {
 	}
 
 	if b.BookingDetails.TransactionTime == nil {
-		b.BookingDetails.TransactionTime = proto.Int64(time.Now().Unix())
+		b.BookingDetails.TransactionTime = proto.Int64(time.Now().Unix() - utils.MINUTE)
 	}
 
 	if b.BookingDetails.PaymentStatus == nil {
