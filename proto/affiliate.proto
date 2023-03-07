@@ -388,8 +388,6 @@ message ReferralRecent{
 //Admin to view top affiliates
 message GetReferralRecentListRequest{
   optional RequestMeta request_meta = 1;
-  optional TimeSelector time_selector = 2;
-  optional int64 affiliate_id = 3;
 }
 
 message GetReferralRecentListResponse{
@@ -401,8 +399,7 @@ message GetReferralRecentListResponse{
 message GetReferralListRequest{
   optional RequestMeta request_meta = 1;
   optional TimeSelector time_selector = 2;
-  optional int64 affiliate_id = 3; //filled in by affiliates only
-  optional string affiliate_name = 4;
+  optional string affiliate_name = 3;
 }
 
 message GetReferralListResponse{
@@ -435,6 +432,10 @@ message BookingDates{
   optional BookingSlot slots = 2;
 }
 
+message GetAvailableSlotRequest{
+  optional RequestMeta request_meta = 1;
+}
+
 //Landing page to get available time slot based on date
 message GetAvailableSlotResponse{
   optional ResponseMeta response_meta = 1;
@@ -459,7 +460,11 @@ message TrackClickResponse{
   optional int64 referral_id = 2;
 }
 
-message GetAffiliateInfoResponse{
+message GetUserInfoRequest{
+  optional RequestMeta request_meta = 1;
+}
+
+message GetUserInfoResponse{
   optional ResponseMeta response_meta = 1;
   optional AffiliateProfileMeta affiliate_meta = 2;
   optional User user_info = 3;

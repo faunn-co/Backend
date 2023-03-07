@@ -12,6 +12,10 @@ import (
 	"google.golang.org/protobuf/proto"
 )
 
+var (
+	testAccounts = []string{"test_affiliate"}
+)
+
 type GetAffiliateList struct {
 	c   echo.Context
 	ctx context.Context
@@ -58,7 +62,8 @@ func (g *GetAffiliateList) GetAffiliateListImpl() ([]*pb.AffiliateMeta, *int64, 
 	//	return nil, nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_REDIS)
 	//}
 	//log.Infof("GetAffiliateList | Successful | Written %v to redis", g.key)
-	return l, proto.Int64(start), proto.Int64(end), nil
+
+	return g.filterTestAccounts(l), proto.Int64(start), proto.Int64(end), nil
 }
 
 func (g *GetAffiliateList) verifyGetAffiliateList() error {
@@ -70,4 +75,15 @@ func (g *GetAffiliateList) verifyGetAffiliateList() error {
 		return err
 	}
 	return nil
+}
+
+func (g *GetAffiliateList) filterTestAccounts(affiliates []*pb.AffiliateMeta) []*pb.AffiliateMeta {
+	for i, a := range affiliates {
+		for _, t := range testAccounts {
+			if a.GetAffiliateName() == t {
+				affiliates = append(affiliates[:i], affiliates[i+1:]...)
+			}
+		}
+	}
+	return affiliates
 }

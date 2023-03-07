@@ -78,9 +78,12 @@ func main() {
 	//e.PUT("api/v1/booking/:id", cmd.GetAvailableSlot)
 	//e.DELETE("api/v1/booking/:id", cmd.GetAvailableSlot)
 
-	//Endpoints below require no Auth
-	e.GET("api/v1/user/info", cmd.GetUserInfo) //DONE
+	//User
+	u := e.Group("api/v1/user")
+	u.Use(auth_middleware.AffiliateAuthorization)
+	u.GET("/info", cmd.GetUserInfo) //DONE
 
+	//Endpoints below require no Auth
 	//Landing Page
 	e.GET("api/v1/booking/slots/available", cmd.GetAvailableSlot) //DONE
 

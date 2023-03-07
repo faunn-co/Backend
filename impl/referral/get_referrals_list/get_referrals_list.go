@@ -3,7 +3,7 @@ package get_referrals_list
 import (
 	"context"
 	"fmt"
-	"github.com/aaronangxz/AffiliateManager/impl/verification/user_verification"
+	"github.com/aaronangxz/AffiliateManager/auth_middleware"
 	"github.com/aaronangxz/AffiliateManager/logger"
 	"github.com/aaronangxz/AffiliateManager/orm"
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
@@ -35,8 +35,15 @@ func (g *GetReferralList) GetReferralListImpl() ([]*pb.ReferralBasic, *int64, *i
 	var l []*pb.ReferralBasic
 	start, end, _, _ := utils.GetStartEndTimeFromTimeSelector(g.req.GetTimeSelector())
 
-	if g.req.AffiliateId != nil {
-		if err := orm.DbInstance(g.ctx).Raw(orm.GetAffiliateReferralListQuery(), start, end, g.req.GetAffiliateId()).Scan(&l).Error; err != nil {
+	//Filtered for affiliate, return all for admin
+	tokenAuth, err := auth_middleware.ExtractTokenMetadata(g.ctx, g.c.Request())
+	if err != nil {
+		logger.Error(g.ctx, err)
+		return nil, nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_TOKEN_ERROR)
+	}
+
+	if tokenAuth.Role == int64(pb.UserRole_ROLE_AFFILIATE) {
+		if err := orm.DbInstance(g.ctx).Raw(orm.GetAffiliateReferralListQuery(), start, end, tokenAuth.UserId).Scan(&l).Error; err != nil {
 			return nil, nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 		}
 	} else {
@@ -56,9 +63,6 @@ func (g *GetReferralList) GetReferralListImpl() ([]*pb.ReferralBasic, *int64, *i
 func (g *GetReferralList) verifyGetReferralList() error {
 	g.req = new(pb.GetReferralListRequest)
 	if err := g.c.Bind(g.req); err != nil {
-		return err
-	}
-	if err := user_verification.New(g.c, g.ctx).VerifyUserId(g.req.GetAffiliateId()); err != nil {
 		return err
 	}
 	if err := utils.VerifyTimeSelectorFields(g.req.TimeSelector); err != nil {

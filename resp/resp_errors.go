@@ -33,7 +33,7 @@ func NotAuthenticatedResp(c echo.Context) error {
 	return c.JSON(http.StatusUnauthorized, pb.GenericResponse{
 		ResponseMeta: &pb.ResponseMeta{
 			ErrorCode: proto.Int64(int64(pb.GlobalErrorCode_ERROR_NOT_AUTHORISED)),
-			ErrorMsg:  proto.String("Not Authorised"),
+			ErrorMsg:  proto.String("Not Authenticated"),
 		},
 	})
 }
