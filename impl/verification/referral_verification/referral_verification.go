@@ -35,18 +35,19 @@ func (r *ReferralVerification) VerifyReferralId(id int64) error {
 		return err
 	} else if val != nil {
 		logger.Info(r.ctx, "VerifyReferralId | Successful | Cached %v", k)
-		return nil
+		return errors.New("referral click already has booking bound")
 	}
 
 	var referral *pb.ReferralDb
 	if err := orm.DbInstance(r.ctx).Raw(orm.GetReferralClickInfo(), id).Scan(&referral).Error; err != nil {
 		return err
 	}
+
 	if referral == nil {
 		return errors.New("referral click not found")
 	}
-	if referral.BookingId == nil {
-		return errors.New("referral not bound to booking")
+	if referral.BookingId != nil {
+		return errors.New("referral click already has booking bound")
 	}
 	if err := orm.SET(r.ctx, k, referral, 0); err != nil {
 		logger.Error(r.ctx, err)

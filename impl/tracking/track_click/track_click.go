@@ -3,6 +3,7 @@ package track_click
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/aaronangxz/AffiliateManager/logger"
 	"github.com/aaronangxz/AffiliateManager/orm"
@@ -91,6 +92,11 @@ func (t *TrackClick) getAffiliateWithCodeUsingCache(code string) (*int64, *resp.
 	var affiliate *pb.AffiliateDetailsDb
 	if err := orm.DbInstance(t.ctx).Raw(orm.GetAffiliateByCodeQuery(), code).Scan(&affiliate).Error; err != nil {
 		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
+	}
+
+	if affiliate == nil {
+		err := errors.New("affiliate not found")
+		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_USER_NOT_FOUND)
 	}
 
 	if affiliate.UserId != nil {

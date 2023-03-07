@@ -3,7 +3,8 @@ package track_checkout
 import (
 	"context"
 	"encoding/json"
-	"errors"
+	"fmt"
+	"github.com/aaronangxz/AffiliateManager/impl/email/send_email"
 	"github.com/aaronangxz/AffiliateManager/impl/verification/referral_verification"
 	"github.com/aaronangxz/AffiliateManager/logger"
 	"github.com/aaronangxz/AffiliateManager/orm"
@@ -11,6 +12,7 @@ import (
 	"github.com/aaronangxz/AffiliateManager/resp"
 	"github.com/labstack/echo/v4"
 	"google.golang.org/protobuf/proto"
+	"strconv"
 	"time"
 )
 
@@ -50,8 +52,8 @@ func (t *TrackCheckOut) verifyTrackCheckOut() error {
 	if err := t.c.Bind(t.req); err != nil {
 		return err
 	}
-	if err := referral_verification.New(t.c, t.ctx).VerifyReferralId(t.req.GetReferralId()); err == nil {
-		return errors.New("referral click already has booking bound")
+	if err := referral_verification.New(t.c, t.ctx).VerifyReferralId(t.req.GetReferralId()); err != nil {
+		return err
 	}
 	return nil
 }
@@ -117,7 +119,8 @@ func (t *TrackCheckOut) startCheckOutTx() (*pb.BookingDetails, error) {
 	if err := tx.Commit().Error; err != nil {
 		return nil, err
 	}
-	return &pb.BookingDetails{
+
+	details := &pb.BookingDetails{
 		BookingId:          b.BookingId,
 		BookingStatus:      b.BookingStatus,
 		BookingDay:         b.BookingDay,
@@ -129,7 +132,10 @@ func (t *TrackCheckOut) startCheckOutTx() (*pb.BookingDetails, error) {
 		CitizenTicketTotal: b.CitizenTicketTotal,
 		TouristTicketTotal: b.TouristTicketTotal,
 		CustomerInfo:       t.req.CustomerInfo,
-	}, nil
+	}
+
+	t.sendConfirmationEmail(details)
+	return details, nil
 }
 
 func (t *TrackCheckOut) calculateTicket() (*int64, *int64, *int64) {
@@ -143,4 +149,23 @@ func (t *TrackCheckOut) calculateCommission() *int64 {
 	total, _, _ := t.calculateTicket()
 	commission := *total / 100 * commissionPercentage
 	return proto.Int64(commission)
+}
+
+func (t *TrackCheckOut) sendConfirmationEmail(details *pb.BookingDetails) {
+	var slotMap = map[int64]string{
+		0: "Corgi - 10.30am to 12:00pm",
+		1: "Corgi - 12.30pm to 02:00pm",
+		2: "Dogs - 02.30pm to 04:00pm",
+		3: "Dogs - 05.00pm to 06.30pm",
+	}
+	id := strconv.FormatInt(details.GetBookingId(), 10)
+	var ticket string
+
+	if details.CitizenTicketCount != nil {
+		ticket += fmt.Sprintf("%v x Citizen ", details.GetCitizenTicketCount())
+	}
+	if details.TouristTicketCount != nil {
+		ticket += fmt.Sprintf("%v x Tourist ", details.GetTouristTicketCount())
+	}
+	send_email.Send(id, details.GetBookingDay(), slotMap[details.GetBookingSlot()], ticket)
 }
