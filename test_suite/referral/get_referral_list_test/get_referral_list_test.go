@@ -149,6 +149,7 @@ func TestGetReferralList_Affiliate_Period_Last7Days(t *testing.T) {
 	)
 
 	req := get_referral_list.New().SetPeriod(period).Request()
+	time.Sleep(1 * time.Second)
 	err, resp := run(req, r.Affiliate.Token)
 
 	assert.Equal(t, expectedHTTPCode, err)
@@ -171,6 +172,7 @@ func TestGetReferralList_Affiliate_Period_Last28Days(t *testing.T) {
 	)
 
 	req := get_referral_list.New().SetPeriod(period).Request()
+	time.Sleep(1 * time.Second)
 	err, resp := run(req, r.Affiliate.Token)
 
 	assert.Equal(t, expectedHTTPCode, err)
@@ -348,6 +350,7 @@ func TestGetReferralList_Admin_Period_Last7Days(t *testing.T) {
 	)
 
 	req := get_referral_list.New().SetPeriod(period).Request()
+	time.Sleep(1 * time.Second)
 	err, resp := run(req, a.User.Token)
 
 	assert.Equal(t, expectedHTTPCode, err)
@@ -367,6 +370,7 @@ func TestGetReferralList_Admin_Period_Last28Days(t *testing.T) {
 	)
 
 	req := get_referral_list.New().SetPeriod(period).Request()
+	time.Sleep(1 * time.Second)
 	err, resp := run(req, a.User.Token)
 
 	assert.Equal(t, expectedHTTPCode, err)

@@ -35,8 +35,6 @@ func (g *GetReferralList) GetReferralListImpl() ([]*pb.ReferralBasic, *int64, *i
 	var l []*pb.ReferralBasic
 	start, end, _, _ := utils.GetStartEndTimeFromTimeSelector(g.req.GetTimeSelector())
 
-	fmt.Println(start, end)
-	//TODO Determine role from token
 	//Filtered for affiliate, return all for admin
 	tokenAuth, err := auth_middleware.ExtractTokenMetadata(g.ctx, g.c.Request())
 	if err != nil {
