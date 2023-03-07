@@ -7,6 +7,7 @@ import (
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
 	"github.com/aaronangxz/AffiliateManager/test_suite/test_builder/booking"
 	"github.com/aaronangxz/AffiliateManager/test_suite/test_builder/user"
+	"github.com/aaronangxz/AffiliateManager/utils"
 	"github.com/labstack/gommon/log"
 	"google.golang.org/protobuf/proto"
 	"time"
@@ -71,7 +72,7 @@ func (r *Referral) filDefaults() *Referral {
 	}
 
 	if r.ReferralDb.ReferralClickTime == nil {
-		r.ReferralDb.ReferralClickTime = proto.Int64(time.Now().Unix())
+		r.ReferralDb.ReferralClickTime = proto.Int64(time.Now().Unix() - utils.MINUTE)
 	}
 
 	if r.ReferralDb.ReferralStatus == nil {
@@ -108,7 +109,7 @@ func (r *Referral) Build() *Referral {
 		ReferralClickTime:  r.ReferralDb.ReferralClickTime,
 		ReferralStatus:     r.ReferralDb.ReferralStatus,
 		BookingId:          r.ReferralDb.BookingId,
-		BookingTime:        r.ReferralDb.BookingTime,
+		BookingTime:        r.Booking.BookingDetails.TransactionTime,
 		ReferralCommission: r.ReferralDb.ReferralCommission,
 	}
 

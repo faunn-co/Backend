@@ -6,7 +6,7 @@ import (
 	"github.com/aaronangxz/AffiliateManager/auth_middleware"
 	"github.com/aaronangxz/AffiliateManager/orm"
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
-	"github.com/aaronangxz/AffiliateManager/test_suite/test_builder/utils"
+	"github.com/aaronangxz/AffiliateManager/test_suite/test_builder/test_utils"
 	"github.com/labstack/gommon/log"
 	"google.golang.org/protobuf/proto"
 	"time"
@@ -70,7 +70,7 @@ func (u *User) SetUniqueReferralCode(code string) *User {
 
 func (u *User) filDefaults() *User {
 	if u.UserInfo.UserName == nil {
-		u.SetUserName(utils.RandomStringWithCharset(10))
+		u.SetUserName(test_utils.RandomStringWithCharset(10))
 	}
 
 	if u.UserInfo.UserEmail == nil {
@@ -78,7 +78,7 @@ func (u *User) filDefaults() *User {
 	}
 
 	if u.UserInfo.UserContact == nil {
-		u.SetUserContact(fmt.Sprintf("+60%v", utils.RandomRange(1000000, 9999999)))
+		u.SetUserContact(fmt.Sprintf("+60%v", test_utils.RandomRange(1000000, 9999999)))
 	}
 
 	if u.UserInfo.UserRole == nil {
@@ -86,11 +86,11 @@ func (u *User) filDefaults() *User {
 	}
 
 	if u.AffiliateInfo.EntityName == nil {
-		u.SetEntityName(utils.RandomStringWithCharset(10))
+		u.SetEntityName(test_utils.RandomStringWithCharset(10))
 	}
 
 	if u.AffiliateInfo.EntityIdentifier == nil {
-		u.SetEntityIdentifier(utils.RandomStringWithCharset(15))
+		u.SetEntityIdentifier(test_utils.RandomStringWithCharset(15))
 	}
 
 	if u.AffiliateInfo.AffiliateType == nil {
@@ -100,7 +100,7 @@ func (u *User) filDefaults() *User {
 	}
 
 	if u.AffiliateInfo.UniqueReferralCode == nil {
-		u.SetUniqueReferralCode(utils.RandomStringWithCharset(5))
+		u.SetUniqueReferralCode(test_utils.RandomStringWithCharset(5))
 	}
 	return u
 }

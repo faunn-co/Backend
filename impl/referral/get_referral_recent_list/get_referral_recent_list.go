@@ -40,11 +40,16 @@ func (g *GetReferralRecentList) GetReferralRecentListImpl() (*pb.ReferralRecent,
 	id := tokenAuth.UserId
 
 	var (
-		c []*pb.ReferralClicks
-		e []*pb.ReferralEarnings
+		c     []*pb.ReferralClicks
+		e     []*pb.ReferralEarnings
+		start int64
+		end   int64
 	)
 
-	start, end, _, _ := utils.GetStartEndTimeFromPeriod(g.c.QueryParam("period"))
+	p := g.c.QueryParam("period")
+	if start, end, _, _, err = utils.GetStartEndTimeFromPeriod(p); err != nil {
+		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_INVALID_PARAMS)
+	}
 	if err := orm.DbInstance(g.ctx).Raw(orm.GetReferralRecentClicksQuery(), id, start, end).Scan(&c).Error; err != nil {
 		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 	}

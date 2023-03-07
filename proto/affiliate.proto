@@ -401,8 +401,7 @@ message GetReferralRecentListResponse{
 message GetReferralListRequest{
   optional RequestMeta request_meta = 1;
   optional TimeSelector time_selector = 2;
-  optional int64 affiliate_id = 3; //filled in by affiliates only
-  optional string affiliate_name = 4;
+  optional string affiliate_name = 3;
 }
 
 message GetReferralListResponse{

@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"github.com/aaronangxz/AffiliateManager/orm"
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
-	u "github.com/aaronangxz/AffiliateManager/test_suite/test_builder/utils"
+	u "github.com/aaronangxz/AffiliateManager/test_suite/test_builder/test_utils"
 	"github.com/aaronangxz/AffiliateManager/utils"
 	"github.com/labstack/gommon/log"
 	"google.golang.org/protobuf/proto"

@@ -201,7 +201,7 @@ func NewMockTest(method string) *MockTest {
 
 	//Stripe
 	m.e.POST("api/v1/payment/create-payment-intent", cmd.CreatePaymentIntent) //DONE
-	orm.DIR = "../../orm/queries/"
+	orm.DIR = "../../../orm/queries/"
 	orm.ENV = "TEST"
 	return m
 }
