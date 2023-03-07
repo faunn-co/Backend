@@ -38,6 +38,10 @@ func VerifyTimeSelectorFields(t *pb.TimeSelector) error {
 	if t.EndTs == nil && t.StartTs != nil {
 		return errors.New("end_ts is required")
 	}
+
+	if t.StartTs != nil && t.EndTs != nil && t.GetEndTs() < t.GetStartTs() {
+		return errors.New("end_ts must be after start_ts")
+	}
 	return nil
 }
 
@@ -137,25 +141,26 @@ func GetStartEndTimeStampFromTimeSelector(t *pb.TimeSelector) (string, string) {
 	return start, end
 }
 
-func GetStartEndTimeFromPeriod(p string) (int64, int64, int64, int64) {
+func GetStartEndTimeFromPeriod(p string) (int64, int64, int64, int64, error) {
 	var (
 		start     int64
 		end       int64
 		prevStart int64
 		prevEnd   int64
 	)
+
 	switch p {
 	case strconv.FormatInt(int64(pb.TimeSelectorPeriod_PERIOD_WEEK), 10):
 		start, end = WeekStartEndDate(time.Now().Unix())
 		prevStart, prevEnd = start-WEEK, start-SECOND
 		break
 	case strconv.FormatInt(int64(pb.TimeSelectorPeriod_PERIOD_MONTH), 10):
-		fallthrough
-	default:
 		start, end = MonthStartEndDate(time.Now().Unix())
 		prevStart, prevEnd = start-MONTH, start-SECOND
 		break
+	default:
+		return 0, 0, 0, 0, errors.New("period not supported")
 	}
 	end = Min(end, time.Now().Unix())
-	return start, end, prevStart, prevEnd
+	return start, end, prevStart, prevEnd, nil
 }

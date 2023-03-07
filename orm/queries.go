@@ -267,3 +267,11 @@ func GetReferralClickInfo() string {
 	}
 	return string(query)
 }
+
+func GetAdminInfoQuery() string {
+	query, err := os.ReadFile(openSql("sql33.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}

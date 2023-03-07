@@ -111,7 +111,7 @@ func ConnectMySQL(ctx context.Context) error {
 	if err != nil {
 		return err
 	}
-
+	logger.Info(ctx, "Successfully connected to %v", DB_NAME)
 	db = openDb
 	return nil
 }

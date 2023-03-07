@@ -3,6 +3,7 @@ package get_referral_stats
 import (
 	"context"
 	"database/sql"
+	"github.com/aaronangxz/AffiliateManager/auth_middleware"
 	"github.com/aaronangxz/AffiliateManager/logger"
 	"github.com/aaronangxz/AffiliateManager/orm"
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
@@ -38,11 +39,19 @@ func (g *GetReferralStats) GetReferralStatsImpl() (*pb.ReferralStats, *pb.Referr
 		sP *pb.ReferralCoreStats
 	)
 
+	tokenAuth, err := auth_middleware.ExtractTokenMetadata(g.ctx, g.c.Request())
+	if err != nil {
+		logger.Error(context.Background(), err)
+		return nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_TOKEN_ERROR)
+	}
+
+	id := tokenAuth.UserId
+
 	start, end, prevStart, prevEnd := utils.GetStartEndTimeFromTimeSelector(g.req.GetTimeSelector())
-	if err := orm.DbInstance(g.ctx).Raw(orm.GetReferralStatsQuery(), sql.Named("id", g.req.GetAffiliateId()), sql.Named("startTime", start), sql.Named("endTime", end)).Scan(&s).Error; err != nil {
+	if err := orm.DbInstance(g.ctx).Raw(orm.GetReferralStatsQuery(), sql.Named("id", id), sql.Named("startTime", start), sql.Named("endTime", end)).Scan(&s).Error; err != nil {
 		return nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 	}
-	if err := orm.DbInstance(g.ctx).Raw(orm.GetReferralStatsQuery(), sql.Named("id", g.req.GetAffiliateId()), sql.Named("startTime", prevStart), sql.Named("endTime", prevEnd)).Scan(&sP).Error; err != nil {
+	if err := orm.DbInstance(g.ctx).Raw(orm.GetReferralStatsQuery(), sql.Named("id", id), sql.Named("startTime", prevStart), sql.Named("endTime", prevEnd)).Scan(&sP).Error; err != nil {
 		return nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 	}
 	return &pb.ReferralStats{

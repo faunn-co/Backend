@@ -27,11 +27,19 @@ func New(c echo.Context) *GetAffiliateRankingList {
 func (g *GetAffiliateRankingList) GetAffiliateRankingListImpl() (*pb.AffiliateRanking, *resp.Error) {
 	var (
 		//Current Period
-		r []*pb.AffiliateMetaTopReferral
-		c []*pb.AffiliateMetaTopCommission
+		r         []*pb.AffiliateMetaTopReferral
+		c         []*pb.AffiliateMetaTopCommission
+		start     int64
+		end       int64
+		prevStart int64
+		prevEnd   int64
+		err       error
 	)
 
-	start, end, prevStart, prevEnd := utils.GetStartEndTimeFromPeriod(g.c.QueryParam("period"))
+	p := g.c.QueryParam("period")
+	if start, end, prevStart, prevEnd, err = utils.GetStartEndTimeFromPeriod(p); err != nil {
+		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_INVALID_PARAMS)
+	}
 	if err := orm.DbInstance(g.ctx).Raw(orm.Sql6(), start, end).Scan(&r).Error; err != nil {
 		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 	}

@@ -28,3 +28,21 @@ func JSONResp(c echo.Context, err *Error) error {
 		},
 	})
 }
+
+func NotAuthenticatedResp(c echo.Context) error {
+	return c.JSON(http.StatusUnauthorized, pb.GenericResponse{
+		ResponseMeta: &pb.ResponseMeta{
+			ErrorCode: proto.Int64(int64(pb.GlobalErrorCode_ERROR_NOT_AUTHORISED)),
+			ErrorMsg:  proto.String("Not Authenticated"),
+		},
+	})
+}
+
+func NotAuthorisedResp(c echo.Context) error {
+	return c.JSON(http.StatusForbidden, pb.GenericResponse{
+		ResponseMeta: &pb.ResponseMeta{
+			ErrorCode: proto.Int64(int64(pb.GlobalErrorCode_ERROR_NO_ACCESS)),
+			ErrorMsg:  proto.String("No Permission"),
+		},
+	})
+}

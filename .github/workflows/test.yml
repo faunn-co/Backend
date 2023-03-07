@@ -5,6 +5,7 @@ on:
     branches: [ master, staging ]
   pull_request:
     branches: [ master, staging ]
+    workflow_dispatch:
 
 jobs:
   build:
@@ -31,3 +32,5 @@ jobs:
           TEST_REDIS_HOST: ${{secrets.TEST_REDIS_HOST}}
           TEST_REDIS_PASS: ${{secrets.TEST_REDIS_PASS}}
           ENV: ${{secrets.ENV}}
+          ACCESS_SECRET: ${{secrets.ACCESS_SECRET}}
+          REFRESH_SECRET: ${{secrets.REFRESH_SECRET}}
