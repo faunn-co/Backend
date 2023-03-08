@@ -33,7 +33,7 @@ FROM
         FROM
             date_ref_table d
                 LEFT JOIN (SELECT * FROM referral_table WHERE affiliate_id= @id) AS r ON d.date_string = DATE(
-                    FROM_UNIXTIME(r.booking_time)
+                    FROM_UNIXTIME(r.booking_time + 28800)
                 )
                 LEFT JOIN booking_details_table b ON r.booking_id = b.booking_id
         WHERE
