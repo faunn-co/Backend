@@ -13,6 +13,10 @@ type Error struct {
 	errCode *int64
 }
 
+func (e *Error) Error() error {
+	return e.err
+}
+
 func BuildError(err error, code pb.GlobalErrorCode) *Error {
 	return &Error{
 		err:     err,
