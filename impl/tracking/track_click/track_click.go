@@ -3,13 +3,13 @@ package track_click
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/aaronangxz/AffiliateManager/logger"
 	"github.com/aaronangxz/AffiliateManager/orm"
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
 	"github.com/aaronangxz/AffiliateManager/resp"
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/gommon/log"
 	"google.golang.org/protobuf/proto"
 	"time"
 )
@@ -32,14 +32,19 @@ func (t *TrackClick) TrackClickImpl() (*int64, *resp.Error) {
 		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_INVALID_PARAMS)
 	}
 
+	var (
+		id  *int64
+		err *resp.Error
+	)
 	code := t.c.QueryParam("ref")
 	if code == "" || code == "null" {
-		return nil, nil
-	}
-
-	id, err := t.getAffiliateWithCodeUsingCache(code)
-	if err != nil {
-		return nil, err
+		logger.Warn(t.ctx, "invalid ref code in url, proceed as anonymous click")
+	} else {
+		id, err = t.getAffiliateWithCodeUsingCache(code)
+		if err != nil {
+			logger.Error(t.ctx, err.Error())
+			return nil, err
+		}
 	}
 	logger.Info(t.ctx, "referral_code: %v referral id: %v", code, id)
 
@@ -64,7 +69,7 @@ func (t *TrackClick) TrackClickImpl() (*int64, *resp.Error) {
 
 func (t *TrackClick) verifyTrackClick() error {
 	if t.c.QueryParam("ref") == "" || t.c.QueryParam("ref") == "null" {
-		log.Warn("no ref id")
+		logger.Warn(t.ctx, "no ref id")
 	}
 	return nil
 }
@@ -91,6 +96,11 @@ func (t *TrackClick) getAffiliateWithCodeUsingCache(code string) (*int64, *resp.
 	var affiliate *pb.AffiliateDetailsDb
 	if err := orm.DbInstance(t.ctx).Raw(orm.GetAffiliateByCodeQuery(), code).Scan(&affiliate).Error; err != nil {
 		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
+	}
+
+	if affiliate == nil {
+		err := errors.New("affiliate not found")
+		return proto.Int64(0), resp.BuildError(err, pb.GlobalErrorCode_ERROR_USER_NOT_FOUND)
 	}
 
 	if affiliate.UserId != nil {
