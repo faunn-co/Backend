@@ -146,6 +146,10 @@ func (t *TrackCheckOut) calculateTicket() (*int64, *int64, *int64) {
 }
 
 func (t *TrackCheckOut) calculateCommission() *int64 {
+	if err := referral_verification.New(t.c, t.ctx).VerifyReferralIdBoundedAffiliate(t.req.GetReferralId()); err != nil {
+		logger.Info(t.ctx, "anonymous click, no commission calculated")
+		return proto.Int64(0)
+	}
 	total, _, _ := t.calculateTicket()
 	commission := *total / 100 * commissionPercentage
 	return proto.Int64(commission)

@@ -17,7 +17,7 @@ SELECT
     COUNT(r.referral_id) AS total_affiliate_bookings
 FROM
     date_ref_table d
-        LEFT JOIN referral_table r ON d.date_string = DATE(
+        LEFT JOIN (SELECT * FROM referral_table WHERE affiliate_id IS NOT NULL) AS r ON d.date_string = DATE(
             FROM_UNIXTIME(r.booking_time)
         )
         LEFT JOIN booking_details_table b ON r.booking_id = b.booking_id

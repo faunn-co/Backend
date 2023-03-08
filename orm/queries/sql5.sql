@@ -8,6 +8,6 @@ FROM
     referral_table r
         LEFT JOIN booking_details_table b ON r.booking_id = b.booking_id
 WHERE
-        r.referral_status = 0
+        r.referral_status = 0 AND r.affiliate_id IS NOT NULL
   AND r.booking_time >= ?
   AND r.booking_time <= ?;

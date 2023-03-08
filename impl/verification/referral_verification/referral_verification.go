@@ -11,10 +11,11 @@ import (
 )
 
 type ReferralVerification struct {
-	c          echo.Context
-	ctx        context.Context
-	entityName string
-	referralId string
+	c                          echo.Context
+	ctx                        context.Context
+	entityName                 string
+	referralId                 string
+	referralIdBoundedAffiliate string
 }
 
 func New(c echo.Context, ctx context.Context) *ReferralVerification {
@@ -22,6 +23,7 @@ func New(c echo.Context, ctx context.Context) *ReferralVerification {
 	r.c = c
 	r.ctx = ctx
 	r.referralId = "ref_id"
+	r.referralIdBoundedAffiliate = "ref_id_bound_affiliate"
 	return r
 }
 
@@ -52,6 +54,37 @@ func (r *ReferralVerification) VerifyReferralId(id int64) error {
 	if err := orm.SET(r.ctx, k, referral, 0); err != nil {
 		logger.Error(r.ctx, err)
 		return nil
+	}
+	return nil
+}
+
+func (r *ReferralVerification) VerifyReferralIdBoundedAffiliate(id int64) error {
+	if id == 0 {
+		return nil
+	}
+
+	k := fmt.Sprintf("%v:%v", r.referralIdBoundedAffiliate, id)
+	if val, err := orm.GET(r.c, r.ctx, k, false); err != nil {
+		return err
+	} else if val != nil {
+		logger.Info(r.ctx, "VerifyReferralIdBoundedAffiliate | Successful | Cached %v", k)
+		return errors.New("referral click has no affiliate bound")
+	}
+
+	var referral *pb.ReferralDb
+	if err := orm.DbInstance(r.ctx).Raw(orm.GetReferralClickInfo(), id).Scan(&referral).Error; err != nil {
+		return err
+	}
+
+	if referral == nil {
+		return errors.New("referral click not found")
+	}
+	if referral.AffiliateId == nil {
+		if err := orm.SET(r.ctx, k, referral, 0); err != nil {
+			logger.Error(r.ctx, err)
+			return nil
+		}
+		return errors.New("referral click has no affiliate bound")
 	}
 	return nil
 }
