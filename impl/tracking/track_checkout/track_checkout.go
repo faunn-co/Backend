@@ -167,5 +167,5 @@ func (t *TrackCheckOut) sendConfirmationEmail(details *pb.BookingDetails) {
 	if details.TouristTicketCount != nil {
 		ticket += fmt.Sprintf("%v x Tourist ", details.GetTouristTicketCount())
 	}
-	send_email.Send(id, details.GetBookingDay(), slotMap[details.GetBookingSlot()], ticket)
+	send_email.New(t.c).Send(id, details.GetBookingDay(), slotMap[details.GetBookingSlot()], ticket, details.GetCustomerInfo()[0].GetCustomerEmail())
 }

@@ -6,12 +6,13 @@ import (
 	"encoding/base64"
 	"errors"
 	"fmt"
+	"github.com/aaronangxz/AffiliateManager/logger"
+	"github.com/labstack/echo/v4"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
 	"google.golang.org/api/gmail/v1"
 	"google.golang.org/api/option"
 	"html/template"
-	"log"
 	"os"
 	"path/filepath"
 	"time"
@@ -19,7 +20,21 @@ import (
 
 var GmailService *gmail.Service
 
-func OAuthGmailService() {
+type SendEmail struct {
+	c         echo.Context
+	ctx       context.Context
+	requestId string
+}
+
+func New(c echo.Context) *SendEmail {
+	s := new(SendEmail)
+	s.c = c
+	s.ctx = logger.NewCtx(s.c)
+	logger.Info(s.ctx, "SendEmail Initialized")
+	return s
+}
+
+func (s *SendEmail) OAuthGmailService() {
 	config := oauth2.Config{
 		ClientID:     os.Getenv("GMAIL_CLIENT_ID"),
 		ClientSecret: os.Getenv("GMAIL_CLIENT_SECRET"),
@@ -38,16 +53,16 @@ func OAuthGmailService() {
 
 	srv, err := gmail.NewService(context.Background(), option.WithTokenSource(tokenSource))
 	if err != nil {
-		log.Printf("Unable to retrieve Gmail client: %v", err)
+		logger.ErrorMsg(s.ctx, "Unable to retrieve Gmail client: %v", err)
 	}
 
 	GmailService = srv
 	if GmailService != nil {
-		fmt.Println("Email service is initialized")
+		logger.Info(s.ctx, "Email service is initialized")
 	}
 }
 
-func parseTemplate(templateFileName string, data interface{}) (string, error) {
+func (s *SendEmail) parseTemplate(templateFileName string, data interface{}) (string, error) {
 	templatePath, err := filepath.Abs(fmt.Sprintf("impl/email/send_email/%s", templateFileName))
 	if err != nil {
 		return "", errors.New("invalid template name")
@@ -64,8 +79,8 @@ func parseTemplate(templateFileName string, data interface{}) (string, error) {
 	return body, nil
 }
 
-func SendEmailOAUTH2(to string, data interface{}, template string) (bool, error) {
-	emailBody, err := parseTemplate(template, data)
+func (s *SendEmail) SendEmailOAUTH2(to string, data interface{}, template string) (bool, error) {
+	emailBody, err := s.parseTemplate(template, data)
 	if err != nil {
 		return false, errors.New("unable to parse email template")
 	}
@@ -87,8 +102,8 @@ func SendEmailOAUTH2(to string, data interface{}, template string) (bool, error)
 	return true, nil
 }
 
-func Send(booking, date, slot, ticket string) {
-	OAuthGmailService()
+func (s *SendEmail) Send(booking, date, slot, ticket, receiver string) {
+	s.OAuthGmailService()
 	data := struct {
 		Booking string
 		Date    string
@@ -101,11 +116,12 @@ func Send(booking, date, slot, ticket string) {
 		Ticket:  ticket,
 	}
 
-	status, err := SendEmailOAUTH2("angxze@gmail.com", data, "email_template.html")
+	status, err := s.SendEmailOAUTH2(receiver, data, "email_template.html")
 	if err != nil {
-		log.Println(err)
+		logger.Error(s.ctx, err)
+		logger.ErrorMsg(s.ctx, "Failed: email not sent to %v", receiver)
 	}
 	if status {
-		log.Println("Email sent successfully using OAUTH")
+		logger.Info(s.ctx, "Email sent successfully using OAUTH")
 	}
 }
