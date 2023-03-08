@@ -63,7 +63,7 @@ func (g *GetAffiliateList) GetAffiliateListImpl() ([]*pb.AffiliateMeta, *int64, 
 	//}
 	//log.Infof("GetAffiliateList | Successful | Written %v to redis", g.key)
 
-	return g.filterTestAccounts(l), proto.Int64(start), proto.Int64(end), nil
+	return l, proto.Int64(start), proto.Int64(end), nil
 }
 
 func (g *GetAffiliateList) verifyGetAffiliateList() error {
