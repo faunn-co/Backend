@@ -18,5 +18,9 @@ steps:
       - 'ENV=${_ENV}'
       - 'ACCESS_SECRET=${_ACCESS_SECRET}'
       - 'REFRESH_SECRET=${_REFRESH_SECRET}'
+      - 'GMAIL_CLIENT_ID=${_GMAIL_CLIENT_ID}'
+      - 'GMAIL_CLIENT_SECRET=${_GMAIL_CLIENT_SECRET}'
+      - 'GMAIL_ACCESS_TOKEN=${_GMAIL_ACCESS_TOKEN}'
+      - 'GMAIL_REFRESH_TOKEN=${_GMAIL_REFRESH_TOKEN}'
   - name: "gcr.io/cloud-builders/gcloud"
     args: [ "app", "deploy" ]
