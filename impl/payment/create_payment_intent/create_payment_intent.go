@@ -2,6 +2,8 @@ package create_payment_intent
 
 import (
 	"context"
+	"errors"
+	"github.com/aaronangxz/AffiliateManager/impl/tracking/track_checkout"
 	"github.com/aaronangxz/AffiliateManager/logger"
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
 	"github.com/aaronangxz/AffiliateManager/resp"
@@ -51,16 +53,23 @@ func (p *CreatePaymentIntent) CreatePaymentIntentImpl() (*string, *resp.Error) {
 }
 
 func (p *CreatePaymentIntent) calculateOrderAmount() int64 {
-	// Replace this constant with a calculation of the order's amount
-	// Calculate the order total on the server to prevent
-	// people from directly manipulating the amount on the client
-	return 1400
+	var total int64
+	if p.req.GetTickets().CitizenTicketCount != nil {
+		total += p.req.GetTickets().GetCitizenTicketCount() * track_checkout.CitizenTicket
+	}
+	if p.req.GetTickets().TouristTicketCount != nil {
+		total += p.req.GetTickets().GetTouristTicketCount() * track_checkout.TouristTicket
+	}
+	return total / 100
 }
 
 func (p *CreatePaymentIntent) verifyCreatePaymentIntent() error {
 	p.req = new(pb.CreatePaymentIntentRequest)
 	if err := p.c.Bind(p.req); err != nil {
 		return err
+	}
+	if p.req.Tickets != nil {
+		return errors.New("no ticket found")
 	}
 	return nil
 }
