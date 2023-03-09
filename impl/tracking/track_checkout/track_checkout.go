@@ -2,7 +2,6 @@ package track_checkout
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"github.com/aaronangxz/AffiliateManager/impl/email/send_email"
 	"github.com/aaronangxz/AffiliateManager/impl/verification/referral_verification"
@@ -70,13 +69,7 @@ func (t *TrackCheckOut) startCheckOutTx() (*pb.BookingDetails, error) {
 		return nil, err
 	}
 
-	marshaledInfo, jErr := json.Marshal(t.req.GetCustomerInfo())
-	if jErr != nil {
-		logger.Warn(t.ctx, jErr.Error())
-	}
-
-	_, citizen, tourist := t.calculateTicket()
-
+	//Update BookingStatus,PaymentStatus,TransactionTime
 	b := struct {
 		BookingId          *int64 `gorm:"primary_key"`
 		BookingStatus      *int64
@@ -90,22 +83,15 @@ func (t *TrackCheckOut) startCheckOutTx() (*pb.BookingDetails, error) {
 		TouristTicketTotal *int64
 		CustomerInfo       []byte
 	}{
-		BookingId:          nil,
-		BookingStatus:      proto.Int64(int64(pb.BookingStatus_BOOKING_STATUS_SUCCESS)),
-		BookingDay:         t.req.BookingDay,
-		BookingSlot:        t.req.BookingSlot,
-		TransactionTime:    proto.Int64(time.Now().Unix()),
-		PaymentStatus:      proto.Int64(int64(pb.PaymentStatus_PAYMENT_STATUS_SUCCESS)),
-		CitizenTicketCount: t.req.CitizenTicketCount,
-		TouristTicketCount: t.req.TouristTicketCount,
-		CitizenTicketTotal: citizen,
-		TouristTicketTotal: tourist,
-		CustomerInfo:       marshaledInfo,
+		BookingId:       t.req.BookingId,
+		BookingStatus:   proto.Int64(int64(pb.BookingStatus_BOOKING_STATUS_SUCCESS)),
+		TransactionTime: proto.Int64(time.Now().Unix()),
+		PaymentStatus:   proto.Int64(int64(pb.PaymentStatus_PAYMENT_STATUS_SUCCESS)),
 	}
 
-	//Insert into booking_table
-	if err := tx.Table(orm.BOOKING_DETAILS_TABLE).Create(&b).Error; err != nil {
-		logger.Warn(t.ctx, "Error during startCheckOutTx:create booking: %v", err.Error())
+	//Update booking_table
+	if err := tx.Table(orm.BOOKING_DETAILS_TABLE).Save(&b).Error; err != nil {
+		logger.Warn(t.ctx, "Error during startCheckOutTx:update booking: %v", err.Error())
 		tx.Rollback()
 		return nil, err
 	}
@@ -131,7 +117,6 @@ func (t *TrackCheckOut) startCheckOutTx() (*pb.BookingDetails, error) {
 		TouristTicketCount: b.TouristTicketCount,
 		CitizenTicketTotal: b.CitizenTicketTotal,
 		TouristTicketTotal: b.TouristTicketTotal,
-		CustomerInfo:       t.req.CustomerInfo,
 	}
 
 	t.sendConfirmationEmail(details)
@@ -165,10 +150,10 @@ func (t *TrackCheckOut) sendConfirmationEmail(details *pb.BookingDetails) {
 	id := strconv.FormatInt(details.GetBookingId(), 10)
 	var ticket string
 
-	if details.CitizenTicketCount != nil {
+	if details.CitizenTicketCount != nil && details.GetCitizenTicketTotal() != 0 {
 		ticket += fmt.Sprintf("%v x Citizen ", details.GetCitizenTicketCount())
 	}
-	if details.TouristTicketCount != nil {
+	if details.TouristTicketCount != nil && details.GetTouristTicketCount() != 0 {
 		ticket += fmt.Sprintf("%v x Tourist ", details.GetTouristTicketCount())
 	}
 	send_email.New(t.c).Send(id, details.GetBookingDay(), slotMap[details.GetBookingSlot()], ticket, details.GetCustomerInfo()[0].GetCustomerEmail())
