@@ -9,6 +9,7 @@ import (
 	"github.com/stripe/stripe-go/v74"
 	"github.com/stripe/stripe-go/v74/paymentintent"
 	"google.golang.org/protobuf/proto"
+	"os"
 )
 
 type CreatePaymentIntent struct {
@@ -31,7 +32,7 @@ func (p *CreatePaymentIntent) CreatePaymentIntentImpl() (*string, *resp.Error) {
 		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_INVALID_PARAMS)
 	}
 
-	stripe.Key = "sk_test_Ou1w6LVt3zmVipDVJsvMeQsc"
+	stripe.Key = os.Getenv("STRIPE_SECRET_KEY")
 	params := &stripe.PaymentIntentParams{
 		Amount:   stripe.Int64(p.calculateOrderAmount()),
 		Currency: stripe.String(string(stripe.CurrencyMYR)),
