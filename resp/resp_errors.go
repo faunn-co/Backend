@@ -17,6 +17,10 @@ func (e *Error) Error() error {
 	return e.err
 }
 
+func (e *Error) ErrorCode() int64 {
+	return *e.errCode
+}
+
 func BuildError(err error, code pb.GlobalErrorCode) *Error {
 	return &Error{
 		err:     err,

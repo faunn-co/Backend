@@ -85,7 +85,7 @@ func GET(e echo.Context, c context.Context, key string, needResponseHeader bool)
 	}
 	logger.Info(c, "Successful | Cached %v", key)
 	if needResponseHeader {
-		e.Response().Header().Set("cache", "1")
+		e.Response().Header().Set("X-From-Cache", "1")
 	}
 	return []byte(val), nil
 }

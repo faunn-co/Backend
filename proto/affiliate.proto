@@ -20,6 +20,7 @@ enum GlobalErrorCode{
   ERROR_NO_ACCESS = 1013;
   ERROR_LOGOUT_FAIL = 1014;
   ERROR_TOKEN_ERROR = 1015;
+  ERROR_CACHE_MISS = 1016;
 }
 
 enum UserRole{
