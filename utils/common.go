@@ -87,15 +87,17 @@ func GetStartEndTimeFromTimeSelector(t *pb.TimeSelector) (int64, int64, int64, i
 	return start, end, prevStart, prevEnd
 }
 
-func GetStartEndTimeStampFromTimeSelector(t *pb.TimeSelector) (string, string) {
+func GetStartEndTimeStampFromTimeSelector(t *pb.TimeSelector) (int64, int64, string, string) {
 	var (
-		start string
-		end   string
+		startTs int64
+		endTs   int64
+		start   string
+		end     string
 	)
 	switch t.GetPeriod() {
 	case int64(pb.TimeSelectorPeriod_PERIOD_DAY):
 		//start end of ts
-		startTs, endTs := DayStartEndDate(t.GetBaseTs())
+		startTs, endTs = DayStartEndDate(t.GetBaseTs())
 		endTs = Min(endTs, time.Now().Unix())
 
 		start = ConvertTimeStampYearMonthDay(startTs)
@@ -103,7 +105,7 @@ func GetStartEndTimeStampFromTimeSelector(t *pb.TimeSelector) (string, string) {
 		break
 	case int64(pb.TimeSelectorPeriod_PERIOD_WEEK):
 		//start end of week of ts
-		startTs, endTs := WeekStartEndDate(t.GetBaseTs())
+		startTs, endTs = WeekStartEndDate(t.GetBaseTs())
 		endTs = Min(endTs, time.Now().Unix())
 
 		start = ConvertTimeStampYearMonthDay(startTs)
@@ -111,34 +113,34 @@ func GetStartEndTimeStampFromTimeSelector(t *pb.TimeSelector) (string, string) {
 		break
 	case int64(pb.TimeSelectorPeriod_PERIOD_MONTH):
 		//start end of month of ts
-		startTs, endTs := MonthStartEndDate(t.GetBaseTs())
+		startTs, endTs = MonthStartEndDate(t.GetBaseTs())
 		endTs = Min(endTs, time.Now().Unix())
 
 		start = ConvertTimeStampYearMonthDay(startTs)
 		end = ConvertTimeStampYearMonthDay(endTs)
 		break
 	case int64(pb.TimeSelectorPeriod_PERIOD_LAST_7_DAYS):
-		endTs := t.GetBaseTs()
-		startTs := endTs - WEEK
+		endTs = t.GetBaseTs()
+		startTs = endTs - WEEK
 		startTs, _ = DayStartEndDate(startTs)
 		end = ConvertTimeStampYearMonthDay(endTs)
 		start = ConvertTimeStampYearMonthDay(startTs)
 		break
 	case int64(pb.TimeSelectorPeriod_PERIOD_LAST_28_DAYS):
-		endTs := t.GetBaseTs()
-		startTs := endTs - MONTH
+		endTs = t.GetBaseTs()
+		startTs = endTs - MONTH
 		startTs, _ = DayStartEndDate(startTs)
 		end = ConvertTimeStampYearMonthDay(endTs)
 		start = ConvertTimeStampYearMonthDay(startTs)
 		break
 	case int64(pb.TimeSelectorPeriod_PERIOD_RANGE):
-		//start of start ts
-		//end of end ts
-		start = ConvertTimeStampYearMonthDay(t.GetStartTs())
-		end = ConvertTimeStampYearMonthDay(t.GetEndTs())
+		startTs = t.GetStartTs()
+		endTs = t.GetEndTs()
+		start = ConvertTimeStampYearMonthDay(startTs)
+		end = ConvertTimeStampYearMonthDay(endTs)
 		break
 	}
-	return start, end
+	return startTs, endTs, start, end
 }
 
 func GetStartEndTimeFromPeriod(p string) (int64, int64, int64, int64, error) {

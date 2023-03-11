@@ -41,14 +41,14 @@ func GetAffiliateDetailsByIdResponseJSON(c echo.Context, meta *pb.AffiliateMeta,
 	})
 }
 
-func GetAffiliateStatsResponseJSON(c echo.Context, curr *pb.AffiliateStats, prev *pb.AffiliateStats) error {
+func GetAffiliateStatsResponseJSON(c echo.Context, r *pb.GetAffiliateStatsResponse) error {
 	return c.JSON(http.StatusOK, pb.GetAffiliateStatsResponse{
 		ResponseMeta: &pb.ResponseMeta{
 			ErrorCode: proto.Int64(int64(pb.GlobalErrorCode_SUCCESS)),
 			ErrorMsg:  proto.String("success"),
 		},
-		AffiliateStats:              curr,
-		AffiliateStatsPreviousCycle: prev,
+		AffiliateStats:              r.AffiliateStats,
+		AffiliateStatsPreviousCycle: r.AffiliateStatsPreviousCycle,
 	})
 }
 
@@ -72,14 +72,14 @@ func GetAffiliateTrendResponseJSON(c echo.Context, trend []*pb.AffiliateCoreTime
 	})
 }
 
-func GetReferralStatsResponseJSON(c echo.Context, curr *pb.ReferralStats, prev *pb.ReferralStats) error {
+func GetReferralStatsResponseJSON(c echo.Context, stats *pb.GetReferralStatsResponse) error {
 	return c.JSON(http.StatusOK, pb.GetReferralStatsResponse{
 		ResponseMeta: &pb.ResponseMeta{
 			ErrorCode: proto.Int64(int64(pb.GlobalErrorCode_SUCCESS)),
 			ErrorMsg:  proto.String("success"),
 		},
-		ReferralStats:              curr,
-		ReferralStatsPreviousCycle: prev,
+		ReferralStats:              stats.ReferralStats,
+		ReferralStatsPreviousCycle: stats.ReferralStatsPreviousCycle,
 	})
 }
 
