@@ -68,7 +68,7 @@ func (p *CreatePaymentIntent) verifyCreatePaymentIntent() error {
 	if err := p.c.Bind(p.req); err != nil {
 		return err
 	}
-	if p.req.Tickets != nil {
+	if p.req.Tickets == nil {
 		return errors.New("no ticket found")
 	}
 	return nil
