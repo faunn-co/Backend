@@ -283,3 +283,11 @@ func DecrementTicketCountQuery() string {
 	}
 	return string(query)
 }
+
+func UpdateBookingPostCheckOutQuery() string {
+	query, err := os.ReadFile(openSql("sql35.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}

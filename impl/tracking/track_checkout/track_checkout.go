@@ -2,6 +2,7 @@ package track_checkout
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"github.com/aaronangxz/AffiliateManager/impl/email/send_email"
 	"github.com/aaronangxz/AffiliateManager/impl/verification/referral_verification"
@@ -68,35 +69,15 @@ func (t *TrackCheckOut) startCheckOutTx() (*pb.BookingDetails, error) {
 	if err := tx.Error; err != nil {
 		return nil, err
 	}
-
-	//Update BookingStatus,PaymentStatus,TransactionTime
-	b := struct {
-		BookingId          *int64 `gorm:"primary_key"`
-		BookingStatus      *int64
-		BookingDay         *string
-		BookingSlot        *int64
-		TransactionTime    *int64
-		PaymentStatus      *int64
-		CitizenTicketCount *int64
-		TouristTicketCount *int64
-		CitizenTicketTotal *int64
-		TouristTicketTotal *int64
-		CustomerInfo       []byte
-	}{
-		BookingId:       t.req.BookingId,
-		BookingStatus:   proto.Int64(int64(pb.BookingStatus_BOOKING_STATUS_SUCCESS)),
-		TransactionTime: proto.Int64(time.Now().Unix()),
-		PaymentStatus:   proto.Int64(int64(pb.PaymentStatus_PAYMENT_STATUS_SUCCESS)),
-	}
-
+	txTime := time.Now().Unix()
 	//Update booking_table
-	if err := tx.Table(orm.BOOKING_DETAILS_TABLE).Save(&b).Error; err != nil {
+	if err := tx.Exec(orm.UpdateBookingPostCheckOutQuery(), int64(pb.BookingStatus_BOOKING_STATUS_SUCCESS), txTime, int64(pb.PaymentStatus_PAYMENT_STATUS_SUCCESS), t.req.GetBookingId()).Error; err != nil {
 		logger.Warn(t.ctx, "Error during startCheckOutTx:update booking: %v", err.Error())
 		tx.Rollback()
 		return nil, err
 	}
 	//Update referral_table using referral_id
-	if err := tx.Exec(orm.UpdateReferralBookingInfoQuery(), pb.ReferralStatus_REFERRAL_STATUS_SUCCESS, b.BookingId, b.TransactionTime, t.calculateCommission(), t.req.GetReferralId()).Error; err != nil {
+	if err := tx.Exec(orm.UpdateReferralBookingInfoQuery(), pb.ReferralStatus_REFERRAL_STATUS_SUCCESS, t.req.GetBookingId(), txTime, t.calculateCommission(), t.req.GetReferralId()).Error; err != nil {
 		logger.Warn(t.ctx, "Error during startCheckOutTx:update referral: %v", err.Error())
 		tx.Rollback()
 		return nil, err
@@ -106,6 +87,15 @@ func (t *TrackCheckOut) startCheckOutTx() (*pb.BookingDetails, error) {
 		return nil, err
 	}
 
+	var b *pb.BookingDetailsDb
+	if err := orm.DbInstance(t.ctx).Debug().Raw(orm.GetReferralBookingDetailsQuery(), t.req.GetBookingId()).Scan(&b).Error; err != nil {
+		logger.Error(t.ctx, err)
+		return nil, err
+	}
+	var c []*pb.CustomerInfo
+	if err := json.Unmarshal(b.GetCustomerInfo(), &c); err != nil {
+		return nil, err
+	}
 	details := &pb.BookingDetails{
 		BookingId:          b.BookingId,
 		BookingStatus:      b.BookingStatus,
@@ -117,8 +107,8 @@ func (t *TrackCheckOut) startCheckOutTx() (*pb.BookingDetails, error) {
 		TouristTicketCount: b.TouristTicketCount,
 		CitizenTicketTotal: b.CitizenTicketTotal,
 		TouristTicketTotal: b.TouristTicketTotal,
+		CustomerInfo:       c,
 	}
-
 	t.sendConfirmationEmail(details)
 	return details, nil
 }
