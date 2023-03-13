@@ -14,9 +14,8 @@ import (
 )
 
 const (
-	CitizenTicket        = 8800
-	TouristTicket        = 9800
-	commissionPercentage = 5
+	CitizenTicket = 8800
+	TouristTicket = 9800
 )
 
 type TrackPayment struct {
