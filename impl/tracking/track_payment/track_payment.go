@@ -90,6 +90,13 @@ func (t *TrackPayment) startPaymentTx() (*int64, error) {
 		CustomerInfo:       marshaledInfo,
 	}
 
+	//decrement ticket
+	if err := tx.Exec(orm.DecrementTicketCountQuery(), t.req.GetCitizenTicketCount(), t.req.GetTouristTicketCount(), t.req.GetBookingDay(), t.req.GetBookingSlot()).Error; err != nil {
+		logger.Warn(t.ctx, "Error during startPaymentTx:decrement ticket: %v", err.Error())
+		tx.Rollback()
+		return nil, err
+	}
+
 	//Insert into booking_table
 	if err := tx.Table(orm.BOOKING_DETAILS_TABLE).Create(&b).Error; err != nil {
 		logger.Warn(t.ctx, "Error during startPaymentTx:create booking: %v", err.Error())
@@ -103,6 +110,7 @@ func (t *TrackPayment) startPaymentTx() (*int64, error) {
 		return nil, err
 	}
 	logger.Info(t.ctx, "committing startPaymentTx")
+
 	if err := tx.Commit().Error; err != nil {
 		return nil, err
 	}

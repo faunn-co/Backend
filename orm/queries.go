@@ -275,3 +275,11 @@ func GetAdminInfoQuery() string {
 	}
 	return string(query)
 }
+
+func DecrementTicketCountQuery() string {
+	query, err := os.ReadFile(openSql("sql34.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}
