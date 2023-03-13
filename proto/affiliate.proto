@@ -547,8 +547,6 @@ message TrackCheckOutRequest{
   optional RequestMeta request_meta = 1;
   optional int64 referral_id = 2;
   optional int64 booking_id = 3;
-  optional int64 citizen_ticket_count = 4;
-  optional int64 tourist_ticket_count = 5;
 }
 
 message TrackCheckOutResponse{

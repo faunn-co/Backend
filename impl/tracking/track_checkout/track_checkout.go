@@ -17,8 +17,6 @@ import (
 )
 
 const (
-	CitizenTicket        = 8800
-	TouristTicket        = 9800
 	commissionPercentage = 5
 )
 
@@ -59,6 +57,16 @@ func (t *TrackCheckOut) verifyTrackCheckOut() error {
 }
 
 func (t *TrackCheckOut) startCheckOutTx() (*pb.BookingDetails, error) {
+	var b *pb.BookingDetailsDb
+	if err := orm.DbInstance(t.ctx).Debug().Raw(orm.GetReferralBookingDetailsQuery(), t.req.GetBookingId()).Scan(&b).Error; err != nil {
+		logger.Error(t.ctx, err)
+		return nil, err
+	}
+	var c []*pb.CustomerInfo
+	if err := json.Unmarshal(b.GetCustomerInfo(), &c); err != nil {
+		return nil, err
+	}
+
 	tx := orm.DbInstance(t.ctx).Begin()
 	defer func() {
 		if r := recover(); r != nil {
@@ -77,7 +85,7 @@ func (t *TrackCheckOut) startCheckOutTx() (*pb.BookingDetails, error) {
 		return nil, err
 	}
 	//Update referral_table using referral_id
-	if err := tx.Exec(orm.UpdateReferralBookingInfoQuery(), pb.ReferralStatus_REFERRAL_STATUS_SUCCESS, t.req.GetBookingId(), txTime, t.calculateCommission(), t.req.GetReferralId()).Error; err != nil {
+	if err := tx.Exec(orm.UpdateReferralBookingInfoQuery(), pb.ReferralStatus_REFERRAL_STATUS_SUCCESS, t.req.GetBookingId(), txTime, t.calculateCommission(b), t.req.GetReferralId()).Error; err != nil {
 		logger.Warn(t.ctx, "Error during startCheckOutTx:update referral: %v", err.Error())
 		tx.Rollback()
 		return nil, err
@@ -87,22 +95,13 @@ func (t *TrackCheckOut) startCheckOutTx() (*pb.BookingDetails, error) {
 		return nil, err
 	}
 
-	var b *pb.BookingDetailsDb
-	if err := orm.DbInstance(t.ctx).Debug().Raw(orm.GetReferralBookingDetailsQuery(), t.req.GetBookingId()).Scan(&b).Error; err != nil {
-		logger.Error(t.ctx, err)
-		return nil, err
-	}
-	var c []*pb.CustomerInfo
-	if err := json.Unmarshal(b.GetCustomerInfo(), &c); err != nil {
-		return nil, err
-	}
 	details := &pb.BookingDetails{
 		BookingId:          b.BookingId,
-		BookingStatus:      b.BookingStatus,
+		BookingStatus:      proto.Int64(int64(pb.BookingStatus_BOOKING_STATUS_SUCCESS)),
 		BookingDay:         b.BookingDay,
 		BookingSlot:        b.BookingSlot,
-		TransactionTime:    b.TransactionTime,
-		PaymentStatus:      b.PaymentStatus,
+		TransactionTime:    proto.Int64(txTime),
+		PaymentStatus:      proto.Int64(int64(pb.PaymentStatus_PAYMENT_STATUS_SUCCESS)),
 		CitizenTicketCount: b.CitizenTicketCount,
 		TouristTicketCount: b.TouristTicketCount,
 		CitizenTicketTotal: b.CitizenTicketTotal,
@@ -113,19 +112,19 @@ func (t *TrackCheckOut) startCheckOutTx() (*pb.BookingDetails, error) {
 	return details, nil
 }
 
-func (t *TrackCheckOut) calculateTicket() (*int64, *int64, *int64) {
-	citizen := t.req.GetCitizenTicketCount() * CitizenTicket
-	tourist := t.req.GetTouristTicketCount() * TouristTicket
+func (t *TrackCheckOut) calculateTicket(b *pb.BookingDetailsDb) (*int64, *int64, *int64) {
+	citizen := b.GetCitizenTicketTotal()
+	tourist := b.GetTouristTicketTotal()
 	total := citizen + tourist
 	return proto.Int64(total), proto.Int64(citizen), proto.Int64(tourist)
 }
 
-func (t *TrackCheckOut) calculateCommission() *int64 {
+func (t *TrackCheckOut) calculateCommission(b *pb.BookingDetailsDb) *int64 {
 	if err := referral_verification.New(t.c, t.ctx).VerifyReferralIdBoundedAffiliate(t.req.GetReferralId()); err != nil {
 		logger.Info(t.ctx, "anonymous click, no commission calculated")
 		return proto.Int64(0)
 	}
-	total, _, _ := t.calculateTicket()
+	total, _, _ := t.calculateTicket(b)
 	commission := *total / 100 * commissionPercentage
 	return proto.Int64(commission)
 }
