@@ -20,6 +20,7 @@ enum GlobalErrorCode{
   ERROR_NO_ACCESS = 1013;
   ERROR_LOGOUT_FAIL = 1014;
   ERROR_TOKEN_ERROR = 1015;
+  ERROR_CACHE_MISS = 1016;
 }
 
 enum UserRole{
@@ -527,13 +528,14 @@ message AffiliateProfileMeta{
   optional int64 total_revenue = 9;
 }
 
-message Items{
-  optional string id = 1;
+message CheckOutTickets{
+  optional int64 citizen_ticket_count = 1;
+  optional int64 tourist_ticket_count = 2;
 }
 
 message CreatePaymentIntentRequest{
   optional RequestMeta request_meta = 1;
-  repeated Items items = 2;
+  optional CheckOutTickets tickets = 2;
 }
 
 message CreatePaymentIntentResponse{

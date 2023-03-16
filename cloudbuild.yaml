@@ -22,5 +22,6 @@ steps:
       - 'GMAIL_CLIENT_SECRET=${_GMAIL_CLIENT_SECRET}'
       - 'GMAIL_ACCESS_TOKEN=${_GMAIL_ACCESS_TOKEN}'
       - 'GMAIL_REFRESH_TOKEN=${_GMAIL_REFRESH_TOKEN}'
+      - 'STRIPE_SECRET_KEY=${_STRIPE_SECRET_KEY}'
   - name: "gcr.io/cloud-builders/gcloud"
     args: [ "app", "deploy" ]
