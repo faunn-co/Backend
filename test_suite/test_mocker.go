@@ -198,8 +198,8 @@ func NewMockTest(method string) *MockTest {
 	m.e.DELETE("api/v1/platform/logout", cmd.UserDeAuthentication) //DONE
 
 	//Tracking
-	m.e.POST("api/v1/tracking/click", cmd.TrackClick)       //DONE
-	m.e.POST("api/v1/tracking/checkout", cmd.TrackCheckout) //DONE
+	m.e.POST("api/v1/welcome/click", cmd.TrackClick)       //DONE
+	m.e.POST("api/v1/welcome/checkout", cmd.TrackCheckout) //DONE
 
 	//Stripe
 	m.e.POST("api/v1/payment/create-payment-intent", cmd.CreatePaymentIntent) //DONE
