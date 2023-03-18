@@ -64,7 +64,7 @@ func SET(c context.Context, key string, data interface{}, ttlSeconds time.Durati
 		return jsonErr
 	}
 
-	if err := RedisInstance().Set(c, key, data, ttlSeconds*time.Minute).Err(); err != nil {
+	if err := RedisInstance().Set(c, key, data, ttlSeconds).Err(); err != nil {
 		logger.ErrorMsg(c, " Error while writing to redis: %v", err.Error())
 		return err
 	}

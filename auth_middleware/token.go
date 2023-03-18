@@ -196,6 +196,18 @@ func DeleteAuth(ctx context.Context, givenUuid string) (int64, error) {
 	return deleted, nil
 }
 
+func DeleteRefresh(ctx context.Context, refreshUuid string) (int64, error) {
+	deleted, err := orm.RedisInstance().Del(context.Background(), refreshUuid).Result()
+	if err != nil {
+		logger.Error(ctx, err)
+		return 0, err
+	}
+	if deleted != 0 {
+		logger.Info(ctx, "Successfully deleted refresh token")
+	}
+	return deleted, nil
+}
+
 func Refresh(c echo.Context) error {
 	mapToken := map[string]string{}
 	if err := c.Bind(&mapToken); err != nil {
