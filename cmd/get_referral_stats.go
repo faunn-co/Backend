@@ -7,9 +7,9 @@ import (
 )
 
 func GetReferralStats(c echo.Context) error {
-	if curr, prev, err := get_referral_stats.New(c).GetReferralStatsImpl(); err != nil {
+	if stats, err := get_referral_stats.New(c).GetReferralStatsImpl(); err != nil {
 		return resp.JSONResp(c, err)
 	} else {
-		return resp.GetReferralStatsResponseJSON(c, curr, prev)
+		return resp.GetReferralStatsResponseJSON(c, stats)
 	}
 }

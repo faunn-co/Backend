@@ -33,6 +33,11 @@ func DayStartEndDate(timestamp int64) (int64, int64) {
 	return time.Date(year, month, day, 0, 0, 0, 0, tz).Unix(), time.Date(year, month, day, 23, 59, 59, 59, tz).Unix()
 }
 
+func IsToday(endTime int64) bool {
+	start, _ := DayStartEndDate(time.Now().Unix())
+	return endTime >= start
+}
+
 // WeekStartEndDate Returns the start and end day of the current week in SGT unix time
 func WeekStartEndDate(timestamp int64) (int64, int64) {
 	date := UnixToUTC(timestamp).In(tz)
