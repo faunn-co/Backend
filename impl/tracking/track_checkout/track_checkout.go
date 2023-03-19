@@ -17,8 +17,6 @@ import (
 )
 
 const (
-	CitizenTicket        = 8800
-	TouristTicket        = 9800
 	commissionPercentage = 5
 )
 
@@ -59,6 +57,16 @@ func (t *TrackCheckOut) verifyTrackCheckOut() error {
 }
 
 func (t *TrackCheckOut) startCheckOutTx() (*pb.BookingDetails, error) {
+	var b *pb.BookingDetailsDb
+	if err := orm.DbInstance(t.ctx).Debug().Raw(orm.GetReferralBookingDetailsQuery(), t.req.GetBookingId()).Scan(&b).Error; err != nil {
+		logger.Error(t.ctx, err)
+		return nil, err
+	}
+	var c []*pb.CustomerInfo
+	if err := json.Unmarshal(b.GetCustomerInfo(), &c); err != nil {
+		return nil, err
+	}
+
 	tx := orm.DbInstance(t.ctx).Begin()
 	defer func() {
 		if r := recover(); r != nil {
@@ -69,48 +77,15 @@ func (t *TrackCheckOut) startCheckOutTx() (*pb.BookingDetails, error) {
 	if err := tx.Error; err != nil {
 		return nil, err
 	}
-
-	marshaledInfo, jErr := json.Marshal(t.req.GetCustomerInfo())
-	if jErr != nil {
-		logger.Warn(t.ctx, jErr.Error())
-	}
-
-	_, citizen, tourist := t.calculateTicket()
-
-	b := struct {
-		BookingId          *int64 `gorm:"primary_key"`
-		BookingStatus      *int64
-		BookingDay         *string
-		BookingSlot        *int64
-		TransactionTime    *int64
-		PaymentStatus      *int64
-		CitizenTicketCount *int64
-		TouristTicketCount *int64
-		CitizenTicketTotal *int64
-		TouristTicketTotal *int64
-		CustomerInfo       []byte
-	}{
-		BookingId:          nil,
-		BookingStatus:      proto.Int64(int64(pb.BookingStatus_BOOKING_STATUS_SUCCESS)),
-		BookingDay:         t.req.BookingDay,
-		BookingSlot:        t.req.BookingSlot,
-		TransactionTime:    proto.Int64(time.Now().Unix()),
-		PaymentStatus:      proto.Int64(int64(pb.PaymentStatus_PAYMENT_STATUS_SUCCESS)),
-		CitizenTicketCount: t.req.CitizenTicketCount,
-		TouristTicketCount: t.req.TouristTicketCount,
-		CitizenTicketTotal: citizen,
-		TouristTicketTotal: tourist,
-		CustomerInfo:       marshaledInfo,
-	}
-
-	//Insert into booking_table
-	if err := tx.Table(orm.BOOKING_DETAILS_TABLE).Create(&b).Error; err != nil {
-		logger.Warn(t.ctx, "Error during startCheckOutTx:create booking: %v", err.Error())
+	txTime := time.Now().Unix()
+	//Update booking_table
+	if err := tx.Exec(orm.UpdateBookingPostCheckOutQuery(), int64(pb.BookingStatus_BOOKING_STATUS_SUCCESS), txTime, int64(pb.PaymentStatus_PAYMENT_STATUS_SUCCESS), t.req.GetBookingId()).Error; err != nil {
+		logger.Warn(t.ctx, "Error during startCheckOutTx:update booking: %v", err.Error())
 		tx.Rollback()
 		return nil, err
 	}
 	//Update referral_table using referral_id
-	if err := tx.Exec(orm.UpdateReferralBookingInfoQuery(), pb.ReferralStatus_REFERRAL_STATUS_SUCCESS, b.BookingId, b.TransactionTime, t.calculateCommission(), t.req.GetReferralId()).Error; err != nil {
+	if err := tx.Exec(orm.UpdateReferralBookingInfoQuery(), pb.ReferralStatus_REFERRAL_STATUS_SUCCESS, t.req.GetBookingId(), txTime, t.calculateCommission(b), t.req.GetReferralId()).Error; err != nil {
 		logger.Warn(t.ctx, "Error during startCheckOutTx:update referral: %v", err.Error())
 		tx.Rollback()
 		return nil, err
@@ -122,35 +97,34 @@ func (t *TrackCheckOut) startCheckOutTx() (*pb.BookingDetails, error) {
 
 	details := &pb.BookingDetails{
 		BookingId:          b.BookingId,
-		BookingStatus:      b.BookingStatus,
+		BookingStatus:      proto.Int64(int64(pb.BookingStatus_BOOKING_STATUS_SUCCESS)),
 		BookingDay:         b.BookingDay,
 		BookingSlot:        b.BookingSlot,
-		TransactionTime:    b.TransactionTime,
-		PaymentStatus:      b.PaymentStatus,
+		TransactionTime:    proto.Int64(txTime),
+		PaymentStatus:      proto.Int64(int64(pb.PaymentStatus_PAYMENT_STATUS_SUCCESS)),
 		CitizenTicketCount: b.CitizenTicketCount,
 		TouristTicketCount: b.TouristTicketCount,
 		CitizenTicketTotal: b.CitizenTicketTotal,
 		TouristTicketTotal: b.TouristTicketTotal,
-		CustomerInfo:       t.req.CustomerInfo,
+		CustomerInfo:       c,
 	}
-
 	t.sendConfirmationEmail(details)
 	return details, nil
 }
 
-func (t *TrackCheckOut) calculateTicket() (*int64, *int64, *int64) {
-	citizen := t.req.GetCitizenTicketCount() * CitizenTicket
-	tourist := t.req.GetTouristTicketCount() * TouristTicket
+func (t *TrackCheckOut) calculateTicket(b *pb.BookingDetailsDb) (*int64, *int64, *int64) {
+	citizen := b.GetCitizenTicketTotal()
+	tourist := b.GetTouristTicketTotal()
 	total := citizen + tourist
 	return proto.Int64(total), proto.Int64(citizen), proto.Int64(tourist)
 }
 
-func (t *TrackCheckOut) calculateCommission() *int64 {
+func (t *TrackCheckOut) calculateCommission(b *pb.BookingDetailsDb) *int64 {
 	if err := referral_verification.New(t.c, t.ctx).VerifyReferralIdBoundedAffiliate(t.req.GetReferralId()); err != nil {
 		logger.Info(t.ctx, "anonymous click, no commission calculated")
 		return proto.Int64(0)
 	}
-	total, _, _ := t.calculateTicket()
+	total, _, _ := t.calculateTicket(b)
 	commission := *total / 100 * commissionPercentage
 	return proto.Int64(commission)
 }
@@ -165,10 +139,10 @@ func (t *TrackCheckOut) sendConfirmationEmail(details *pb.BookingDetails) {
 	id := strconv.FormatInt(details.GetBookingId(), 10)
 	var ticket string
 
-	if details.CitizenTicketCount != nil {
+	if details.CitizenTicketCount != nil && details.GetCitizenTicketTotal() != 0 {
 		ticket += fmt.Sprintf("%v x Citizen ", details.GetCitizenTicketCount())
 	}
-	if details.TouristTicketCount != nil {
+	if details.TouristTicketCount != nil && details.GetTouristTicketCount() != 0 {
 		ticket += fmt.Sprintf("%v x Tourist ", details.GetTouristTicketCount())
 	}
 	send_email.New(t.c).Send(id, details.GetBookingDay(), slotMap[details.GetBookingSlot()], ticket, details.GetCustomerInfo()[0].GetCustomerEmail())

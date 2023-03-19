@@ -3,7 +3,7 @@ package create_payment_intent
 import (
 	"context"
 	"errors"
-	"github.com/aaronangxz/AffiliateManager/impl/tracking/track_checkout"
+	"github.com/aaronangxz/AffiliateManager/impl/tracking/track_payment"
 	"github.com/aaronangxz/AffiliateManager/logger"
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
 	"github.com/aaronangxz/AffiliateManager/resp"
@@ -55,10 +55,10 @@ func (p *CreatePaymentIntent) CreatePaymentIntentImpl() (*string, *resp.Error) {
 func (p *CreatePaymentIntent) calculateOrderAmount() int64 {
 	var total int64
 	if p.req.GetTickets().CitizenTicketCount != nil {
-		total += p.req.GetTickets().GetCitizenTicketCount() * track_checkout.CitizenTicket
+		total += p.req.GetTickets().GetCitizenTicketCount() * track_payment.CitizenTicket
 	}
 	if p.req.GetTickets().TouristTicketCount != nil {
-		total += p.req.GetTickets().GetTouristTicketCount() * track_checkout.TouristTicket
+		total += p.req.GetTickets().GetTouristTicketCount() * track_payment.TouristTicket
 	}
 	return total / 100
 }
@@ -67,6 +67,9 @@ func (p *CreatePaymentIntent) verifyCreatePaymentIntent() error {
 	p.req = new(pb.CreatePaymentIntentRequest)
 	if err := p.c.Bind(p.req); err != nil {
 		return err
+	}
+	if p.req == nil {
+		return errors.New("request cannot be empty")
 	}
 	if p.req.Tickets == nil {
 		return errors.New("no ticket found")

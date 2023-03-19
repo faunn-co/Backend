@@ -94,6 +94,7 @@ func main() {
 
 	//Tracking
 	e.POST("api/v1/welcome/click", cmd.TrackClick)       //DONE
+	e.POST("api/v1/welcome/payment", cmd.TrackPayment)   //DONE
 	e.POST("api/v1/welcome/checkout", cmd.TrackCheckout) //DONE
 
 	//Stripe

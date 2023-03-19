@@ -171,4 +171,9 @@ func (u *User) TearDown() {
 	if err != nil {
 		log.Error(err)
 	}
+
+	_, err = auth_middleware.DeleteRefresh(context.Background(), u.token.RefreshUuid)
+	if err != nil {
+		log.Error(err)
+	}
 }

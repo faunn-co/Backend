@@ -546,11 +546,7 @@ message CreatePaymentIntentResponse{
 message TrackCheckOutRequest{
   optional RequestMeta request_meta = 1;
   optional int64 referral_id = 2;
-  optional string booking_day = 3;
-  optional int64 booking_slot = 4;
-  optional int64 citizen_ticket_count = 5;
-  optional int64 tourist_ticket_count = 6;
-  repeated CustomerInfo customer_info = 7;
+  optional int64 booking_id = 3;
 }
 
 message TrackCheckOutResponse{
@@ -560,4 +556,19 @@ message TrackCheckOutResponse{
 
 message UserDeAuthenticationResponse{
   optional ResponseMeta response_meta = 1;
+}
+
+message TrackPaymentRequest{
+  optional RequestMeta request_meta = 1;
+  optional int64 referral_id = 2;
+  optional string booking_day = 3;
+  optional int64 booking_slot = 4;
+  optional int64 citizen_ticket_count = 5;
+  optional int64 tourist_ticket_count = 6;
+  repeated CustomerInfo customer_info = 7;
+}
+
+message TrackPaymentResponse{
+  optional ResponseMeta response_meta = 1;
+  optional int64 booking_id = 2;
 }
