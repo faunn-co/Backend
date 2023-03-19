@@ -3,8 +3,6 @@ package create_payment_intent
 import (
 	"context"
 	"errors"
-	"github.com/aaronangxz/AffiliateManager/impl/tracking/track_checkout"
-	"errors"
 	"github.com/aaronangxz/AffiliateManager/impl/tracking/track_payment"
 	"github.com/aaronangxz/AffiliateManager/logger"
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
