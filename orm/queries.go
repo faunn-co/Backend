@@ -291,3 +291,19 @@ func UpdateBookingPostCheckOutQuery() string {
 	}
 	return string(query)
 }
+
+func IncrementTicketCountQuery() string {
+	query, err := os.ReadFile(openSql("sql36.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}
+
+func UpdateReferralBookingInfoRollbackCheckOutQuery() string {
+	query, err := os.ReadFile(openSql("sql37.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}

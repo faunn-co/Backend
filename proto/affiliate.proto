@@ -572,3 +572,13 @@ message TrackPaymentResponse{
   optional ResponseMeta response_meta = 1;
   optional int64 booking_id = 2;
 }
+
+message RollbackCheckOutRequest{
+  optional RequestMeta request_meta = 1;
+  optional int64 referral_id = 2;
+  optional int64 booking_id = 3;
+}
+
+message RollbackCheckOutResponse{
+  optional ResponseMeta response_meta = 1;
+}

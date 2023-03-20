@@ -109,6 +109,9 @@ func (t *TrackCheckOut) startCheckOutTx() (*pb.BookingDetails, error) {
 		CustomerInfo:       c,
 	}
 	t.sendConfirmationEmail(details)
+	if err := referral_verification.New(t.c, t.ctx).PurgeReferralDetailsCache(t.req.GetReferralId()); err != nil {
+		return nil, err
+	}
 	return details, nil
 }
 
