@@ -58,7 +58,7 @@ func (r *BookingVerification) VerifyBookingIdAndGetDetails(id int64) (*pb.Bookin
 	if err := orm.SET(r.ctx, k, booking, 0); err != nil {
 		logger.Warn(r.ctx, err.Error())
 	}
-	logger.Info(r.ctx, "VerifyBookingId | Successful", booking)
+	logger.Info(r.ctx, "VerifyBookingId | Successful | %v", booking)
 	return booking, nil
 }
 
