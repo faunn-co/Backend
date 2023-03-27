@@ -1,0 +1,1 @@
+UPDATE referral_table SET referral_status = ?, referral_commission = 0 WHERE referral_id = ?;

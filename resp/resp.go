@@ -215,3 +215,12 @@ func TrackPaymentResponseJSON(c echo.Context, id *int64) error {
 		BookingId: id,
 	})
 }
+
+func RollbackCheckoutResponseJSON(c echo.Context) error {
+	return c.JSON(http.StatusOK, pb.TrackCheckOutResponse{
+		ResponseMeta: &pb.ResponseMeta{
+			ErrorCode: proto.Int64(int64(pb.GlobalErrorCode_SUCCESS)),
+			ErrorMsg:  proto.String("successfully roll-backed transaction"),
+		},
+	})
+}

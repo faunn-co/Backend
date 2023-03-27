@@ -113,6 +113,9 @@ func (t *TrackPayment) startPaymentTx() (*int64, error) {
 	if err := tx.Commit().Error; err != nil {
 		return nil, err
 	}
+	if err := referral_verification.New(t.c, t.ctx).PurgeReferralDetailsCache(t.req.GetReferralId()); err != nil {
+		return nil, err
+	}
 	return b.BookingId, nil
 }
 

@@ -58,6 +58,19 @@ func (r *ReferralVerification) VerifyReferralId(id int64) error {
 	return nil
 }
 
+func (r *ReferralVerification) PurgeReferralDetailsCache(id int64) error {
+	k := fmt.Sprintf("%v:%v", r.referralId, id)
+	deleted, err := orm.RedisInstance().Del(context.Background(), k).Result()
+	if err != nil {
+		logger.Error(r.ctx, err)
+		return err
+	}
+	if deleted == 0 {
+		logger.Warn(r.ctx, "purgeReferralIdCache| failed to purge cache | key: %v", k)
+	}
+	return nil
+}
+
 func (r *ReferralVerification) VerifyReferralIdBoundedAffiliate(id int64) error {
 	if id == 0 {
 		return nil

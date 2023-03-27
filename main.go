@@ -93,9 +93,10 @@ func main() {
 	e.DELETE("api/v1/platform/logout", cmd.UserDeAuthentication) //DONE
 
 	//Tracking
-	e.POST("api/v1/welcome/click", cmd.TrackClick)       //DONE
-	e.POST("api/v1/welcome/payment", cmd.TrackPayment)   //DONE
-	e.POST("api/v1/welcome/checkout", cmd.TrackCheckout) //DONE
+	e.POST("api/v1/welcome/click", cmd.TrackClick)                   //DONE
+	e.POST("api/v1/welcome/payment", cmd.TrackPayment)               //DONE
+	e.POST("api/v1/welcome/checkout", cmd.TrackCheckout)             //DONE
+	e.POST("api/v1/welcome/rollback-checkout", cmd.RollbackCheckout) //DONE
 
 	//Stripe
 	e.POST("api/v1/payment/create-payment-intent", cmd.CreatePaymentIntent) //DONE
