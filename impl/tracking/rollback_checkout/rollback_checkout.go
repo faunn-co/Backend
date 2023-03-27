@@ -42,7 +42,7 @@ func (t *RollbackCheckOut) verifyRollbackCheckOut() error {
 	if err := t.c.Bind(t.req); err != nil {
 		return err
 	}
-	if err := referral_verification.New(t.c, t.ctx).VerifyReferralId(t.req.GetReferralId()); err != nil {
+	if err := referral_verification.New(t.c, t.ctx).VerifyReferralId(t.req.GetReferralId()); err == nil {
 		return err
 	}
 	return nil
@@ -72,7 +72,7 @@ func (t *RollbackCheckOut) startRollbackCheckOutTx() error {
 	}
 	txTime := time.Now().Unix()
 	//increment ticket
-	if err := tx.Exec(orm.IncrementTicketCountQuery(), b.GetCitizenTicketCount(), b.GetTouristTicketCount(), b.GetBookingDay(), b.GetBookingSlot()).Error; err != nil {
+	if err := tx.Exec(orm.IncrementTicketCountQuery(), b.GetCitizenTicketCount(), b.GetTouristTicketCount(), b.GetBookingDay(), b.GetBookingSlot(), b.GetCitizenTicketCount(), b.GetTouristTicketCount()).Error; err != nil {
 		logger.Warn(t.ctx, "Error during startRollbackCheckOutTx:decrement ticket: %v", err.Error())
 		tx.Rollback()
 		return err
@@ -91,13 +91,14 @@ func (t *RollbackCheckOut) startRollbackCheckOutTx() error {
 	}
 	logger.Info(t.ctx, "committing startRollbackCheckOutTx")
 	if err := tx.Commit().Error; err != nil {
+		logger.Error(t.ctx, err)
 		return err
 	}
 	if err := referral_verification.New(t.c, t.ctx).PurgeReferralDetailsCache(t.req.GetReferralId()); err != nil {
-		return err
+		logger.Error(t.ctx, err)
 	}
 	if err := booking_verification.New(t.c, t.ctx).PurgeBookingDetailsCache(t.req.GetBookingId()); err != nil {
-		return err
+		logger.Error(t.ctx, err)
 	}
 	return nil
 }

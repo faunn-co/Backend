@@ -8,6 +8,7 @@ import (
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
 	"github.com/aaronangxz/AffiliateManager/resp"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/gommon/log"
 	"github.com/stripe/stripe-go/v74"
 	"github.com/stripe/stripe-go/v74/paymentintent"
 	"google.golang.org/protobuf/proto"
@@ -60,7 +61,8 @@ func (p *CreatePaymentIntent) calculateOrderAmount() int64 {
 	if p.req.GetTickets().TouristTicketCount != nil {
 		total += p.req.GetTickets().GetTouristTicketCount() * track_payment.TouristTicket
 	}
-	return total / 100
+	log.Print(total)
+	return total
 }
 
 func (p *CreatePaymentIntent) verifyCreatePaymentIntent() error {
