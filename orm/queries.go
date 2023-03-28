@@ -307,3 +307,11 @@ func UpdateReferralBookingInfoRollbackCheckOutQuery() string {
 	}
 	return string(query)
 }
+
+func GetAffiliateInfoWithAffiliateId() string {
+	query, err := os.ReadFile(openSql("sql38.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}

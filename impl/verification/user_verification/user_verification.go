@@ -9,6 +9,7 @@ import (
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
 	"github.com/labstack/echo/v4"
 	"strconv"
+	"time"
 )
 
 type UserVerification struct {
@@ -65,7 +66,7 @@ func (u *UserVerification) VerifyUserId(id interface{}) error {
 	if user == nil {
 		return errors.New("user not found")
 	}
-	if err := orm.SET(u.ctx, k, user, 0); err != nil {
+	if err := orm.SET(u.ctx, k, user, time.Hour); err != nil {
 		logger.Error(u.ctx, err)
 		return nil
 	}
@@ -94,7 +95,7 @@ func (u *UserVerification) VerifyUserName(name string) error {
 	if user == nil {
 		return errors.New("user not found")
 	}
-	if err := orm.SET(u.ctx, k, user, 0); err != nil {
+	if err := orm.SET(u.ctx, k, user, time.Hour); err != nil {
 		logger.Error(u.ctx, err)
 		return nil
 	}
@@ -122,7 +123,7 @@ func (u *UserVerification) VerifyUserEmail(email string) error {
 	if user == nil {
 		return errors.New("user not found")
 	}
-	if err := orm.SET(u.ctx, k, user, 0); err != nil {
+	if err := orm.SET(u.ctx, k, user, time.Hour); err != nil {
 		logger.Error(u.ctx, err)
 		return nil
 	}
