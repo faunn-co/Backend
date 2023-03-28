@@ -35,9 +35,11 @@ func (g *GetReferralById) GetReferralByIdImpl() (*pb.ReferralDetails, *resp.Erro
 	}
 
 	var (
-		r   = new(pb.ReferralDetails)
-		rDb *pb.ReferralDb
-		b   *pb.BookingDetailsDb
+		r         = new(pb.ReferralDetails)
+		rDb       *pb.ReferralDb
+		b         *pb.BookingDetailsDb
+		affiliate = new(pb.AffiliateDetailsDb)
+		err       error
 	)
 
 	if err := orm.DbInstance(g.ctx).Raw(orm.GetReferralDetailsByIdQuery(), g.c.Param("id")).Scan(&rDb).Error; err != nil {
@@ -51,10 +53,13 @@ func (g *GetReferralById) GetReferralByIdImpl() (*pb.ReferralDetails, *resp.Erro
 		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_FAIL)
 	}
 
-	affiliate, err := affiliate_verification.New(g.c, g.ctx).VerifyAffiliateId(rDb.GetAffiliateId())
-	if err != nil {
-		logger.Error(g.ctx, err)
-		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_FAIL)
+	if rDb.AffiliateId != nil {
+		logger.Info(g.ctx, "Fetching affiliate_name")
+		affiliate, err = affiliate_verification.New(g.c, g.ctx).VerifyAffiliateId(rDb.GetAffiliateId())
+		if err != nil {
+			logger.Error(g.ctx, err)
+			return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_FAIL)
+		}
 	}
 
 	r = &pb.ReferralDetails{
