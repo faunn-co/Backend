@@ -50,7 +50,7 @@ func (t *TrackCheckOut) verifyTrackCheckOut() error {
 	if err := t.c.Bind(t.req); err != nil {
 		return err
 	}
-	if err := referral_verification.New(t.c, t.ctx).VerifyReferralId(t.req.GetReferralId()); err != nil {
+	if err := referral_verification.New(t.c, t.ctx).VerifyReferralId(t.req.GetReferralId()); err == nil {
 		return err
 	}
 	return nil
