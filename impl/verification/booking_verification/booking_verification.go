@@ -9,6 +9,7 @@ import (
 	"github.com/aaronangxz/AffiliateManager/orm"
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
 	"github.com/labstack/echo/v4"
+	"time"
 )
 
 type BookingVerification struct {
@@ -55,7 +56,7 @@ func (r *BookingVerification) VerifyBookingIdAndGetDetails(id int64) (*pb.Bookin
 		return nil, errors.New("booking id not found")
 	}
 
-	if err := orm.SET(r.ctx, k, booking, 0); err != nil {
+	if err := orm.SET(r.ctx, k, booking, time.Hour); err != nil {
 		logger.Warn(r.ctx, err.Error())
 	}
 	logger.Info(r.ctx, "VerifyBookingId | Successful | %v", booking)

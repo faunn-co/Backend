@@ -9,6 +9,7 @@ import (
 	"github.com/aaronangxz/AffiliateManager/orm"
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
 	"github.com/labstack/echo/v4"
+	"time"
 )
 
 type AffiliateVerification struct {
@@ -50,7 +51,7 @@ func (a *AffiliateVerification) VerifyEntityName(name string) error {
 		return errors.New("affiliate not found")
 	}
 
-	if err := orm.SET(a.ctx, k, user, 0); err != nil {
+	if err := orm.SET(a.ctx, k, user, time.Hour); err != nil {
 		logger.Error(a.ctx, err)
 		return nil
 	}
@@ -78,7 +79,7 @@ func (a *AffiliateVerification) VerifyReferralCode(code string) error {
 		return errors.New("affiliate not found")
 	}
 
-	if err := orm.SET(a.ctx, k, user, 0); err != nil {
+	if err := orm.SET(a.ctx, k, user, time.Hour); err != nil {
 		logger.Error(a.ctx, err)
 		return nil
 	}
@@ -115,7 +116,7 @@ func (a *AffiliateVerification) VerifyAffiliateId(id int64) (*pb.AffiliateDetail
 		return nil, err
 	}
 
-	if err := orm.SET(a.ctx, k, user, 0); err != nil {
+	if err := orm.SET(a.ctx, k, user, time.Hour); err != nil {
 		logger.Error(a.ctx, err)
 		return nil, nil
 	}
