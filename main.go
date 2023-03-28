@@ -63,7 +63,9 @@ func main() {
 	r.POST("/stats", cmd.GetReferralStats)           //DONE
 	r.POST("/trend", cmd.GetReferralTrend)           //DONE
 	r.GET("/recent/list", cmd.GetReferralRecentList) //DONE
-	r.GET("/:id", cmd.GetReferralById)               //DONE, not tested
+	r.GET("/:id", cmd.GetReferralById)               //DONE
+	r.PUT("/:id", cmd.GetReferralById)               //DONE
+	r.DELETE("/:id", cmd.GetReferralById)            //DONE
 
 	//Booking
 	//Allows admin / dev only
