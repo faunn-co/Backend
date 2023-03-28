@@ -1,0 +1,1 @@
+SELECT * FROM affiliate_details_table WHERE user_id = ?

@@ -136,11 +136,12 @@ message ReferralDb{
 message ReferralDetails{
   optional int64 referral_id = 1;
   optional int64 affiliate_id = 2;
-  optional int64 referral_click_time = 3;
-  optional int64 referral_status = 4;
-  optional int64 booking_id = 5;
-  optional BookingDetails booking_details = 6; //nil if referral is not successful
-  optional int64 referral_commission = 7;
+  optional string entity_name = 3;
+  optional int64 referral_click_time = 4;
+  optional int64 referral_status = 5;
+  optional int64 booking_id = 6;
+  optional BookingDetails booking_details = 7; //nil if referral is not successful
+  optional int64 referral_commission = 8;
 }
 
 message ReferralBasic{

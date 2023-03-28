@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
+	"github.com/aaronangxz/AffiliateManager/impl/verification/affiliate_verification"
 	"github.com/aaronangxz/AffiliateManager/logger"
 	"github.com/aaronangxz/AffiliateManager/orm"
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
@@ -28,7 +29,9 @@ func (g *GetReferralById) GetReferralByIdImpl() (*pb.ReferralDetails, *resp.Erro
 	id := g.c.Param("id")
 
 	if id == "" {
-		return nil, resp.BuildError(errors.New("invalid id"), pb.GlobalErrorCode_ERROR_INVALID_PARAMS)
+		err := errors.New("invalid id")
+		logger.Error(g.ctx, err)
+		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_INVALID_PARAMS)
 	}
 
 	var (
@@ -38,16 +41,26 @@ func (g *GetReferralById) GetReferralByIdImpl() (*pb.ReferralDetails, *resp.Erro
 	)
 
 	if err := orm.DbInstance(g.ctx).Raw(orm.GetReferralDetailsByIdQuery(), g.c.Param("id")).Scan(&rDb).Error; err != nil {
+		logger.Error(g.ctx, err)
 		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 	}
 
 	if rDb == nil {
-		return nil, resp.BuildError(errors.New("id not found"), pb.GlobalErrorCode_ERROR_FAIL)
+		err := errors.New("id not found")
+		logger.Error(g.ctx, err)
+		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_FAIL)
+	}
+
+	affiliate, err := affiliate_verification.New(g.c, g.ctx).VerifyAffiliateId(rDb.GetAffiliateId())
+	if err != nil {
+		logger.Error(g.ctx, err)
+		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_FAIL)
 	}
 
 	r = &pb.ReferralDetails{
 		ReferralId:         rDb.ReferralId,
 		AffiliateId:        rDb.AffiliateId,
+		EntityName:         affiliate.EntityName,
 		ReferralClickTime:  rDb.ReferralClickTime,
 		ReferralStatus:     rDb.ReferralStatus,
 		BookingId:          nil,
@@ -60,12 +73,13 @@ func (g *GetReferralById) GetReferralByIdImpl() (*pb.ReferralDetails, *resp.Erro
 	}
 
 	if err := orm.DbInstance(g.ctx).Raw(orm.GetReferralBookingDetailsQuery(), rDb.GetBookingId()).Scan(&b).Error; err != nil {
+		logger.Error(g.ctx, err)
 		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 	}
 
 	var c []*pb.CustomerInfo
 	if err := json.Unmarshal(b.GetCustomerInfo(), &c); err != nil {
-		//return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_JSON_UNMARSHAL)
+		logger.Warn(g.ctx, err.Error())
 	}
 
 	r.BookingDetails = &pb.BookingDetails{
