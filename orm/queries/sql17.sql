@@ -16,7 +16,7 @@ FROM
     referral_table r
         LEFT JOIN user_table u ON u.user_id = r.affiliate_id
         LEFT JOIN booking_details_table b ON b.booking_id = r.booking_id
-        WHERE r.referral_click_time > ? AND referral_click_time <= ?
+        WHERE r.referral_click_time > ? AND referral_click_time <= ? AND r.referral_status != 4
 GROUP BY
     r.referral_id,
     r.referral_click_time

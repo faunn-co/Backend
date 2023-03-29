@@ -9,6 +9,7 @@ WHERE
         affiliate_id = ?
   AND booking_time > ?
   AND booking_time <= ?
+  AND referral_status != 4
 ORDER BY
     booking_time DESC
 LIMIT

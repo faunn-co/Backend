@@ -32,7 +32,7 @@ FROM
                 ) AS tourist_ticket_total
         FROM
             date_ref_table d
-                LEFT JOIN (SELECT * FROM referral_table WHERE affiliate_id= @id) AS r ON d.date_string = DATE(
+                LEFT JOIN (SELECT * FROM referral_table WHERE affiliate_id= @id AND referral_status != 4) AS r ON d.date_string = DATE(
                     FROM_UNIXTIME(r.booking_time + 28800)
                 )
                 LEFT JOIN booking_details_table b ON r.booking_id = b.booking_id

@@ -36,7 +36,7 @@ func (g *UpdateReferralById) UpdateReferralByIdImpl() *resp.Error {
 		rDb *pb.ReferralDb
 	)
 
-	if err := orm.DbInstance(g.ctx).Raw(orm.GetReferralDetailsByIdQuery(), g.c.Param("id")).Scan(&rDb).Error; err != nil {
+	if err := orm.DbInstance(g.ctx).Raw(orm.GetReferralDetailsByIdQuery(), id).Scan(&rDb).Error; err != nil {
 		logger.Error(g.ctx, err)
 		return resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 	}
@@ -52,14 +52,22 @@ func (g *UpdateReferralById) UpdateReferralByIdImpl() *resp.Error {
 	case int64(pb.ReferralStatus_REFERRAL_STATUS_SUCCESS):
 		newStatus = int64(pb.ReferralStatus_REFERRAL_STATUS_CANCELLED)
 	case int64(pb.ReferralStatus_REFERRAL_STATUS_CANCELLED):
-		//cancelled but without booking cannot be success
+		//cancelled but without booking cannot be updated
+		if rDb.BookingId == nil {
+			err := errors.New("no booking exists, not allow to update status to success")
+			return resp.BuildError(err, pb.GlobalErrorCode_ERROR_FAIL)
+		}
 		newStatus = int64(pb.ReferralStatus_REFERRAL_STATUS_SUCCESS)
 	default:
 		err := errors.New("invalid referral status")
-		return resp.BuildError(err, pb.GlobalErrorCode_ERROR_INVALID_PARAMS)
+		return resp.BuildError(err, pb.GlobalErrorCode_ERROR_FAIL)
 	}
 
 	//update db
-
+	if err := orm.DbInstance(g.ctx).Exec(orm.UpdateReferralStatusByIdQuery(), newStatus, id).Error; err != nil {
+		logger.Error(g.ctx, err)
+		return resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
+	}
+	logger.Info(g.ctx, "updated referral status to %v", newStatus)
 	return nil
 }

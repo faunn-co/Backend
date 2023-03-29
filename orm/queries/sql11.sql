@@ -21,6 +21,7 @@ SELECT
                 r.affiliate_id = @id
           AND r.referral_click_time >= @startTime
           AND r.referral_click_time <= @endTime
+          AND r.referral_status != 4
     ) AS total_clicks
 FROM
     referral_table r

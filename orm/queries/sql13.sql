@@ -9,4 +9,5 @@ WHERE
   AND r.referral_click_time <= UNIX_TIMESTAMP(
         CONCAT(@endTime, ' 23:59:59')
     )
-  AND r.affiliate_id = @id;
+  AND r.affiliate_id = @id
+  AND r.referral_status != 4;

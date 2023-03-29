@@ -1,0 +1,1 @@
+UPDATE referral_table SET referral_status = ? WHERE referral_id = ?
