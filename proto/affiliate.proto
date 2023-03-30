@@ -587,6 +587,7 @@ message RollbackCheckOutResponse{
 
 message UpdateReferralByIdResponse{
   optional ResponseMeta response_meta = 1;
+  optional int64 status = 2;
 }
 
 message DeleteReferralByIdResponse{

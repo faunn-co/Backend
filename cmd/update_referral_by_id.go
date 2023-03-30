@@ -7,9 +7,9 @@ import (
 )
 
 func UpdateReferralById(c echo.Context) error {
-	if err := update_referral_by_id.New(c).UpdateReferralByIdImpl(); err != nil {
+	if s, err := update_referral_by_id.New(c).UpdateReferralByIdImpl(); err != nil {
 		return resp.JSONResp(c, err)
 	} else {
-		return resp.UpdateReferralByIdResponseJSON(c)
+		return resp.UpdateReferralByIdResponseJSON(c, s)
 	}
 }

@@ -8,6 +8,7 @@ import (
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
 	"github.com/aaronangxz/AffiliateManager/resp"
 	"github.com/labstack/echo/v4"
+	"google.golang.org/protobuf/proto"
 )
 
 type UpdateReferralById struct {
@@ -23,13 +24,13 @@ func New(c echo.Context) *UpdateReferralById {
 	return g
 }
 
-func (g *UpdateReferralById) UpdateReferralByIdImpl() *resp.Error {
+func (g *UpdateReferralById) UpdateReferralByIdImpl() (*int64, *resp.Error) {
 	id := g.c.Param("id")
 
 	if id == "" {
 		err := errors.New("invalid id")
 		logger.Error(g.ctx, err)
-		return resp.BuildError(err, pb.GlobalErrorCode_ERROR_INVALID_PARAMS)
+		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_INVALID_PARAMS)
 	}
 
 	var (
@@ -38,13 +39,13 @@ func (g *UpdateReferralById) UpdateReferralByIdImpl() *resp.Error {
 
 	if err := orm.DbInstance(g.ctx).Raw(orm.GetReferralDetailsByIdQuery(), id).Scan(&rDb).Error; err != nil {
 		logger.Error(g.ctx, err)
-		return resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
+		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 	}
 
 	if rDb == nil {
 		err := errors.New("id not found")
 		logger.Error(g.ctx, err)
-		return resp.BuildError(err, pb.GlobalErrorCode_ERROR_FAIL)
+		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_FAIL)
 	}
 
 	var newStatus int64
@@ -55,19 +56,19 @@ func (g *UpdateReferralById) UpdateReferralByIdImpl() *resp.Error {
 		//cancelled but without booking cannot be updated
 		if rDb.BookingId == nil {
 			err := errors.New("no booking exists, not allow to update status to success")
-			return resp.BuildError(err, pb.GlobalErrorCode_ERROR_FAIL)
+			return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_FAIL)
 		}
 		newStatus = int64(pb.ReferralStatus_REFERRAL_STATUS_SUCCESS)
 	default:
 		err := errors.New("invalid referral status")
-		return resp.BuildError(err, pb.GlobalErrorCode_ERROR_FAIL)
+		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_FAIL)
 	}
 
 	//update db
 	if err := orm.DbInstance(g.ctx).Exec(orm.UpdateReferralStatusByIdQuery(), newStatus, id).Error; err != nil {
 		logger.Error(g.ctx, err)
-		return resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
+		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 	}
 	logger.Info(g.ctx, "updated referral status to %v", newStatus)
-	return nil
+	return proto.Int64(newStatus), nil
 }
