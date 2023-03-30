@@ -594,3 +594,21 @@ message UpdateReferralByIdResponse{
 message DeleteReferralByIdResponse{
   optional ResponseMeta response_meta = 1;
 }
+
+message MockData{
+  optional int64 affiliate_count = 1; //total number of affiliates
+  optional int64 referrals_each_affiliate = 2; //if filled, generate this amount of referrals for each affiliate
+  optional int64 random_referrals = 3; //if filled, generate random number of referrals
+  optional int64 min_referrals = 4; //required if random_referrals is filled
+  optional int64 max_referrals = 5; //required if random_referrals is filled
+  optional int64 booking_success_rate = 6; //if filled, generate random number of success booking
+  optional int64 min_booking_success_rate = 7; //required if booking_success_rate is not filled
+  optional int64 max_booking_success_rate = 8; //required if booking_success_rate is not filled
+  optional int64 start_date = 9;
+  optional int64 end_date = 10;
+}
+
+message GenerateMockDataRequest{
+  optional RequestMeta request_meta = 1;
+  optional MockData mock_data = 2;
+}
