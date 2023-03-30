@@ -315,3 +315,11 @@ func GetAffiliateInfoWithAffiliateId() string {
 	}
 	return string(query)
 }
+
+func UpdateReferralStatusByIdQuery() string {
+	query, err := os.ReadFile(openSql("sql39.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}

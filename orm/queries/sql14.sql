@@ -8,6 +8,7 @@ WHERE
         affiliate_id = ?
   AND referral_click_time > ?
   AND referral_click_time <= ?
+  AND referral_status != 4
 ORDER BY
     referral_click_time DESC
 LIMIT
