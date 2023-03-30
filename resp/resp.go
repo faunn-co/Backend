@@ -224,3 +224,21 @@ func RollbackCheckoutResponseJSON(c echo.Context) error {
 		},
 	})
 }
+
+func UpdateReferralByIdResponseJSON(c echo.Context) error {
+	return c.JSON(http.StatusOK, pb.UpdateReferralByIdResponse{
+		ResponseMeta: &pb.ResponseMeta{
+			ErrorCode: proto.Int64(int64(pb.GlobalErrorCode_SUCCESS)),
+			ErrorMsg:  proto.String("success"),
+		},
+	})
+}
+
+func DeleteReferralByIdResponseJSON(c echo.Context) error {
+	return c.JSON(http.StatusOK, pb.DeleteReferralByIdResponse{
+		ResponseMeta: &pb.ResponseMeta{
+			ErrorCode: proto.Int64(int64(pb.GlobalErrorCode_SUCCESS)),
+			ErrorMsg:  proto.String("success"),
+		},
+	})
+}

@@ -584,3 +584,11 @@ message RollbackCheckOutRequest{
 message RollbackCheckOutResponse{
   optional ResponseMeta response_meta = 1;
 }
+
+message UpdateReferralByIdResponse{
+  optional ResponseMeta response_meta = 1;
+}
+
+message DeleteReferralByIdResponse{
+  optional ResponseMeta response_meta = 1;
+}
