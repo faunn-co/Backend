@@ -3,6 +3,7 @@ package user_registration
 import (
 	"context"
 	"errors"
+	"github.com/aaronangxz/AffiliateManager/encrypt"
 	"github.com/aaronangxz/AffiliateManager/impl/verification/affiliate_verification"
 	"github.com/aaronangxz/AffiliateManager/impl/verification/user_verification"
 	"github.com/aaronangxz/AffiliateManager/logger"
@@ -83,7 +84,7 @@ func (u *UserRegistration) UserRegistrationImpl() *resp.Error {
 
 	auth := &pb.UserAuth{
 		UserId:       user.UserId,
-		UserPassword: u.req.UserPassword,
+		UserPassword: proto.String(encrypt.HashAndSalt(u.ctx, u.req.GetUserPassword())),
 	}
 
 	if err := orm.DbInstance(u.ctx).Table(orm.USER_AUTH_TABLE).Create(&auth).Error; err != nil {
@@ -207,7 +208,7 @@ func (u *UserRegistration) verifyUserRegistration() error {
 	}
 
 	if len(u.req.GetPreferredReferralCode()) > REFERRAL_CODE_MAX_LENGTH {
-		return errors.New("referral code cannot be longer than 50 characters")
+		return errors.New("referral code cannot be longer than 10 characters")
 	}
 
 	if isContainsSpecialChar(u.req.GetPreferredReferralCode()) || isContainsSpace(u.req.GetPreferredReferralCode()) {

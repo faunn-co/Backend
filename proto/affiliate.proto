@@ -99,6 +99,7 @@ message User{
   optional string user_contact = 4;
   optional int64 user_role = 5;
   optional int64 create_timestamp = 6;
+  optional string user_password = 7;
 }
 
 //Direct from affiliate_details_table
