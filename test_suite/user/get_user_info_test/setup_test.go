@@ -6,7 +6,7 @@ import (
 )
 
 func run(reqBody *pb.GetUserInfoRequest, tokens *pb.Tokens) (int, *pb.GetUserInfoResponse) {
-	err, response := test_suite.NewMockTest(test_suite.GetUserInfo).Req(reqBody, tokens).Response()
+	err, response := test_suite.NewMockTest(test_suite.UserGetUserInfo).Req(reqBody, tokens).Response()
 	resp := response.(*pb.GetUserInfoResponse)
 	return err, resp
 }
