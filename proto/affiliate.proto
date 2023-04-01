@@ -598,17 +598,27 @@ message DeleteReferralByIdResponse{
 message MockData{
   optional int64 affiliate_count = 1; //total number of affiliates
   optional int64 referrals_each_affiliate = 2; //if filled, generate this amount of referrals for each affiliate
-  optional int64 random_referrals = 3; //if filled, generate random number of referrals
-  optional int64 min_referrals = 4; //required if random_referrals is filled
-  optional int64 max_referrals = 5; //required if random_referrals is filled
-  optional int64 booking_success_rate = 6; //if filled, generate random number of success booking
-  optional int64 min_booking_success_rate = 7; //required if booking_success_rate is not filled
-  optional int64 max_booking_success_rate = 8; //required if booking_success_rate is not filled
-  optional int64 start_date = 9;
-  optional int64 end_date = 10;
+  optional int64 min_referrals = 3; //required if random_referrals is filled
+  optional int64 max_referrals = 4; //required if random_referrals is filled
+  optional int64 booking_success_rate = 5; //if filled, generate random number of success booking
+  optional int64 min_booking_success_rate = 6; //required if booking_success_rate is not filled
+  optional int64 max_booking_success_rate = 7; //required if booking_success_rate is not filled
+  optional string start_date = 8;
+  optional string end_date = 9;
 }
 
 message GenerateMockDataRequest{
   optional RequestMeta request_meta = 1;
   optional MockData mock_data = 2;
+}
+
+message MockDataCount{
+  optional int64 total_affiliates = 1;
+  optional int64 total_referrals = 2;
+  optional int64 total_bookings = 3;
+}
+
+message GenerateMockDataResponse{
+  optional ResponseMeta response_meta = 1;
+  optional MockDataCount mock_date_count = 2;
 }

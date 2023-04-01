@@ -152,7 +152,7 @@ func (b *Booking) filDefaults() *Booking {
 	}
 
 	if b.BookingDetails.BookingSlot == nil {
-		b.BookingDetails.BookingSlot = proto.Int64(int64(pb.TicketSlot_SLOT_CORGI_1030_1200))
+		b.BookingDetails.BookingSlot = proto.Int64(u.RandomRange(0, 3))
 	}
 
 	if b.BookingDetails.TransactionTime == nil {
@@ -164,15 +164,15 @@ func (b *Booking) filDefaults() *Booking {
 	}
 
 	if b.BookingDetails.CitizenTicketCount == nil {
-		b.BookingDetails.CitizenTicketCount = proto.Int64(u.RandomRange(1, 10))
+		b.BookingDetails.CitizenTicketCount = proto.Int64(u.RandomRange(1, 5))
 	}
 
 	if b.BookingDetails.CitizenTicketTotal == nil {
-		b.BookingDetails.CitizenTicketTotal = proto.Int64(CitizenTicket * b.BookingDetails.GetCitizenTicketTotal())
+		b.BookingDetails.CitizenTicketTotal = proto.Int64(CitizenTicket * b.BookingDetails.GetCitizenTicketCount())
 	}
 
 	if b.BookingDetails.TouristTicketCount == nil {
-		b.BookingDetails.TouristTicketCount = proto.Int64(u.RandomRange(1, 5))
+		b.BookingDetails.TouristTicketCount = proto.Int64(u.RandomRange(0, 5))
 	}
 
 	if b.BookingDetails.TouristTicketTotal == nil {

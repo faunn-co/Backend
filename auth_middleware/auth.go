@@ -73,3 +73,31 @@ func AffiliateAuthorization(next echo.HandlerFunc) echo.HandlerFunc {
 		return next(c)
 	}
 }
+
+func DevAuthorization(next echo.HandlerFunc) echo.HandlerFunc {
+	return func(c echo.Context) error {
+		if err := globalAuthentication(c); err != nil {
+			return resp.NotAuthenticatedResp(c)
+		}
+
+		tokenAuth, err := ExtractTokenMetadata(c.Request().Context(), c.Request())
+		if err != nil {
+			return resp.NotAuthenticatedResp(c)
+		}
+
+		if tokenAuth.Role != int64(pb.UserRole_ROLE_DEV) {
+			logger.ErrorMsg(context.Background(), "Role no permission")
+			return resp.NotAuthorisedResp(c)
+		}
+
+		userId, err := FetchAuth(c.Request().Context(), tokenAuth)
+		if err != nil {
+			return resp.NotAuthenticatedResp(c)
+		}
+
+		if userId == 0 {
+			return resp.NotAuthenticatedResp(c)
+		}
+		return next(c)
+	}
+}
