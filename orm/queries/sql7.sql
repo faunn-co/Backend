@@ -1,6 +1,6 @@
 SELECT
     a.*,
-    u.user_name as affiliate_name,
+    a.entity_name as affiliate_name,
     SUM(r.referral_commission) AS total_commission
 FROM
     referral_table r,
