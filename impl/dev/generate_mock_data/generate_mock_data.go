@@ -12,6 +12,7 @@ import (
 	"github.com/aaronangxz/AffiliateManager/utils"
 	"github.com/labstack/echo/v4"
 	"google.golang.org/protobuf/proto"
+	"sync"
 )
 
 type GenerateMockData struct {
@@ -34,6 +35,7 @@ func (g *GenerateMockData) GenerateMockDataImpl() (*pb.MockDataCount, *resp.Erro
 	}
 
 	var (
+		wg                 sync.WaitGroup
 		affiliateIds       []int64
 		totalReferralCount int64
 		referralCount      int64
@@ -43,9 +45,21 @@ func (g *GenerateMockData) GenerateMockDataImpl() (*pb.MockDataCount, *resp.Erro
 		endTime            int64
 	)
 
-	for i := 0; i < int(g.req.GetMockData().GetAffiliateCount()); i++ {
-		u := user.New().SetNeedLogin(false).Build()
-		affiliateIds = append(affiliateIds, u.AffiliateInfo.GetUserId())
+	if g.req.IsParallel != nil && g.req.GetIsParallel() {
+		for i := 0; i < int(g.req.GetMockData().GetAffiliateCount()); i++ {
+			wg.Add(1)
+			go func() {
+				defer wg.Done()
+				u := user.New().SetNeedLogin(false).Build()
+				affiliateIds = append(affiliateIds, u.AffiliateInfo.GetUserId())
+			}()
+		}
+		wg.Wait()
+	} else {
+		for i := 0; i < int(g.req.GetMockData().GetAffiliateCount()); i++ {
+			u := user.New().SetNeedLogin(false).Build()
+			affiliateIds = append(affiliateIds, u.AffiliateInfo.GetUserId())
+		}
 	}
 
 	if g.req.GetMockData().ReferralsEachAffiliate != nil {
@@ -74,15 +88,33 @@ func (g *GenerateMockData) GenerateMockDataImpl() (*pb.MockDataCount, *resp.Erro
 			bookingSuccessRate = 100 / test_utils.RandomRange(int(g.req.GetMockData().GetMinBookingSuccessRate()), int(g.req.GetMockData().GetMaxBookingSuccessRate()))
 		}
 
-		for i := 0; i < int(referralCount); i++ {
-			isSuccess := false
-			if int64(i)%bookingSuccessRate == 0 {
-				totalBookings++
-				isSuccess = true
+		if g.req.IsParallel != nil && g.req.GetIsParallel() {
+			for i := 0; i < int(referralCount); i++ {
+				wg.Add(1)
+				go func(i int, referralCount int64, bookingSuccessRate int64) {
+					defer wg.Done()
+					isSuccess := false
+					if int64(i)%bookingSuccessRate == 0 {
+						totalBookings++
+						isSuccess = true
+					}
+					refClickTime := test_utils.RandomRangeInt64(startTime, endTime)
+					bookingTime := test_utils.RandomRangeInt64(refClickTime, endTime)
+					referral.New().SetAffiliateId(a).SetHasBooking(isSuccess).SetReferralClickTime(refClickTime).SetBookingTime(bookingTime).Build()
+				}(i, referralCount, bookingSuccessRate)
 			}
-			refClickTime := test_utils.RandomRangeInt64(startTime, endTime)
-			bookingTime := test_utils.RandomRangeInt64(refClickTime, endTime)
-			referral.New().SetAffiliateId(a).SetHasBooking(isSuccess).SetReferralClickTime(refClickTime).SetBookingTime(bookingTime).Build()
+			wg.Wait()
+		} else {
+			for i := 0; i < int(referralCount); i++ {
+				isSuccess := false
+				if int64(i)%bookingSuccessRate == 0 {
+					totalBookings++
+					isSuccess = true
+				}
+				refClickTime := test_utils.RandomRangeInt64(startTime, endTime)
+				bookingTime := test_utils.RandomRangeInt64(refClickTime, endTime)
+				referral.New().SetAffiliateId(a).SetHasBooking(isSuccess).SetReferralClickTime(refClickTime).SetBookingTime(bookingTime).Build()
+			}
 		}
 	}
 	return &pb.MockDataCount{
