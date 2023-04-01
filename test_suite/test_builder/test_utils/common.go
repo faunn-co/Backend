@@ -21,3 +21,9 @@ func RandomRange(min, max int) int64 {
 	time.Sleep(50 * time.Millisecond)
 	return int64(rand.Intn(max-min+1) + min)
 }
+
+func RandomRangeInt64(min, max int64) int64 {
+	rand.Seed(time.Now().UnixNano())
+	time.Sleep(50 * time.Millisecond)
+	return int64(rand.Int63n(max-min+1) + min)
+}

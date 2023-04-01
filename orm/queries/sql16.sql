@@ -70,4 +70,5 @@ GROUP BY
     a.user_email,
     a.user_contact,
     a.affiliate_type,
-    a.unique_referral_code;
+    a.unique_referral_code
+ORDER BY total_revenue DESC, referral_commission DESC

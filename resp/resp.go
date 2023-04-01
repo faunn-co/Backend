@@ -243,3 +243,13 @@ func DeleteReferralByIdResponseJSON(c echo.Context) error {
 		},
 	})
 }
+
+func GenerateMockDataResponseJSON(c echo.Context, count *pb.MockDataCount) error {
+	return c.JSON(http.StatusOK, pb.GenerateMockDataResponse{
+		ResponseMeta: &pb.ResponseMeta{
+			ErrorCode: proto.Int64(int64(pb.GlobalErrorCode_SUCCESS)),
+			ErrorMsg:  proto.String("success"),
+		},
+		MockDateCount: count,
+	})
+}

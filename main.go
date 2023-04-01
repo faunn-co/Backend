@@ -103,6 +103,10 @@ func main() {
 	//Stripe
 	e.POST("api/v1/payment/create-payment-intent", cmd.CreatePaymentIntent) //DONE
 
+	d := e.Group("api/v1/dev")
+	d.Use(auth_middleware.DevAuthorization)
+	d.POST("/mock", cmd.GenerateMockData) //DONE
+
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%v", getPort())))
 }
 
