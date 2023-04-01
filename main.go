@@ -49,63 +49,56 @@ func main() {
 	//Allows admin / dev only
 	a := e.Group("api/v1/affiliate")
 	a.Use(auth_middleware.AdminAuthorization)
-	a.POST("/list", cmd.GetAffiliateList)               //DONE
-	a.GET("/:id", cmd.GetAffiliateDetailsById)          //DONE, not tested
-	a.POST("/stats", cmd.GetAffiliateStats)             //DONE
-	a.POST("/trend", cmd.GetAffiliateTrend)             //DONE
-	a.GET("/ranking/list", cmd.GetAffiliateRankingList) //DONE
+	a.POST("/list", cmd.GetAffiliateList)
+	a.GET("/:id", cmd.GetAffiliateDetailsById)
+	a.POST("/stats", cmd.GetAffiliateStats)
+	a.POST("/trend", cmd.GetAffiliateTrend)
+	a.GET("/ranking/list", cmd.GetAffiliateRankingList)
 
 	//Referral
 	//Allows admin / affiliate / dev
 	r := e.Group("api/v1/referral")
 	r.Use(auth_middleware.AffiliateAuthorization)
-	r.POST("/list", cmd.GetReferralsList)            //DONE
-	r.POST("/stats", cmd.GetReferralStats)           //DONE
-	r.POST("/trend", cmd.GetReferralTrend)           //DONE
-	r.GET("/recent/list", cmd.GetReferralRecentList) //DONE
-	r.GET("/:id", cmd.GetReferralById)               //DONE
-	r.PUT("/:id", cmd.UpdateReferralById)            //DONE
-	r.DELETE("/:id", cmd.DeleteReferralById)         //DONE
+	r.POST("/list", cmd.GetReferralsList)
+	r.POST("/stats", cmd.GetReferralStats)
+	r.POST("/trend", cmd.GetReferralTrend)
+	r.GET("/recent/list", cmd.GetReferralRecentList)
+	r.GET("/:id", cmd.GetReferralById)
+	r.PUT("/:id", cmd.UpdateReferralById)
+	r.DELETE("/:id", cmd.DeleteReferralById)
 
 	//Booking
 	//Allows admin / dev only
 	b := e.Group("api/v1/booking")
 	b.Use(auth_middleware.AdminAuthorization)
-	b.POST("/list", cmd.GetBookingList) //DONE
-	//e.POST("api/v1/booking/list", cmd.GetBookingList) //DONE
-	//e.POST("api/v1/booking/stats", cmd.GetAvailableSlot)
-	//e.POST("api/v1/booking/trend", cmd.GetAvailableSlot)
-	//e.GET("api/v1/booking/recent/list", cmd.GetAvailableSlot)
-	//e.GET("api/v1/booking/:id", cmd.GetAvailableSlot)
-	//e.PUT("api/v1/booking/:id", cmd.GetAvailableSlot)
-	//e.DELETE("api/v1/booking/:id", cmd.GetAvailableSlot)
+	b.POST("/list", cmd.GetBookingList)
+
+	d := e.Group("api/v1/dev")
+	d.Use(auth_middleware.DevAuthorization)
+	d.POST("/mock", cmd.GenerateMockData)
 
 	//User
 	u := e.Group("api/v1/user")
 	u.Use(auth_middleware.AffiliateAuthorization)
-	u.GET("/info", cmd.GetUserInfo) //DONE
+	u.GET("/info", cmd.GetUserInfo)
 
 	//Endpoints below require no Auth
 	//Landing Page
-	e.GET("api/v1/booking/slots/available", cmd.GetAvailableSlot) //DONE
+	e.GET("api/v1/booking/slots/available", cmd.GetAvailableSlot)
 
 	//Registration
-	e.POST("api/v1/platform/register", cmd.UserRegistration)     //DONE
-	e.POST("api/v1/platform/login", cmd.UserAuthentication)      //DONE
-	e.DELETE("api/v1/platform/logout", cmd.UserDeAuthentication) //DONE
+	e.POST("api/v1/platform/register", cmd.UserRegistration)
+	e.POST("api/v1/platform/login", cmd.UserAuthentication)
+	e.DELETE("api/v1/platform/logout", cmd.UserDeAuthentication)
 
 	//Tracking
-	e.POST("api/v1/welcome/click", cmd.TrackClick)                   //DONE
-	e.POST("api/v1/welcome/payment", cmd.TrackPayment)               //DONE
-	e.POST("api/v1/welcome/checkout", cmd.TrackCheckout)             //DONE
-	e.POST("api/v1/welcome/rollback-checkout", cmd.RollbackCheckout) //DONE
+	e.POST("api/v1/welcome/click", cmd.TrackClick)
+	e.POST("api/v1/welcome/payment", cmd.TrackPayment)
+	e.POST("api/v1/welcome/checkout", cmd.TrackCheckout)
+	e.POST("api/v1/welcome/rollback-checkout", cmd.RollbackCheckout)
 
 	//Stripe
-	e.POST("api/v1/payment/create-payment-intent", cmd.CreatePaymentIntent) //DONE
-
-	d := e.Group("api/v1/dev")
-	d.Use(auth_middleware.DevAuthorization)
-	d.POST("/mock", cmd.GenerateMockData) //DONE
+	e.POST("api/v1/payment/create-payment-intent", cmd.CreatePaymentIntent)
 
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%v", getPort())))
 }

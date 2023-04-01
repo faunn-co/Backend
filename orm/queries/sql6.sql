@@ -1,6 +1,6 @@
 SELECT
     a.*,
-    u.user_name as affiliate_name,
+    a.entity_name as affiliate_name,
     COUNT(referral_id) AS total_referrals
 FROM
     referral_table r,
