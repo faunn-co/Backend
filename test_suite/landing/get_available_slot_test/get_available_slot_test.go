@@ -60,7 +60,7 @@ func TestGetUserInfo_SubsequentMonth(t *testing.T) {
 	var (
 		expectedHTTPCode = http.StatusOK
 		expectedErrCode  = int64(pb.GlobalErrorCode_ERROR_INVALID_PARAMS)
-		date             = utils.ConvertTimeStampYearMonthDay(time.Now().Unix() + utils.MONTH)
+		date             = utils.ConvertTimeStampYearMonthDay(time.Now().Unix() + 6*utils.MONTH)
 	)
 
 	req := get_available_slot.New().Request()
