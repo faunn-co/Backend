@@ -28,7 +28,7 @@ func TestGetReferralList_Affiliate_Happy(t *testing.T) {
 	if assert.Equal(t, expectedErrCode, resp.GetResponseMeta().GetErrorCode()) {
 		assert.NotNil(t, resp.GetReferralList())
 		for _, l := range resp.GetReferralList() {
-			assert.Equal(t, r.Affiliate.UserInfo.GetUserName(), l.GetAffiliateName())
+			assert.Equal(t, r.Affiliate.AffiliateInfo.GetEntityName(), l.GetAffiliateName())
 		}
 	}
 }
