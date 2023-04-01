@@ -49,7 +49,7 @@ func TestGetReferralList_Affiliate_InputRandomAffiliateName(t *testing.T) {
 	if assert.Equal(t, expectedErrCode, resp.GetResponseMeta().GetErrorCode()) {
 		assert.NotNil(t, resp.GetReferralList())
 		for _, l := range resp.GetReferralList() {
-			assert.Equal(t, r.Affiliate.UserInfo.GetUserName(), l.GetAffiliateName())
+			assert.Equal(t, r.Affiliate.AffiliateInfo.GetEntityName(), l.GetAffiliateName())
 		}
 	}
 }
@@ -89,7 +89,7 @@ func TestGetReferralList_Affiliate_Period_Day(t *testing.T) {
 	if assert.Equal(t, expectedErrCode, resp.GetResponseMeta().GetErrorCode()) {
 		assert.NotNil(t, resp.GetReferralList())
 		for _, l := range resp.GetReferralList() {
-			assert.Equal(t, r.Affiliate.UserInfo.GetUserName(), l.GetAffiliateName())
+			assert.Equal(t, r.Affiliate.AffiliateInfo.GetEntityName(), l.GetAffiliateName())
 		}
 	}
 }
@@ -111,7 +111,7 @@ func TestGetReferralList_Affiliate_Period_Week(t *testing.T) {
 	if assert.Equal(t, expectedErrCode, resp.GetResponseMeta().GetErrorCode()) {
 		assert.NotNil(t, resp.GetReferralList())
 		for _, l := range resp.GetReferralList() {
-			assert.Equal(t, r.Affiliate.UserInfo.GetUserName(), l.GetAffiliateName())
+			assert.Equal(t, r.Affiliate.AffiliateInfo.GetEntityName(), l.GetAffiliateName())
 		}
 	}
 }
@@ -133,7 +133,7 @@ func TestGetReferralList_Affiliate_Period_Month(t *testing.T) {
 	if assert.Equal(t, expectedErrCode, resp.GetResponseMeta().GetErrorCode()) {
 		assert.NotNil(t, resp.GetReferralList())
 		for _, l := range resp.GetReferralList() {
-			assert.Equal(t, r.Affiliate.UserInfo.GetUserName(), l.GetAffiliateName())
+			assert.Equal(t, r.Affiliate.AffiliateInfo.GetEntityName(), l.GetAffiliateName())
 		}
 	}
 }
@@ -156,7 +156,7 @@ func TestGetReferralList_Affiliate_Period_Last7Days(t *testing.T) {
 	if assert.Equal(t, expectedErrCode, resp.GetResponseMeta().GetErrorCode()) {
 		assert.NotNil(t, resp.GetReferralList())
 		for _, l := range resp.GetReferralList() {
-			assert.Equal(t, r.Affiliate.UserInfo.GetUserName(), l.GetAffiliateName())
+			assert.Equal(t, r.Affiliate.AffiliateInfo.GetEntityName(), l.GetAffiliateName())
 		}
 	}
 }
@@ -179,7 +179,7 @@ func TestGetReferralList_Affiliate_Period_Last28Days(t *testing.T) {
 	if assert.Equal(t, expectedErrCode, resp.GetResponseMeta().GetErrorCode()) {
 		assert.NotNil(t, resp.GetReferralList())
 		for _, l := range resp.GetReferralList() {
-			assert.Equal(t, r.Affiliate.UserInfo.GetUserName(), l.GetAffiliateName())
+			assert.Equal(t, r.Affiliate.AffiliateInfo.GetEntityName(), l.GetAffiliateName())
 		}
 	}
 }
@@ -201,7 +201,7 @@ func TestGetReferralList_Affiliate_Period_Range(t *testing.T) {
 	if assert.Equal(t, expectedErrCode, resp.GetResponseMeta().GetErrorCode()) {
 		assert.NotNil(t, resp.GetReferralList())
 		for _, l := range resp.GetReferralList() {
-			assert.Equal(t, r.Affiliate.UserInfo.GetUserName(), l.GetAffiliateName())
+			assert.Equal(t, r.Affiliate.AffiliateInfo.GetEntityName(), l.GetAffiliateName())
 		}
 	}
 }
@@ -255,7 +255,7 @@ func TestGetReferralList_Admin_InputAffiliateName(t *testing.T) {
 		expectedErrCode  = int64(pb.GlobalErrorCode_SUCCESS)
 	)
 
-	req := get_referral_list.New().SetAffiliateName(a.Referrals[0].Affiliate.UserInfo.GetUserName()).Request()
+	req := get_referral_list.New().SetAffiliateName(a.Referrals[0].Affiliate.AffiliateInfo.GetEntityName()).Request()
 	err, resp := run(req, a.User.Token)
 
 	assert.Equal(t, expectedHTTPCode, err)
