@@ -7,10 +7,9 @@ import (
 	"github.com/aaronangxz/AffiliateManager/orm"
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
 	"github.com/aaronangxz/AffiliateManager/resp"
-	"github.com/aaronangxz/AffiliateManager/utils"
 	"github.com/labstack/echo/v4"
 	"google.golang.org/protobuf/proto"
-	"strconv"
+	"time"
 )
 
 type GetReferralRecentList struct {
@@ -41,27 +40,22 @@ func (g *GetReferralRecentList) GetReferralRecentListImpl() (*pb.ReferralRecent,
 	id := tokenAuth.UserId
 
 	var (
-		c     []*pb.ReferralClicks
-		e     []*pb.ReferralEarnings
-		start int64
-		end   int64
+		c []*pb.ReferralClicks
+		e []*pb.ReferralEarnings
 	)
 
-	if start, end, _, _, err = utils.GetStartEndTimeFromPeriod(strconv.FormatInt(int64(pb.TimeSelectorPeriod_PERIOD_MONTH), 10)); err != nil {
-		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_INVALID_PARAMS)
-	}
-	if err := orm.DbInstance(g.ctx).Raw(orm.GetReferralRecentClicksQuery(), id, start, end).Scan(&c).Error; err != nil {
+	t := time.Now().Unix()
+	if err := orm.DbInstance(g.ctx).Raw(orm.GetReferralRecentClicksQuery(), id, t).Scan(&c).Error; err != nil {
 		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 	}
-	if err := orm.DbInstance(g.ctx).Raw(orm.GetReferralRecentEarningsQuery(), id, start, end).Scan(&e).Error; err != nil {
+	if err := orm.DbInstance(g.ctx).Raw(orm.GetReferralRecentEarningsQuery(), id, t).Scan(&e).Error; err != nil {
 		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 	}
 
 	return &pb.ReferralRecent{
 		RecentClicks:   c,
 		RecentEarnings: e,
-		StartTime:      proto.Int64(start),
-		EndTime:        proto.Int64(end),
+		EndTime:        proto.Int64(t),
 	}, nil
 }
 

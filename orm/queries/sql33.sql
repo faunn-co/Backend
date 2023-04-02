@@ -15,7 +15,7 @@ FROM
                         0
                 ) AS total_revenue
         FROM
-            booking_details_table b
-    ) AS b
+            booking_details_table b WHERE b.transaction_time <= ?
+    ) AS b WHERE r.referral_click_time <= ? AND r.booking_time <= ?
 GROUP BY
     total_revenue

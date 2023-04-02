@@ -9,6 +9,7 @@ import (
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
 	"github.com/aaronangxz/AffiliateManager/resp"
 	"github.com/labstack/echo/v4"
+	"time"
 )
 
 type GetUserInfo struct {
@@ -38,12 +39,13 @@ func (g *GetUserInfo) GetUserInfoImpl() (*pb.AffiliateProfileMeta, *pb.User, *re
 	}
 
 	var a *pb.AffiliateProfileMeta
+	t := time.Now().Unix()
 	if tokenAuth.Role == int64(pb.UserRole_ROLE_ADMIN) {
-		if err := orm.DbInstance(g.ctx).Raw(orm.GetAdminInfoQuery()).Scan(&a).Error; err != nil {
+		if err := orm.DbInstance(g.ctx).Raw(orm.GetAdminInfoQuery(), t, t, t).Scan(&a).Error; err != nil {
 			return nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 		}
 	} else {
-		if err := orm.DbInstance(g.ctx).Raw(orm.GetAffiliateInfoQuery(), id).Scan(&a).Error; err != nil {
+		if err := orm.DbInstance(g.ctx).Raw(orm.GetAffiliateInfoQuery(), id, t, t, t).Scan(&a).Error; err != nil {
 			return nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 		}
 	}
