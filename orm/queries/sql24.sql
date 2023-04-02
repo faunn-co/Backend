@@ -20,5 +20,5 @@ FROM
         LEFT JOIN referral_table r ON a.user_id = r.affiliate_id
         LEFT JOIN booking_details_table b ON b.booking_id = r.booking_id
 WHERE
-        a.user_id = ?
+        a.user_id = ? AND r.referral_click_time <= ? AND r.booking_time <= ? AND b.transaction_time <= ?
 GROUP BY a.user_id
