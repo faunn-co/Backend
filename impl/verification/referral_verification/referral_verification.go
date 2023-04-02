@@ -8,6 +8,7 @@ import (
 	"github.com/aaronangxz/AffiliateManager/orm"
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
 	"github.com/labstack/echo/v4"
+	"time"
 )
 
 type ReferralVerification struct {
@@ -51,9 +52,22 @@ func (r *ReferralVerification) VerifyReferralId(id int64) error {
 	if referral.BookingId != nil {
 		return errors.New("referral click already has booking bound")
 	}
-	if err := orm.SET(r.ctx, k, referral, 0); err != nil {
+	if err := orm.SET(r.ctx, k, referral, time.Hour); err != nil {
 		logger.Error(r.ctx, err)
 		return nil
+	}
+	return nil
+}
+
+func (r *ReferralVerification) PurgeReferralDetailsCache(id int64) error {
+	k := fmt.Sprintf("%v:%v", r.referralId, id)
+	deleted, err := orm.RedisInstance().Del(context.Background(), k).Result()
+	if err != nil {
+		logger.Error(r.ctx, err)
+		return err
+	}
+	if deleted == 0 {
+		logger.Warn(r.ctx, "purgeReferralIdCache| failed to purge cache | key: %v", k)
 	}
 	return nil
 }
@@ -80,7 +94,7 @@ func (r *ReferralVerification) VerifyReferralIdBoundedAffiliate(id int64) error 
 		return errors.New("referral click not found")
 	}
 	if referral.AffiliateId == nil {
-		if err := orm.SET(r.ctx, k, referral, 0); err != nil {
+		if err := orm.SET(r.ctx, k, referral, time.Hour); err != nil {
 			logger.Error(r.ctx, err)
 			return nil
 		}

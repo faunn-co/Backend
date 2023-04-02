@@ -29,8 +29,13 @@ type Referral struct {
 func New() *Referral {
 	r := new(Referral)
 	r.ReferralDb = new(pb.ReferralDb)
-	r.HasBooking = false
+	r.HasBooking = true
 	orm.ENV = "TEST"
+	return r
+}
+
+func (r *Referral) SetHasBooking(hasBooking bool) *Referral {
+	r.HasBooking = hasBooking
 	return r
 }
 
@@ -76,15 +81,22 @@ func (r *Referral) filDefaults() *Referral {
 	}
 
 	if r.ReferralDb.ReferralStatus == nil {
-		r.ReferralDb.ReferralStatus = proto.Int64(int64(pb.ReferralStatus_REFERRAL_STATUS_SUCCESS))
+		if r.HasBooking {
+			r.ReferralDb.ReferralStatus = proto.Int64(int64(pb.ReferralStatus_REFERRAL_STATUS_SUCCESS))
+		} else {
+			r.ReferralDb.ReferralStatus = proto.Int64(int64(pb.ReferralStatus_REFERRAL_STATUS_PENDING))
+		}
 	}
 
-	if r.ReferralDb.BookingId == nil {
-		r.Booking = booking.New().Build()
+	if r.HasBooking && r.ReferralDb.BookingId == nil {
+		if r.ReferralDb.BookingTime == nil {
+			r.ReferralDb.BookingTime = proto.Int64(time.Now().Unix())
+		}
+		r.Booking = booking.New().SetTransactionTime(r.ReferralDb.GetBookingTime()).Build()
 		r.ReferralDb.BookingId = r.Booking.BookingDetails.BookingId
 	}
 
-	if r.ReferralDb.ReferralCommission == nil {
+	if r.HasBooking && r.ReferralDb.ReferralCommission == nil {
 		r.ReferralDb.ReferralCommission = proto.Int64((r.Booking.BookingDetails.GetTouristTicketTotal() + r.Booking.BookingDetails.GetCitizenTicketTotal()) / 100 * commissionPercentage)
 	}
 	return r
@@ -109,7 +121,7 @@ func (r *Referral) Build() *Referral {
 		ReferralClickTime:  r.ReferralDb.ReferralClickTime,
 		ReferralStatus:     r.ReferralDb.ReferralStatus,
 		BookingId:          r.ReferralDb.BookingId,
-		BookingTime:        r.Booking.BookingDetails.TransactionTime,
+		BookingTime:        r.ReferralDb.BookingTime,
 		ReferralCommission: r.ReferralDb.ReferralCommission,
 	}
 

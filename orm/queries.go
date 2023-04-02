@@ -275,3 +275,51 @@ func GetAdminInfoQuery() string {
 	}
 	return string(query)
 }
+
+func DecrementTicketCountQuery() string {
+	query, err := os.ReadFile(openSql("sql34.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}
+
+func UpdateBookingPostCheckOutQuery() string {
+	query, err := os.ReadFile(openSql("sql35.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}
+
+func IncrementTicketCountQuery() string {
+	query, err := os.ReadFile(openSql("sql36.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}
+
+func UpdateReferralBookingInfoRollbackCheckOutQuery() string {
+	query, err := os.ReadFile(openSql("sql37.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}
+
+func GetAffiliateInfoWithAffiliateId() string {
+	query, err := os.ReadFile(openSql("sql38.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}
+
+func UpdateReferralStatusByIdQuery() string {
+	query, err := os.ReadFile(openSql("sql39.sql"))
+	if err != nil {
+		panic(err)
+	}
+	return string(query)
+}

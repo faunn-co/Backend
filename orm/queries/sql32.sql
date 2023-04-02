@@ -1,1 +1,1 @@
-SELECT * FROM referral_table WHERE referral_id = ?
+SELECT * FROM referral_table WHERE referral_id = ? AND referral_status != 4

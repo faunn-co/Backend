@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/aaronangxz/AffiliateManager/auth_middleware"
+	"github.com/aaronangxz/AffiliateManager/encrypt"
 	"github.com/aaronangxz/AffiliateManager/impl/verification/user_verification"
 	"github.com/aaronangxz/AffiliateManager/logger"
 	"github.com/aaronangxz/AffiliateManager/orm"
@@ -49,15 +50,20 @@ func (u *UserAuthentication) UserAuthenticationImpl() (*pb.AuthCookie, *resp.Err
 
 func (u *UserAuthentication) executeLogin() (*pb.AuthCookie, error) {
 	var user *pb.User
-	if err := orm.DbInstance(u.ctx).Raw(orm.GetUserInfoWithAuthQuery(), u.req.GetUserName(), u.req.GetUserPassword()).Scan(&user).Error; err != nil {
+	if err := orm.DbInstance(u.ctx).Raw(orm.GetUserInfoWithAuthQuery(), u.req.GetUserName()).Scan(&user).Error; err != nil {
 		return nil, err
 	}
 
-	if user == nil {
+	if !encrypt.ComparePasswords(u.ctx, user.GetUserPassword(), u.req.GetUserPassword()) {
 		return nil, errors.New("login credentials are incorrect")
 	}
 
-	token, err := auth_middleware.CreateToken(u.ctx, user.GetUserId(), user.GetUserRole())
+	isPermanent := false
+	if user.GetUserRole() == int64(pb.UserRole_ROLE_DEV) && u.req.IsPermanent != nil {
+		isPermanent = u.req.GetIsPermanent()
+	}
+
+	token, err := auth_middleware.CreateToken(u.ctx, user.GetUserId(), user.GetUserRole(), isPermanent)
 	if err != nil {
 		return nil, err
 	}

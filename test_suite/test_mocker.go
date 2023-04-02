@@ -16,27 +16,54 @@ import (
 )
 
 const (
-	GET                     = "GET"
-	POST                    = "POST"
-	DELETE                  = "DELETE"
-	GetAffiliateList        = "/api/v1/affiliate/list"
-	GetAffiliateStats       = "/api/v1/affiliate/stats"
-	GetAffiliateTrend       = "/api/v1/affiliate/trend"
-	GetAffiliateRankingList = "/api/v1/affiliate/ranking/list"
-	GetAffiliateDetailsById = "/api/v1/affiliate/:id"
-	GetReferralsList        = "/api/v1/referral/list"
-	GetReferralStats        = "/api/v1/referral/stats"
-	GetReferralTrend        = "/api/v1/referral/trend"
-	GetReferralRecentList   = "/api/v1/referral/recent/list"
-	GetReferralById         = "/api/v1/referral/:id"
-	GetBookingList          = "/api/v1/booking/list"
-	GetUserInfo             = "/api/v1/user/info"
-	GetAvailableSlot        = "/api/v1/booking/slots/available"
-	UserRegistration        = "/api/v1/platform/register"
-	UserAuthentication      = "/api/v1/platform/login"
-	UserDeAuthentication    = "/api/v1/platform/logout"
-	TrackClick              = "/api/v1/tracking/click"
-	TrackCheckout           = "/api/v1/tracking/checkout"
+	GET                              = "GET"
+	POST                             = "POST"
+	PUT                              = "PUT"
+	DELETE                           = "DELETE"
+	AffiliateGetAffiliateList        = "GetAffiliateList"
+	AffiliateGetAffiliateStats       = "GetAffiliateStats"
+	AffiliateGetAffiliateTrend       = "GetAffiliateTrend"
+	AffiliateGetAffiliateRankingList = "GetAffiliateRankingList"
+	AffiliateGetAffiliateDetailsById = "GetAffiliateDetailsById"
+	ReferralGetReferralsList         = "GetReferralsList"
+	ReferralGetReferralStats         = "GetReferralStats"
+	ReferralGetReferralTrend         = "GetReferralTrend"
+	ReferralGetReferralRecentList    = "GetReferralRecentList"
+	ReferralGetReferralById          = "GetReferralById"
+	ReferralUpdateReferralById       = "UpdateReferralById"
+	ReferralDeleteReferralById       = "DeleteReferralById"
+	BookingGetBookingList            = "GetBookingList"
+	UserGetUserInfo                  = "GetUserInfo"
+	BookingGetAvailableSlot          = "GetAvailableSlot"
+	UserUserRegistration             = "UserRegistration"
+	UserUserAuthentication           = "UserAuthentication"
+	UserUserDeAuthentication         = "UserDeAuthentication"
+	WelcomeTrackClick                = "TrackClick"
+	WelcomeTrackPayment              = "TrackPayment"
+	WelcomeTrackCheckout             = "TrackCheckout"
+	WelcomeRollbackCheckout          = "RollbackCheckout"
+	GetAffiliateList                 = "/api/v1/affiliate/list"
+	GetAffiliateStats                = "/api/v1/affiliate/stats"
+	GetAffiliateTrend                = "/api/v1/affiliate/trend"
+	GetAffiliateRankingList          = "/api/v1/affiliate/ranking/list"
+	GetAffiliateDetailsById          = "/api/v1/affiliate/:id"
+	GetReferralsList                 = "/api/v1/referral/list"
+	GetReferralStats                 = "/api/v1/referral/stats"
+	GetReferralTrend                 = "/api/v1/referral/trend"
+	GetReferralRecentList            = "/api/v1/referral/recent/list"
+	GetReferralById                  = "/api/v1/referral/:id"
+	UpdateReferralById               = "/api/v1/referral/:id"
+	DeleteReferralById               = "/api/v1/referral/:id"
+	GetBookingList                   = "/api/v1/booking/list"
+	GetUserInfo                      = "/api/v1/user/info"
+	GetAvailableSlot                 = "/api/v1/booking/slots/available"
+	UserRegistration                 = "/api/v1/platform/register"
+	UserAuthentication               = "/api/v1/platform/login"
+	UserDeAuthentication             = "/api/v1/platform/logout"
+	TrackClick                       = "/api/v1/welcome/click"
+	TrackPayment                     = "/api/v1/welcome/payment"
+	TrackCheckout                    = "/api/v1/welcome/checkout"
+	RollbackCheckout                 = "/api/v1/welcome/rollback-checkout"
 )
 
 type Method struct {
@@ -46,95 +73,115 @@ type Method struct {
 }
 
 var methodMap = map[string]Method{
-	GetAffiliateStats: {
+	AffiliateGetAffiliateStats: {
 		Endpoint:   GetAffiliateStats,
 		HTTPMethod: POST,
 		Model:      reflect.TypeOf(pb.GetAffiliateStatsResponse{}),
 	},
-	GetAffiliateList: {
+	AffiliateGetAffiliateList: {
 		Endpoint:   GetAffiliateList,
 		HTTPMethod: POST,
 		Model:      reflect.TypeOf(pb.GetAffiliateListResponse{}),
 	},
-	GetAffiliateTrend: {
+	AffiliateGetAffiliateTrend: {
 		Endpoint:   GetAffiliateTrend,
 		HTTPMethod: POST,
 		Model:      reflect.TypeOf(pb.GetAffiliateTrendResponse{}),
 	},
-	GetAffiliateRankingList: {
+	AffiliateGetAffiliateRankingList: {
 		Endpoint:   GetAffiliateRankingList,
 		HTTPMethod: GET,
 		Model:      reflect.TypeOf(pb.GetAffiliateRankingListResponse{}),
 	},
-	GetAffiliateDetailsById: {
+	AffiliateGetAffiliateDetailsById: {
 		Endpoint:   GetAffiliateDetailsById,
 		HTTPMethod: GET,
 		Model:      reflect.TypeOf(pb.GetAffiliateDetailsByIdResponse{}),
 	},
-	GetReferralsList: {
+	ReferralGetReferralsList: {
 		Endpoint:   GetReferralsList,
 		HTTPMethod: POST,
 		Model:      reflect.TypeOf(pb.GetReferralListResponse{}),
 	},
-	GetReferralStats: {
+	ReferralGetReferralStats: {
 		Endpoint:   GetReferralStats,
 		HTTPMethod: POST,
 		Model:      reflect.TypeOf(pb.GetReferralStatsResponse{}),
 	},
-	GetReferralTrend: {
+	ReferralGetReferralTrend: {
 		Endpoint:   GetReferralTrend,
 		HTTPMethod: POST,
 		Model:      reflect.TypeOf(pb.GetReferralTrendResponse{}),
 	},
-	GetReferralRecentList: {
+	ReferralGetReferralRecentList: {
 		Endpoint:   GetReferralRecentList,
 		HTTPMethod: GET,
 		Model:      reflect.TypeOf(pb.GetReferralRecentListResponse{}),
 	},
-	GetReferralById: {
+	ReferralGetReferralById: {
 		Endpoint:   GetReferralById,
 		HTTPMethod: GET,
 		Model:      reflect.TypeOf(pb.GetReferralDetailsByReferralIdResponse{}),
 	},
-	GetBookingList: {
+	ReferralUpdateReferralById: {
+		Endpoint:   UpdateReferralById,
+		HTTPMethod: PUT,
+		Model:      reflect.TypeOf(pb.UpdateReferralByIdResponse{}),
+	},
+	ReferralDeleteReferralById: {
+		Endpoint:   DeleteReferralById,
+		HTTPMethod: DELETE,
+		Model:      reflect.TypeOf(pb.DeleteReferralByIdResponse{}),
+	},
+	BookingGetBookingList: {
 		Endpoint:   GetBookingList,
 		HTTPMethod: POST,
 		Model:      reflect.TypeOf(pb.GetBookingListResponse{}),
 	},
-	GetUserInfo: {
+	UserGetUserInfo: {
 		Endpoint:   GetUserInfo,
 		HTTPMethod: GET,
 		Model:      reflect.TypeOf(pb.GetUserInfoResponse{}),
 	},
-	GetAvailableSlot: {
+	BookingGetAvailableSlot: {
 		Endpoint:   GetAvailableSlot,
 		HTTPMethod: GET,
 		Model:      reflect.TypeOf(pb.GetAvailableSlotResponse{}),
 	},
-	UserRegistration: {
+	UserUserRegistration: {
 		Endpoint:   UserRegistration,
 		HTTPMethod: POST,
 		Model:      reflect.TypeOf(pb.UserRegistrationResponse{}),
 	},
-	UserAuthentication: {
+	UserUserAuthentication: {
 		Endpoint:   UserAuthentication,
 		HTTPMethod: POST,
 		Model:      reflect.TypeOf(pb.UserAuthenticationResponse{}),
 	},
-	UserDeAuthentication: {
+	UserUserDeAuthentication: {
 		Endpoint:   UserDeAuthentication,
 		HTTPMethod: DELETE,
 		Model:      reflect.TypeOf(pb.UserDeAuthenticationResponse{}),
 	},
-	TrackClick: {
+	WelcomeTrackClick: {
 		Endpoint:   TrackClick,
 		HTTPMethod: POST,
 		Model:      reflect.TypeOf(pb.TrackClickResponse{}),
 	},
-	TrackCheckout: {
+	WelcomeTrackPayment: {
+		Endpoint:   TrackPayment,
+		HTTPMethod: POST,
+		Model:      reflect.TypeOf(pb.TrackPaymentResponse{}),
+	},
+	WelcomeTrackCheckout: {
 		Endpoint:   TrackCheckout,
 		HTTPMethod: POST,
 		Model:      reflect.TypeOf(pb.TrackCheckOutResponse{}),
+	},
+	WelcomeRollbackCheckout: {
+		Endpoint:   RollbackCheckout,
+		HTTPMethod: POST,
+		Model:      reflect.TypeOf(pb.RollbackCheckOutResponse{}),
 	},
 }
 
@@ -170,6 +217,9 @@ func NewMockTest(method string) *MockTest {
 	r.POST("/trend", cmd.GetReferralTrend)           //DONE
 	r.GET("/recent/list", cmd.GetReferralRecentList) //DONE
 	r.GET("/:id", cmd.GetReferralById)               //DONE, not tested
+	r.GET("/:id", cmd.GetReferralById)               //DONE
+	r.PUT("/:id", cmd.UpdateReferralById)            //DONE
+	r.DELETE("/:id", cmd.DeleteReferralById)         //DONE
 
 	//Booking
 	//Allows admin / dev only
@@ -198,8 +248,10 @@ func NewMockTest(method string) *MockTest {
 	m.e.DELETE("api/v1/platform/logout", cmd.UserDeAuthentication) //DONE
 
 	//Tracking
-	m.e.POST("api/v1/welcome/click", cmd.TrackClick)       //DONE
-	m.e.POST("api/v1/welcome/checkout", cmd.TrackCheckout) //DONE
+	m.e.POST("api/v1/welcome/click", cmd.TrackClick)                   //DONE
+	m.e.POST("api/v1/welcome/checkout", cmd.TrackCheckout)             //DONE
+	m.e.POST("api/v1/welcome/checkout", cmd.TrackCheckout)             //DONE
+	m.e.POST("api/v1/welcome/rollback-checkout", cmd.RollbackCheckout) //DONE
 
 	//Stripe
 	m.e.POST("api/v1/payment/create-payment-intent", cmd.CreatePaymentIntent) //DONE

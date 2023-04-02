@@ -39,6 +39,7 @@ enum ReferralStatus{
   REFERRAL_STATUS_PENDING = 1;
   REFERRAL_STATUS_FAILED = 2;
   REFERRAL_STATUS_CANCELLED = 3;
+  REFERRAL_STATUS_DELETED = 4;
 }
 
 enum BookingStatus{
@@ -98,6 +99,7 @@ message User{
   optional string user_contact = 4;
   optional int64 user_role = 5;
   optional int64 create_timestamp = 6;
+  optional string user_password = 7;
 }
 
 //Direct from affiliate_details_table
@@ -136,11 +138,12 @@ message ReferralDb{
 message ReferralDetails{
   optional int64 referral_id = 1;
   optional int64 affiliate_id = 2;
-  optional int64 referral_click_time = 3;
-  optional int64 referral_status = 4;
-  optional int64 booking_id = 5;
-  optional BookingDetails booking_details = 6; //nil if referral is not successful
-  optional int64 referral_commission = 7;
+  optional string entity_name = 3;
+  optional int64 referral_click_time = 4;
+  optional int64 referral_status = 5;
+  optional int64 booking_id = 6;
+  optional BookingDetails booking_details = 7; //nil if referral is not successful
+  optional int64 referral_commission = 8;
 }
 
 message ReferralBasic{
@@ -496,6 +499,7 @@ message UserAuthenticationRequest{
   optional RequestMeta request_meta = 1;
   optional string user_name = 2;
   optional string user_password = 3;
+  optional bool is_permanent = 4;
 }
 
 message Tokens{
@@ -546,11 +550,7 @@ message CreatePaymentIntentResponse{
 message TrackCheckOutRequest{
   optional RequestMeta request_meta = 1;
   optional int64 referral_id = 2;
-  optional string booking_day = 3;
-  optional int64 booking_slot = 4;
-  optional int64 citizen_ticket_count = 5;
-  optional int64 tourist_ticket_count = 6;
-  repeated CustomerInfo customer_info = 7;
+  optional int64 booking_id = 3;
 }
 
 message TrackCheckOutResponse{
@@ -560,4 +560,77 @@ message TrackCheckOutResponse{
 
 message UserDeAuthenticationResponse{
   optional ResponseMeta response_meta = 1;
+}
+
+message TrackPaymentRequest{
+  optional RequestMeta request_meta = 1;
+  optional int64 referral_id = 2;
+  optional string booking_day = 3;
+  optional int64 booking_slot = 4;
+  optional int64 citizen_ticket_count = 5;
+  optional int64 tourist_ticket_count = 6;
+  repeated CustomerInfo customer_info = 7;
+}
+
+message TrackPaymentResponse{
+  optional ResponseMeta response_meta = 1;
+  optional int64 booking_id = 2;
+}
+
+message RollbackCheckOutRequest{
+  optional RequestMeta request_meta = 1;
+  optional int64 referral_id = 2;
+  optional int64 booking_id = 3;
+}
+
+message RollbackCheckOutResponse{
+  optional ResponseMeta response_meta = 1;
+}
+
+message UpdateReferralByIdResponse{
+  optional ResponseMeta response_meta = 1;
+  optional int64 status = 2;
+}
+
+message DeleteReferralByIdResponse{
+  optional ResponseMeta response_meta = 1;
+}
+
+message MockData{
+  optional int64 affiliate_count = 1; //total number of affiliates
+  optional int64 referrals_each_affiliate = 2; //if filled, generate this amount of referrals for each affiliate
+  optional int64 min_referrals = 3; //required if random_referrals is filled
+  optional int64 max_referrals = 4; //required if random_referrals is filled
+  optional int64 booking_success_rate = 5; //if filled, generate random number of success booking
+  optional int64 min_booking_success_rate = 6; //required if booking_success_rate is not filled
+  optional int64 max_booking_success_rate = 7; //required if booking_success_rate is not filled
+  optional string start_date = 8;
+  optional string end_date = 9;
+}
+
+message GenerateMockDataRequest{
+  optional RequestMeta request_meta = 1;
+  optional MockData mock_data = 2;
+  optional bool is_parallel = 3;
+}
+
+message MockDataCount{
+  optional int64 total_affiliates = 1;
+  optional int64 total_referrals = 2;
+  optional int64 total_bookings = 3;
+}
+
+message GenerateMockDataResponse{
+  optional ResponseMeta response_meta = 1;
+  optional MockDataCount mock_date_count = 2;
+}
+
+message UserAuthenticationRefreshRequest{
+  optional RequestMeta request_meta = 1;
+  optional Tokens tokens = 2;
+}
+
+message UserAuthenticationRefreshResponse{
+  optional ResponseMeta response_meta = 1;
+  optional Tokens tokens = 2;
 }

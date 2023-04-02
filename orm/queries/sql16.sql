@@ -1,6 +1,6 @@
 SELECT
     a.user_id AS affiliate_id,
-    a.user_name AS affiliate_name,
+    a.entity_name AS affiliate_name,
     a.affiliate_type,
     a.unique_referral_code,
     COUNT(a.referral_click_time) AS referral_clicks,
@@ -18,7 +18,7 @@ FROM
         SELECT
             a.affiliate_type,
             a.unique_referral_code,
-            u.user_name,
+            a.entity_name,
             u.user_email,
             u.user_contact,
             a.user_id,
@@ -66,8 +66,9 @@ FROM
     ) AS a
 GROUP BY
     a.user_id,
-    a.user_name,
+    a.entity_name,
     a.user_email,
     a.user_contact,
     a.affiliate_type,
-    a.unique_referral_code;
+    a.unique_referral_code
+ORDER BY total_revenue DESC, referral_commission DESC

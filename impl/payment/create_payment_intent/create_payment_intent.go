@@ -3,11 +3,12 @@ package create_payment_intent
 import (
 	"context"
 	"errors"
-	"github.com/aaronangxz/AffiliateManager/impl/tracking/track_checkout"
+	"github.com/aaronangxz/AffiliateManager/impl/tracking/track_payment"
 	"github.com/aaronangxz/AffiliateManager/logger"
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
 	"github.com/aaronangxz/AffiliateManager/resp"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/gommon/log"
 	"github.com/stripe/stripe-go/v74"
 	"github.com/stripe/stripe-go/v74/paymentintent"
 	"google.golang.org/protobuf/proto"
@@ -55,18 +56,22 @@ func (p *CreatePaymentIntent) CreatePaymentIntentImpl() (*string, *resp.Error) {
 func (p *CreatePaymentIntent) calculateOrderAmount() int64 {
 	var total int64
 	if p.req.GetTickets().CitizenTicketCount != nil {
-		total += p.req.GetTickets().GetCitizenTicketCount() * track_checkout.CitizenTicket
+		total += p.req.GetTickets().GetCitizenTicketCount() * track_payment.CitizenTicket
 	}
 	if p.req.GetTickets().TouristTicketCount != nil {
-		total += p.req.GetTickets().GetTouristTicketCount() * track_checkout.TouristTicket
+		total += p.req.GetTickets().GetTouristTicketCount() * track_payment.TouristTicket
 	}
-	return total / 100
+	log.Print(total)
+	return total
 }
 
 func (p *CreatePaymentIntent) verifyCreatePaymentIntent() error {
 	p.req = new(pb.CreatePaymentIntentRequest)
 	if err := p.c.Bind(p.req); err != nil {
 		return err
+	}
+	if p.req == nil {
+		return errors.New("request cannot be empty")
 	}
 	if p.req.Tickets == nil {
 		return errors.New("no ticket found")

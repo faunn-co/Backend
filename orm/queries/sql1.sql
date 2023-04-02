@@ -9,5 +9,6 @@ FROM
 WHERE
         a.user_id = r.affiliate_id
   AND a.user_id = u.user_id
+  AND r.referral_status != 4
 GROUP BY
     r.affiliate_id;

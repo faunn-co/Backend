@@ -6,7 +6,7 @@ import (
 )
 
 func run(reqBody *pb.GetReferralRecentListRequest, tokens *pb.Tokens) (int, *pb.GetReferralRecentListResponse) {
-	err, response := test_suite.NewMockTest(test_suite.GetReferralRecentList).Req(reqBody, tokens).Response()
+	err, response := test_suite.NewMockTest(test_suite.ReferralGetReferralRecentList).Req(reqBody, tokens).Response()
 	resp := response.(*pb.GetReferralRecentListResponse)
 	return err, resp
 }

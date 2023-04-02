@@ -2,6 +2,7 @@ package auth_middleware
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"github.com/aaronangxz/AffiliateManager/logger"
 	"github.com/aaronangxz/AffiliateManager/orm"
@@ -31,13 +32,19 @@ type AccessDetails struct {
 }
 
 // CreateToken creates a token upon user login
-func CreateToken(ctx context.Context, userId, userRole int64) (*TokenDetails, error) {
+func CreateToken(ctx context.Context, userId, userRole int64, isPermanent bool) (*TokenDetails, error) {
 	td := &TokenDetails{}
 
-	td.AtExpires = time.Now().Add(time.Hour * 24 * 7).Unix()
-	td.AccessUuid = uuid.NewV4().String()
+	if isPermanent {
+		logger.Warn(ctx, "creating permanent token")
+		td.AtExpires = 0
+		td.RtExpires = 0
+	} else {
+		td.AtExpires = time.Now().Add(time.Hour * 24 * 30).Unix()
+		td.RtExpires = time.Now().Add(time.Hour * 24 * 30).Unix()
+	}
 
-	td.RtExpires = time.Now().Add(time.Hour * 24 * 7).Unix()
+	td.AccessUuid = uuid.NewV4().String()
 	td.RefreshUuid = uuid.NewV4().String()
 
 	var err error
@@ -75,13 +82,13 @@ func CreateAuth(ctx context.Context, userId int64, td *TokenDetails) error {
 	rt := time.Unix(td.RtExpires, 0)
 	now := time.Now()
 
-	errAccess := orm.RedisInstance().Set(context.Background(), td.AccessUuid, strconv.Itoa(int(userId)), at.Sub(now)).Err()
+	errAccess := orm.RedisInstance().Set(ctx, td.AccessUuid, strconv.Itoa(int(userId)), at.Sub(now)).Err()
 	if errAccess != nil {
 		logger.Error(ctx, errAccess)
 		return errAccess
 	}
 	logger.Info(ctx, "Added to Redis: %v", td.AccessUuid)
-	errRefresh := orm.RedisInstance().Set(context.Background(), td.RefreshUuid, strconv.Itoa(int(userId)), rt.Sub(now)).Err()
+	errRefresh := orm.RedisInstance().Set(ctx, td.RefreshUuid, strconv.Itoa(int(userId)), rt.Sub(now)).Err()
 	if errRefresh != nil {
 		logger.Error(ctx, errRefresh)
 		return errRefresh
@@ -174,7 +181,7 @@ func ExtractTokenMetadata(ctx context.Context, r *http.Request) (*AccessDetails,
 
 // FetchAuth fetches the corresponding userid of an auth from cache
 func FetchAuth(ctx context.Context, authD *AccessDetails) (int64, error) {
-	userid, err := orm.RedisInstance().Get(context.Background(), authD.AccessUuid).Result()
+	userid, err := orm.RedisInstance().Get(ctx, authD.AccessUuid).Result()
 	if err != nil {
 		logger.ErrorMsg(ctx, "Error during FetchAuth: %v", err)
 		return 0, err
@@ -185,7 +192,7 @@ func FetchAuth(ctx context.Context, authD *AccessDetails) (int64, error) {
 }
 
 func DeleteAuth(ctx context.Context, givenUuid string) (int64, error) {
-	deleted, err := orm.RedisInstance().Del(context.Background(), givenUuid).Result()
+	deleted, err := orm.RedisInstance().Del(ctx, givenUuid).Result()
 	if err != nil {
 		logger.Error(ctx, err)
 		return 0, err
@@ -196,10 +203,22 @@ func DeleteAuth(ctx context.Context, givenUuid string) (int64, error) {
 	return deleted, nil
 }
 
-func Refresh(c echo.Context) error {
+func DeleteRefresh(ctx context.Context, refreshUuid string) (int64, error) {
+	deleted, err := orm.RedisInstance().Del(ctx, refreshUuid).Result()
+	if err != nil {
+		logger.Error(ctx, err)
+		return 0, err
+	}
+	if deleted != 0 {
+		logger.Info(ctx, "Successfully deleted refresh token")
+	}
+	return deleted, nil
+}
+
+func Refresh(ctx context.Context, c echo.Context) (*TokenDetails, error) {
 	mapToken := map[string]string{}
 	if err := c.Bind(&mapToken); err != nil {
-		return c.JSON(http.StatusUnprocessableEntity, err.Error())
+		return nil, err
 	}
 	refreshToken := mapToken["refresh_token"]
 
@@ -213,48 +232,54 @@ func Refresh(c echo.Context) error {
 	})
 	//if there is an error, the token must have expired
 	if err != nil {
-		return c.JSON(http.StatusUnauthorized, "Refresh token expired")
+		logger.ErrorMsg(ctx, "refresh token expired")
+		return nil, errors.New("refresh token expired")
 	}
 	//is token valid?
 	if _, ok := token.Claims.(jwt.MapClaims); !ok && !token.Valid {
-		return c.JSON(http.StatusUnauthorized, err)
+		return nil, err
 	}
 	//Since token is valid, get the uuid:
 	claims, ok := token.Claims.(jwt.MapClaims) //the token claims should conform to MapClaims
 	if ok && token.Valid {
 		refreshUuid, ok := claims["refresh_uuid"].(string) //convert the interface to string
 		if !ok {
-			return c.JSON(http.StatusUnprocessableEntity, err)
+			return nil, err
 		}
 		userId, err := strconv.ParseInt(fmt.Sprintf("%.f", claims["user_id"]), 10, 64)
 		if err != nil {
-			return c.JSON(http.StatusUnprocessableEntity, "Error occurred")
+			logger.Error(ctx, err)
+			return nil, err
 		}
 		userRole, err := strconv.ParseInt(fmt.Sprintf("%.f", claims["role"]), 10, 64)
 		if err != nil {
-			return c.JSON(http.StatusUnprocessableEntity, "Error occurred")
+			logger.Error(ctx, err)
+			return nil, err
 		}
 		//Delete the previous Refresh Token
-		deleted, delErr := DeleteAuth(context.Background(), refreshUuid)
+		deleted, delErr := DeleteAuth(ctx, refreshUuid)
 		if delErr != nil || deleted == 0 { //if any goes wrong
-			return c.JSON(http.StatusUnauthorized, "unauthorized")
+			logger.Error(ctx, delErr)
+			return nil, delErr
 		}
 		//Create new pairs of refresh and access tokens
-		ts, createErr := CreateToken(context.Background(), userId, userRole)
+		ts, createErr := CreateToken(ctx, userId, userRole, false)
 		if createErr != nil {
-			return c.JSON(http.StatusForbidden, createErr.Error())
+			logger.Error(ctx, createErr)
+			return nil, createErr
 		}
 		//save the tokens metadata to redis
-		saveErr := CreateAuth(context.Background(), userId, ts)
+		saveErr := CreateAuth(ctx, userId, ts)
 		if saveErr != nil {
-			return c.JSON(http.StatusForbidden, saveErr.Error())
+			return nil, saveErr
 		}
-		tokens := map[string]string{
-			"access_token":  ts.AccessToken,
-			"refresh_token": ts.RefreshToken,
-		}
-		return c.JSON(http.StatusCreated, tokens)
+		return &TokenDetails{
+			AccessToken:  ts.AccessToken,
+			RefreshToken: ts.RefreshToken,
+		}, nil
 	} else {
-		return c.JSON(http.StatusUnauthorized, "refresh expired")
+		err := errors.New("refresh expired")
+		logger.Error(ctx, err)
+		return nil, err
 	}
 }

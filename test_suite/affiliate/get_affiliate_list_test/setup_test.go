@@ -6,7 +6,7 @@ import (
 )
 
 func run(reqBody *pb.GetAffiliateListRequest, tokens *pb.Tokens) (int, *pb.GetAffiliateListResponse) {
-	err, response := test_suite.NewMockTest(test_suite.GetAffiliateList).Req(reqBody, tokens).Response()
+	err, response := test_suite.NewMockTest(test_suite.AffiliateGetAffiliateList).Req(reqBody, tokens).Response()
 	resp := response.(*pb.GetAffiliateListResponse)
 	return err, resp
 }

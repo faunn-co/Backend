@@ -1,6 +1,6 @@
 SELECT
     a.*,
-    u.user_name as affiliate_name,
+    a.entity_name as affiliate_name,
     SUM(r.referral_commission) AS total_commission
 FROM
     referral_table r,
@@ -12,6 +12,7 @@ WHERE
   AND r.affiliate_id = u.user_id
   AND r.booking_time >= ?
   AND r.booking_time <= ?
+  AND r.referral_status != 4
 GROUP BY
     affiliate_id
 ORDER BY

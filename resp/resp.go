@@ -205,3 +205,61 @@ func UserDeAuthenticationResponseJSON(c echo.Context) error {
 		},
 	})
 }
+
+func TrackPaymentResponseJSON(c echo.Context, id *int64) error {
+	return c.JSON(http.StatusOK, pb.TrackPaymentResponse{
+		ResponseMeta: &pb.ResponseMeta{
+			ErrorCode: proto.Int64(int64(pb.GlobalErrorCode_SUCCESS)),
+			ErrorMsg:  proto.String("success"),
+		},
+		BookingId: id,
+	})
+}
+
+func RollbackCheckoutResponseJSON(c echo.Context) error {
+	return c.JSON(http.StatusOK, pb.TrackCheckOutResponse{
+		ResponseMeta: &pb.ResponseMeta{
+			ErrorCode: proto.Int64(int64(pb.GlobalErrorCode_SUCCESS)),
+			ErrorMsg:  proto.String("successfully roll-backed transaction"),
+		},
+	})
+}
+
+func UpdateReferralByIdResponseJSON(c echo.Context, status *int64) error {
+	return c.JSON(http.StatusOK, pb.UpdateReferralByIdResponse{
+		ResponseMeta: &pb.ResponseMeta{
+			ErrorCode: proto.Int64(int64(pb.GlobalErrorCode_SUCCESS)),
+			ErrorMsg:  proto.String("success"),
+		},
+		Status: status,
+	})
+}
+
+func DeleteReferralByIdResponseJSON(c echo.Context) error {
+	return c.JSON(http.StatusOK, pb.DeleteReferralByIdResponse{
+		ResponseMeta: &pb.ResponseMeta{
+			ErrorCode: proto.Int64(int64(pb.GlobalErrorCode_SUCCESS)),
+			ErrorMsg:  proto.String("success"),
+		},
+	})
+}
+
+func GenerateMockDataResponseJSON(c echo.Context, count *pb.MockDataCount) error {
+	return c.JSON(http.StatusOK, pb.GenerateMockDataResponse{
+		ResponseMeta: &pb.ResponseMeta{
+			ErrorCode: proto.Int64(int64(pb.GlobalErrorCode_SUCCESS)),
+			ErrorMsg:  proto.String("success"),
+		},
+		MockDateCount: count,
+	})
+}
+
+func UserAuthenticationRefreshResponseJSON(c echo.Context, t *pb.Tokens) error {
+	return c.JSON(http.StatusOK, pb.UserAuthenticationRefreshResponse{
+		ResponseMeta: &pb.ResponseMeta{
+			ErrorCode: proto.Int64(int64(pb.GlobalErrorCode_SUCCESS)),
+			ErrorMsg:  proto.String("success"),
+		},
+		Tokens: t,
+	})
+}

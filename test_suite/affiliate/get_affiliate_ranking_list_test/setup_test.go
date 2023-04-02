@@ -13,7 +13,7 @@ func run(reqBody *pb.GetAffiliateRankingListRequest, tokens *pb.Tokens, period *
 	} else {
 		q = strconv.FormatInt(int64(*period), 10)
 	}
-	err, response := test_suite.NewMockTest(test_suite.GetAffiliateRankingList).QueryParam("period", q).Req(reqBody, tokens).Response()
+	err, response := test_suite.NewMockTest(test_suite.AffiliateGetAffiliateRankingList).QueryParam("period", q).Req(reqBody, tokens).Response()
 	resp := response.(*pb.GetAffiliateRankingListResponse)
 	return err, resp
 }
