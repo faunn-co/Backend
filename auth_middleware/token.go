@@ -32,13 +32,18 @@ type AccessDetails struct {
 }
 
 // CreateToken creates a token upon user login
-func CreateToken(ctx context.Context, userId, userRole int64) (*TokenDetails, error) {
+func CreateToken(ctx context.Context, userId, userRole int64, isPermanent bool) (*TokenDetails, error) {
 	td := &TokenDetails{}
 
-	td.AtExpires = time.Now().Add(time.Hour * 24 * 7).Unix()
-	td.AccessUuid = uuid.NewV4().String()
+	if isPermanent {
+		td.AtExpires = 0
+		td.RtExpires = 0
+	} else {
+		td.AtExpires = time.Now().Add(time.Hour * 24 * 30).Unix()
+		td.RtExpires = time.Now().Add(time.Hour * 24 * 30).Unix()
+	}
 
-	td.RtExpires = time.Now().Add(time.Hour * 24 * 7).Unix()
+	td.AccessUuid = uuid.NewV4().String()
 	td.RefreshUuid = uuid.NewV4().String()
 
 	var err error
@@ -257,7 +262,7 @@ func Refresh(ctx context.Context, c echo.Context) (*TokenDetails, error) {
 			return nil, delErr
 		}
 		//Create new pairs of refresh and access tokens
-		ts, createErr := CreateToken(ctx, userId, userRole)
+		ts, createErr := CreateToken(ctx, userId, userRole, false)
 		if createErr != nil {
 			logger.Error(ctx, createErr)
 			return nil, createErr

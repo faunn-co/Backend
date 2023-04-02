@@ -58,7 +58,12 @@ func (u *UserAuthentication) executeLogin() (*pb.AuthCookie, error) {
 		return nil, errors.New("login credentials are incorrect")
 	}
 
-	token, err := auth_middleware.CreateToken(u.ctx, user.GetUserId(), user.GetUserRole())
+	isPermanent := false
+	if user.GetUserRole() == int64(pb.UserRole_ROLE_DEV) && u.req.IsPermanent != nil {
+		isPermanent = u.req.GetIsPermanent()
+	}
+
+	token, err := auth_middleware.CreateToken(u.ctx, user.GetUserId(), user.GetUserRole(), isPermanent)
 	if err != nil {
 		return nil, err
 	}

@@ -164,7 +164,7 @@ func (u *User) Build() *User {
 	}
 
 	if u.NeedLogin {
-		token, err := auth_middleware.CreateToken(context.Background(), u.UserInfo.GetUserId(), u.UserInfo.GetUserRole())
+		token, err := auth_middleware.CreateToken(context.Background(), u.UserInfo.GetUserId(), u.UserInfo.GetUserRole(), false)
 		if err != nil {
 			log.Error(err)
 			return nil
