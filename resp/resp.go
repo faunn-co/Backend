@@ -253,3 +253,13 @@ func GenerateMockDataResponseJSON(c echo.Context, count *pb.MockDataCount) error
 		MockDateCount: count,
 	})
 }
+
+func UserAuthenticationRefreshResponseJSON(c echo.Context, t *pb.Tokens) error {
+	return c.JSON(http.StatusOK, pb.UserAuthenticationRefreshResponse{
+		ResponseMeta: &pb.ResponseMeta{
+			ErrorCode: proto.Int64(int64(pb.GlobalErrorCode_SUCCESS)),
+			ErrorMsg:  proto.String("success"),
+		},
+		Tokens: t,
+	})
+}
