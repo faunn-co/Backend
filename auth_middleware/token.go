@@ -36,6 +36,7 @@ func CreateToken(ctx context.Context, userId, userRole int64, isPermanent bool) 
 	td := &TokenDetails{}
 
 	if isPermanent {
+		logger.Warn(ctx, "creating permanent token")
 		td.AtExpires = 0
 		td.RtExpires = 0
 	} else {
