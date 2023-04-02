@@ -7,7 +7,6 @@ FROM
     referral_table
 WHERE
         affiliate_id = ?
-  AND booking_time > ?
   AND booking_time <= ?
   AND referral_status != 4
 ORDER BY
