@@ -623,3 +623,13 @@ message GenerateMockDataResponse{
   optional ResponseMeta response_meta = 1;
   optional MockDataCount mock_date_count = 2;
 }
+
+message UserAuthenticationRefreshRequest{
+  optional RequestMeta request_meta = 1;
+  optional Tokens tokens = 2;
+}
+
+message UserAuthenticationRefreshResponse{
+  optional ResponseMeta response_meta = 1;
+  optional Tokens tokens = 2;
+}

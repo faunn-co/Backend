@@ -89,6 +89,7 @@ func main() {
 	//Registration
 	e.POST("api/v1/platform/register", cmd.UserRegistration)
 	e.POST("api/v1/platform/login", cmd.UserAuthentication)
+	e.POST("api/v1/platform/refresh", cmd.UserAuthenticationRefresh)
 	e.DELETE("api/v1/platform/logout", cmd.UserDeAuthentication)
 
 	//Tracking
