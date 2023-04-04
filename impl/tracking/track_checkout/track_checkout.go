@@ -3,6 +3,7 @@ package track_checkout
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"github.com/aaronangxz/AffiliateManager/impl/email/send_email"
 	"github.com/aaronangxz/AffiliateManager/impl/verification/referral_verification"
@@ -50,6 +51,14 @@ func (t *TrackCheckOut) verifyTrackCheckOut() error {
 	if err := t.c.Bind(t.req); err != nil {
 		return err
 	}
+	if t.req.ReferralId == nil {
+		err := errors.New("referral_id is required")
+		return err
+	}
+	if t.req.BookingId == nil {
+		err := errors.New("booking_id is required")
+		return err
+	}
 	if err := referral_verification.New(t.c, t.ctx).VerifyReferralId(t.req.GetReferralId()); err == nil {
 		return err
 	}
@@ -58,13 +67,13 @@ func (t *TrackCheckOut) verifyTrackCheckOut() error {
 
 func (t *TrackCheckOut) startCheckOutTx() (*pb.BookingDetails, error) {
 	var b *pb.BookingDetailsDb
-	if err := orm.DbInstance(t.ctx).Debug().Raw(orm.GetReferralBookingDetailsQuery(), t.req.GetBookingId()).Scan(&b).Error; err != nil {
+	if err := orm.DbInstance(t.ctx).Raw(orm.GetReferralBookingDetailsQuery(), t.req.GetBookingId()).Scan(&b).Error; err != nil {
 		logger.Error(t.ctx, err)
 		return nil, err
 	}
 	var c []*pb.CustomerInfo
 	if err := json.Unmarshal(b.GetCustomerInfo(), &c); err != nil {
-		return nil, err
+		logger.Error(t.ctx, err)
 	}
 
 	tx := orm.DbInstance(t.ctx).Begin()

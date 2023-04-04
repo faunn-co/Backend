@@ -17,10 +17,11 @@ import (
 )
 
 type GetReferralTrend struct {
-	c   echo.Context
-	ctx context.Context
-	req *pb.GetReferralTrendRequest
-	key string
+	c      echo.Context
+	ctx    context.Context
+	req    *pb.GetReferralTrendRequest
+	key    string
+	userId int64
 }
 
 func New(c echo.Context) *GetReferralTrend {
@@ -28,6 +29,7 @@ func New(c echo.Context) *GetReferralTrend {
 	g.c = c
 	g.key = "get_referral_trend"
 	g.ctx = logger.NewCtx(g.c)
+	g.userId = auth_middleware.GetUserIdFromToken(g.c)
 	logger.Info(g.ctx, "GetReferralTrend Initialized")
 	return g
 }
@@ -37,22 +39,14 @@ func (g *GetReferralTrend) GetReferralTrendImpl() ([]*pb.ReferralCoreTimedStats,
 		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_INVALID_PARAMS)
 	}
 
-	tokenAuth, err := auth_middleware.ExtractTokenMetadata(g.ctx, g.c.Request())
-	if err != nil {
-		logger.Error(context.Background(), err)
-		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_TOKEN_ERROR)
-	}
-
-	id := tokenAuth.UserId
-
 	var s []*pb.ReferralCoreTimedStats
 	_, endTs, start, end := utils.GetStartEndTimeStampFromTimeSelector(g.req.GetTimeSelector())
-	k := fmt.Sprintf("%v:%v:%v:%v:%v", g.key, id, g.req.GetTimeSelector().GetPeriod(), start, end)
+	k := fmt.Sprintf("%v:%v:%v:%v:%v", g.key, g.userId, g.req.GetTimeSelector().GetPeriod(), start, end)
 
 	if r := g.cacheGet(k, endTs); r != nil {
 		return r, nil
 	}
-	if err := orm.DbInstance(g.ctx).Raw(orm.GetReferralTrendQuery(), sql.Named("id", id), sql.Named("startTime", start), sql.Named("endTime", end)).Scan(&s).Error; err != nil {
+	if err := orm.DbInstance(g.ctx).Raw(orm.GetReferralTrendQuery(), sql.Named("id", g.userId), sql.Named("startTime", start), sql.Named("endTime", end)).Scan(&s).Error; err != nil {
 		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 	}
 
@@ -62,7 +56,7 @@ func (g *GetReferralTrend) GetReferralTrendImpl() ([]*pb.ReferralCoreTimedStats,
 			TotalClicks *int64 `json:"total_clicks,omitempty"`
 		}
 		var c click
-		if err := orm.DbInstance(g.ctx).Raw(orm.GetReferralTrendClicksQuery(), sql.Named("id", id), sql.Named("startTime", trend.DateString), sql.Named("endTime", trend.DateString)).Scan(&c).Error; err != nil {
+		if err := orm.DbInstance(g.ctx).Raw(orm.GetReferralTrendClicksQuery(), sql.Named("id", g.userId), sql.Named("startTime", trend.DateString), sql.Named("endTime", trend.DateString)).Scan(&c).Error; err != nil {
 			return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 		}
 		trend.TotalClicks = c.TotalClicks

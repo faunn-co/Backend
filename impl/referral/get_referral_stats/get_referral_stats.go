@@ -17,10 +17,11 @@ import (
 )
 
 type GetReferralStats struct {
-	c   echo.Context
-	ctx context.Context
-	req *pb.GetReferralStatsRequest
-	key string
+	c      echo.Context
+	ctx    context.Context
+	req    *pb.GetReferralStatsRequest
+	key    string
+	userId int64
 }
 
 func New(c echo.Context) *GetReferralStats {
@@ -28,6 +29,7 @@ func New(c echo.Context) *GetReferralStats {
 	g.c = c
 	g.key = "get_referral_stats"
 	g.ctx = logger.NewCtx(g.c)
+	g.userId = auth_middleware.GetUserIdFromToken(g.c)
 	logger.Info(g.ctx, "GetReferralStats Initialized")
 	return g
 }
@@ -44,23 +46,16 @@ func (g *GetReferralStats) GetReferralStatsImpl() (*pb.GetReferralStatsResponse,
 		sP *pb.ReferralCoreStats
 	)
 
-	tokenAuth, err := auth_middleware.ExtractTokenMetadata(g.ctx, g.c.Request())
-	if err != nil {
-		logger.Error(context.Background(), err)
-		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_TOKEN_ERROR)
-	}
-	id := tokenAuth.UserId
-
 	start, end, prevStart, prevEnd := utils.GetStartEndTimeFromTimeSelector(g.req.GetTimeSelector())
-	k := fmt.Sprintf("%v:%v:%v:%v:%v", g.key, id, g.req.GetTimeSelector().GetPeriod(), start, end)
+	k := fmt.Sprintf("%v:%v:%v:%v:%v", g.key, g.userId, g.req.GetTimeSelector().GetPeriod(), start, end)
 
 	if r := g.cacheGet(k, end); r != nil {
 		return r, nil
 	}
-	if err := orm.DbInstance(g.ctx).Raw(orm.GetReferralStatsQuery(), sql.Named("id", id), sql.Named("startTime", start), sql.Named("endTime", end)).Scan(&s).Error; err != nil {
+	if err := orm.DbInstance(g.ctx).Raw(orm.GetReferralStatsQuery(), sql.Named("id", g.userId), sql.Named("startTime", start), sql.Named("endTime", end)).Scan(&s).Error; err != nil {
 		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 	}
-	if err := orm.DbInstance(g.ctx).Raw(orm.GetReferralStatsQuery(), sql.Named("id", id), sql.Named("startTime", prevStart), sql.Named("endTime", prevEnd)).Scan(&sP).Error; err != nil {
+	if err := orm.DbInstance(g.ctx).Raw(orm.GetReferralStatsQuery(), sql.Named("id", g.userId), sql.Named("startTime", prevStart), sql.Named("endTime", prevEnd)).Scan(&sP).Error; err != nil {
 		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 	}
 

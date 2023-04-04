@@ -45,7 +45,7 @@ func TestGetReferralStats_NoLogin(t *testing.T) {
 
 func TestGetReferralStats_Period_None(t *testing.T) {
 	var (
-		expectedHTTPCode = http.StatusOK
+		expectedHTTPCode = http.StatusBadRequest
 		expectedErrCode  = int64(pb.GlobalErrorCode_ERROR_INVALID_PARAMS)
 	)
 	r := referral.New().Build()
@@ -168,7 +168,7 @@ func TestGetReferralStats_Period_Range(t *testing.T) {
 
 func TestGetReferralStats_Period_Range_StartBeforeEnd(t *testing.T) {
 	var (
-		expectedHTTPCode = http.StatusOK
+		expectedHTTPCode = http.StatusBadRequest
 		expectedErrCode  = int64(pb.GlobalErrorCode_ERROR_INVALID_PARAMS)
 	)
 	r := referral.New().Build()

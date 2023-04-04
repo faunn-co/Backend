@@ -42,5 +42,8 @@ func (g *GetBookingList) verifyGetBookingList() error {
 	if err := g.c.Bind(g.req); err != nil {
 		return err
 	}
+	if err := utils.VerifyTimeSelectorFields(g.req.TimeSelector); err != nil {
+		return err
+	}
 	return nil
 }

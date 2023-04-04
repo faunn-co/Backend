@@ -16,10 +16,12 @@ import (
 )
 
 type GetReferralList struct {
-	c   echo.Context
-	ctx context.Context
-	req *pb.GetReferralListRequest
-	key string
+	c        echo.Context
+	ctx      context.Context
+	req      *pb.GetReferralListRequest
+	key      string
+	userId   int64
+	userRole int64
 }
 
 func New(c echo.Context) *GetReferralList {
@@ -27,6 +29,8 @@ func New(c echo.Context) *GetReferralList {
 	g.c = c
 	g.key = "get_referral_list"
 	g.ctx = logger.NewCtx(g.c)
+	g.userId = auth_middleware.GetUserIdFromToken(g.c)
+	g.userRole = auth_middleware.GetUserRoleFromToken(g.c)
 	logger.Info(g.ctx, "GetReferralList Initialized")
 	return g
 }
@@ -39,19 +43,14 @@ func (g *GetReferralList) GetReferralListImpl() ([]*pb.ReferralBasic, *int64, *i
 	var l []*pb.ReferralBasic
 
 	//Filtered for affiliate, return all for admin
-	tokenAuth, err := auth_middleware.ExtractTokenMetadata(g.ctx, g.c.Request())
-	if err != nil {
-		logger.Error(g.ctx, err)
-		return nil, nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_TOKEN_ERROR)
-	}
 	start, end, _, _ := utils.GetStartEndTimeFromTimeSelector(g.req.GetTimeSelector())
-	k := fmt.Sprintf("%v:%v:%v:%v:%v", g.key, tokenAuth.UserId, g.req.GetTimeSelector().GetPeriod(), start, end)
+	k := fmt.Sprintf("%v:%v:%v:%v:%v", g.key, g.userId, g.req.GetTimeSelector().GetPeriod(), start, end)
 
-	if tokenAuth.Role == int64(pb.UserRole_ROLE_AFFILIATE) {
+	if g.userRole == int64(pb.UserRole_ROLE_AFFILIATE) {
 		if r := g.cacheGet(k, end); r != nil {
 			return r, proto.Int64(start), proto.Int64(end), nil
 		}
-		if err := orm.DbInstance(g.ctx).Raw(orm.GetAffiliateReferralListQuery(), start, end, tokenAuth.UserId).Scan(&l).Error; err != nil {
+		if err := orm.DbInstance(g.ctx).Raw(orm.GetAffiliateReferralListQuery(), start, end, g.userId).Scan(&l).Error; err != nil {
 			return nil, nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_DATABASE)
 		}
 		g.cacheSet(k, l, end)
