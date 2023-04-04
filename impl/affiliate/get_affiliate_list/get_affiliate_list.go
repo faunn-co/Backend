@@ -21,10 +21,11 @@ var (
 )
 
 type GetAffiliateList struct {
-	c   echo.Context
-	ctx context.Context
-	req *pb.GetAffiliateListRequest
-	key string
+	c      echo.Context
+	ctx    context.Context
+	req    *pb.GetAffiliateListRequest
+	key    string
+	userId int64
 }
 
 func New(c echo.Context) *GetAffiliateList {
@@ -32,6 +33,7 @@ func New(c echo.Context) *GetAffiliateList {
 	g.c = c
 	g.key = "get_affiliate_list"
 	g.ctx = logger.NewCtx(g.c)
+	g.userId = auth_middleware.GetUserIdFromToken(g.c)
 	logger.Info(g.ctx, "GetAffiliateList Initialized")
 	return g
 }
@@ -41,16 +43,9 @@ func (g *GetAffiliateList) GetAffiliateListImpl() ([]*pb.AffiliateMeta, *int64, 
 		return nil, nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_INVALID_PARAMS)
 	}
 
-	tokenAuth, err := auth_middleware.ExtractTokenMetadata(g.ctx, g.c.Request())
-	if err != nil {
-		logger.Error(g.ctx, err)
-		return nil, nil, nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_TOKEN_ERROR)
-	}
-	id := tokenAuth.UserId
-
 	start, end, _, _ := utils.GetStartEndTimeFromTimeSelector(g.req.GetTimeSelector())
 	//cache key : <function>:<user_id>:<period>:<start_ts>:<end_ts>
-	k := fmt.Sprintf("%v:%v:%v:%v:%v", g.key, id, g.req.GetTimeSelector().GetPeriod(), start, end)
+	k := fmt.Sprintf("%v:%v:%v:%v:%v", g.key, g.userId, g.req.GetTimeSelector().GetPeriod(), start, end)
 
 	if list := g.cacheGet(k, end); list != nil {
 		return list, proto.Int64(start), proto.Int64(end), nil
