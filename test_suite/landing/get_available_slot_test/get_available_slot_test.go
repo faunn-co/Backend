@@ -29,7 +29,7 @@ func TestGetUserInfo_Happy(t *testing.T) {
 
 func TestGetUserInfo_InvalidDate(t *testing.T) {
 	var (
-		expectedHTTPCode = http.StatusOK
+		expectedHTTPCode = http.StatusBadRequest
 		expectedErrCode  = int64(pb.GlobalErrorCode_ERROR_INVALID_PARAMS)
 	)
 
@@ -43,7 +43,7 @@ func TestGetUserInfo_InvalidDate(t *testing.T) {
 
 func TestGetUserInfo_PreviousDay(t *testing.T) {
 	var (
-		expectedHTTPCode = http.StatusOK
+		expectedHTTPCode = http.StatusBadRequest
 		expectedErrCode  = int64(pb.GlobalErrorCode_ERROR_INVALID_PARAMS)
 		date             = utils.ConvertTimeStampYearMonthDay(time.Now().Unix() - utils.DAY)
 	)
@@ -58,7 +58,7 @@ func TestGetUserInfo_PreviousDay(t *testing.T) {
 
 func TestGetUserInfo_SubsequentMonth(t *testing.T) {
 	var (
-		expectedHTTPCode = http.StatusOK
+		expectedHTTPCode = http.StatusBadRequest
 		expectedErrCode  = int64(pb.GlobalErrorCode_ERROR_INVALID_PARAMS)
 		date             = utils.ConvertTimeStampYearMonthDay(time.Now().Unix() + 6*utils.MONTH)
 	)

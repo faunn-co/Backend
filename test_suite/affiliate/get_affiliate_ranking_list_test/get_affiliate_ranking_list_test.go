@@ -61,7 +61,7 @@ func TestGetAffiliateRankingList_NoPermission(t *testing.T) {
 func TestGetAffiliateRankingList_Period_None(t *testing.T) {
 	var (
 		period           = pb.TimeSelectorPeriod_PERIOD_NONE
-		expectedHTTPCode = http.StatusOK
+		expectedHTTPCode = http.StatusBadRequest
 		expectedErrCode  = int64(pb.GlobalErrorCode_ERROR_INVALID_PARAMS)
 	)
 	a := admin.New().Build()
@@ -78,7 +78,7 @@ func TestGetAffiliateRankingList_Period_None(t *testing.T) {
 func TestGetAffiliateRankingList_Period_Day(t *testing.T) {
 	var (
 		period           = pb.TimeSelectorPeriod_PERIOD_DAY
-		expectedHTTPCode = http.StatusOK
+		expectedHTTPCode = http.StatusBadRequest
 		expectedErrCode  = int64(pb.GlobalErrorCode_ERROR_INVALID_PARAMS)
 	)
 	a := admin.New().Build()
@@ -129,7 +129,7 @@ func TestGetAffiliateRankingList_Period_Month(t *testing.T) {
 func TestGetAffiliateRankingList_Period_Last7Days(t *testing.T) {
 	var (
 		period           = pb.TimeSelectorPeriod_PERIOD_LAST_7_DAYS
-		expectedHTTPCode = http.StatusOK
+		expectedHTTPCode = http.StatusBadRequest
 		expectedErrCode  = int64(pb.GlobalErrorCode_ERROR_INVALID_PARAMS)
 	)
 	a := admin.New().Build()
@@ -146,7 +146,7 @@ func TestGetAffiliateRankingList_Period_Last7Days(t *testing.T) {
 func TestGetAffiliateRankingList_Period_Last28Days(t *testing.T) {
 	var (
 		period           = pb.TimeSelectorPeriod_PERIOD_LAST_28_DAYS
-		expectedHTTPCode = http.StatusOK
+		expectedHTTPCode = http.StatusBadRequest
 		expectedErrCode  = int64(pb.GlobalErrorCode_ERROR_INVALID_PARAMS)
 	)
 	a := admin.New().Build()
