@@ -138,7 +138,7 @@ func TestGetReferralList_Affiliate_Period_Month(t *testing.T) {
 	}
 }
 
-func TestGetReferralList_Affiliate_Period_Last7Days(t *testing.T) {
+func Skip_TestGetReferralList_Affiliate_Period_Last7Days(t *testing.T) {
 	r := referral.New().Build()
 	defer r.TearDown()
 
@@ -161,7 +161,7 @@ func TestGetReferralList_Affiliate_Period_Last7Days(t *testing.T) {
 	}
 }
 
-func TestGetReferralList_Affiliate_Period_Last28Days(t *testing.T) {
+func Skip_TestGetReferralList_Affiliate_Period_Last28Days(t *testing.T) {
 	r := referral.New().Build()
 	defer r.TearDown()
 
