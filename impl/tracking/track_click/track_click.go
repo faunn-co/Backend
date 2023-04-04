@@ -33,7 +33,7 @@ func (t *TrackClick) TrackClickImpl() (*int64, *resp.Error) {
 	}
 
 	var (
-		id  *int64
+		id  = proto.Int64(0)
 		err *resp.Error
 	)
 	code := t.c.QueryParam("ref")
@@ -43,10 +43,16 @@ func (t *TrackClick) TrackClickImpl() (*int64, *resp.Error) {
 		id, err = t.getAffiliateWithCodeUsingCache(code)
 		if err != nil {
 			logger.Error(t.ctx, err.Error())
-			return nil, err
+			switch err.ErrorCode() {
+			case int64(pb.GlobalErrorCode_ERROR_USER_NOT_FOUND):
+				code = ""
+				logger.Warn(t.ctx, "invalid ref code in url, proceed as anonymous click")
+			default:
+				return nil, err
+			}
 		}
 	}
-	logger.Info(t.ctx, "referral_code: %v referral id: %v", code, id)
+	logger.Info(t.ctx, "referral_code: [%v] referral id: [%v]", code, *id)
 
 	type Referral struct {
 		ReferralId        *int64 `gorm:"primary_key"`

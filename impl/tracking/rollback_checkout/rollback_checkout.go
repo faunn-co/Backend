@@ -3,6 +3,7 @@ package rollback_checkout
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"github.com/aaronangxz/AffiliateManager/impl/verification/booking_verification"
 	"github.com/aaronangxz/AffiliateManager/impl/verification/referral_verification"
 	"github.com/aaronangxz/AffiliateManager/logger"
@@ -40,6 +41,14 @@ func (t *RollbackCheckOut) RollbackCheckOutImpl() *resp.Error {
 func (t *RollbackCheckOut) verifyRollbackCheckOut() error {
 	t.req = new(pb.RollbackCheckOutRequest)
 	if err := t.c.Bind(t.req); err != nil {
+		return err
+	}
+	if t.req.ReferralId == nil {
+		err := errors.New("referral_id is required")
+		return err
+	}
+	if t.req.BookingId == nil {
+		err := errors.New("booking_id is required")
 		return err
 	}
 	if err := referral_verification.New(t.c, t.ctx).VerifyReferralId(t.req.GetReferralId()); err == nil {
