@@ -16,10 +16,11 @@ import (
 )
 
 type GetAffiliateStats struct {
-	c   echo.Context
-	ctx context.Context
-	req *pb.GetAffiliateStatsRequest
-	key string
+	c      echo.Context
+	ctx    context.Context
+	req    *pb.GetAffiliateStatsRequest
+	key    string
+	userId int64
 }
 
 func New(c echo.Context) *GetAffiliateStats {
@@ -27,6 +28,7 @@ func New(c echo.Context) *GetAffiliateStats {
 	g.c = c
 	g.key = "get_affiliate_stats"
 	g.ctx = logger.NewCtx(g.c)
+	g.userId = auth_middleware.GetUserIdFromToken(g.c)
 	logger.Info(g.ctx, "GetAffiliateStats Initialized")
 	return g
 }
@@ -35,13 +37,6 @@ func (g *GetAffiliateStats) GetAffiliateStatsImpl() (*pb.GetAffiliateStatsRespon
 	if err := g.verifyGetAffiliateStats(); err != nil {
 		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_INVALID_PARAMS)
 	}
-
-	tokenAuth, err := auth_middleware.ExtractTokenMetadata(g.ctx, g.c.Request())
-	if err != nil {
-		logger.Error(g.ctx, err)
-		return nil, resp.BuildError(err, pb.GlobalErrorCode_ERROR_TOKEN_ERROR)
-	}
-	id := tokenAuth.UserId
 
 	var (
 		//Current Period
@@ -52,9 +47,9 @@ func (g *GetAffiliateStats) GetAffiliateStatsImpl() (*pb.GetAffiliateStatsRespon
 	)
 
 	start, end, prevStart, prevEnd := utils.GetStartEndTimeFromTimeSelector(g.req.GetTimeSelector())
-	k := fmt.Sprintf("%v:%v:%v:%v:%v", g.key, id, g.req.GetTimeSelector().GetPeriod(), start, end)
+	k := fmt.Sprintf("%v:%v:%v:%v:%v", g.key, g.userId, g.req.GetTimeSelector().GetPeriod(), start, end)
 
-	if r := g.cacheGet(k, end); err != nil {
+	if r := g.cacheGet(k, end); r != nil {
 		return r, nil
 	}
 	if err := orm.DbInstance(g.ctx).Raw(orm.Sql5(), start, end).Scan(&s).Error; err != nil {

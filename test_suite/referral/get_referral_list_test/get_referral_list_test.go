@@ -60,7 +60,7 @@ func TestGetReferralList_Affiliate_Period_None(t *testing.T) {
 
 	var (
 		period           = pb.TimeSelectorPeriod_PERIOD_NONE
-		expectedHTTPCode = http.StatusOK
+		expectedHTTPCode = http.StatusBadRequest
 		expectedErrCode  = int64(pb.GlobalErrorCode_ERROR_INVALID_PARAMS)
 	)
 
@@ -212,7 +212,7 @@ func TestGetReferralList_Affiliate_Period_Range_StartBeforeEnd(t *testing.T) {
 
 	var (
 		period           = pb.TimeSelectorPeriod_PERIOD_RANGE
-		expectedHTTPCode = http.StatusOK
+		expectedHTTPCode = http.StatusBadRequest
 		expectedErrCode  = int64(pb.GlobalErrorCode_ERROR_INVALID_PARAMS)
 	)
 
@@ -270,7 +270,7 @@ func TestGetReferralList_Admin_Period_None(t *testing.T) {
 
 	var (
 		period           = pb.TimeSelectorPeriod_PERIOD_NONE
-		expectedHTTPCode = http.StatusOK
+		expectedHTTPCode = http.StatusBadRequest
 		expectedErrCode  = int64(pb.GlobalErrorCode_ERROR_INVALID_PARAMS)
 	)
 
@@ -405,7 +405,7 @@ func TestGetReferralList_Admin_Period_Range_StartBeforeEnd(t *testing.T) {
 
 	var (
 		period           = pb.TimeSelectorPeriod_PERIOD_RANGE
-		expectedHTTPCode = http.StatusOK
+		expectedHTTPCode = http.StatusBadRequest
 		expectedErrCode  = int64(pb.GlobalErrorCode_ERROR_INVALID_PARAMS)
 	)
 

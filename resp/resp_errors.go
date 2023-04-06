@@ -29,7 +29,7 @@ func BuildError(err error, code pb.GlobalErrorCode) *Error {
 }
 
 func JSONResp(c echo.Context, err *Error) error {
-	return c.JSON(http.StatusOK, pb.GenericResponse{
+	return c.JSON(http.StatusBadRequest, pb.GenericResponse{
 		ResponseMeta: &pb.ResponseMeta{
 			ErrorCode: err.errCode,
 			ErrorMsg:  proto.String(string(append([]rune{unicode.ToUpper([]rune(err.err.Error())[0])}, []rune(err.err.Error()[1:])...))),

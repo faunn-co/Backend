@@ -2,6 +2,7 @@ package auth_middleware
 
 import (
 	"context"
+	"errors"
 	"github.com/aaronangxz/AffiliateManager/logger"
 	pb "github.com/aaronangxz/AffiliateManager/proto/affiliate"
 	"github.com/aaronangxz/AffiliateManager/resp"
@@ -20,31 +21,13 @@ func globalAuthentication(c echo.Context) error {
 // AdminAuthorization verifies if a request is from a logged-in admin
 func AdminAuthorization(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		if err := globalAuthentication(c); err != nil {
-			logger.Error(context.Background(), err)
+		if extErr := ExtractMetaFromToken(c); extErr != nil {
+			logger.Error(context.Background(), extErr)
 			return resp.NotAuthenticatedResp(c)
 		}
-
-		tokenAuth, err := ExtractTokenMetadata(c.Request().Context(), c.Request())
-		if err != nil {
-			logger.Error(context.Background(), err)
-			return resp.NotAuthenticatedResp(c)
-		}
-
-		if tokenAuth.Role == int64(pb.UserRole_ROLE_AFFILIATE) {
+		if GetUserRoleFromToken(c) == int64(pb.UserRole_ROLE_AFFILIATE) {
 			logger.ErrorMsg(context.Background(), "Role no permission")
 			return resp.NotAuthorisedResp(c)
-		}
-
-		userId, err := FetchAuth(c.Request().Context(), tokenAuth)
-		if err != nil {
-			logger.Error(context.Background(), err)
-			return resp.NotAuthenticatedResp(c)
-		}
-
-		if userId == 0 {
-			logger.ErrorMsg(context.Background(), "Invalid credentials")
-			return resp.NotAuthenticatedResp(c)
 		}
 		return next(c)
 	}
@@ -53,21 +36,8 @@ func AdminAuthorization(next echo.HandlerFunc) echo.HandlerFunc {
 // AffiliateAuthorization verifies if a request is from a logged-in admin or affiliate
 func AffiliateAuthorization(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		if err := globalAuthentication(c); err != nil {
-			return resp.NotAuthenticatedResp(c)
-		}
-
-		tokenAuth, err := ExtractTokenMetadata(c.Request().Context(), c.Request())
-		if err != nil {
-			return resp.NotAuthenticatedResp(c)
-		}
-
-		userId, err := FetchAuth(c.Request().Context(), tokenAuth)
-		if err != nil {
-			return resp.NotAuthenticatedResp(c)
-		}
-
-		if userId == 0 {
+		if extErr := ExtractMetaFromToken(c); extErr != nil {
+			logger.Error(context.Background(), extErr)
 			return resp.NotAuthenticatedResp(c)
 		}
 		return next(c)
@@ -76,28 +46,46 @@ func AffiliateAuthorization(next echo.HandlerFunc) echo.HandlerFunc {
 
 func DevAuthorization(next echo.HandlerFunc) echo.HandlerFunc {
 	return func(c echo.Context) error {
-		if err := globalAuthentication(c); err != nil {
+		if extErr := ExtractMetaFromToken(c); extErr != nil {
+			logger.Error(context.Background(), extErr)
 			return resp.NotAuthenticatedResp(c)
 		}
-
-		tokenAuth, err := ExtractTokenMetadata(c.Request().Context(), c.Request())
-		if err != nil {
-			return resp.NotAuthenticatedResp(c)
-		}
-
-		if tokenAuth.Role != int64(pb.UserRole_ROLE_DEV) {
+		if GetUserRoleFromToken(c) != int64(pb.UserRole_ROLE_DEV) {
 			logger.ErrorMsg(context.Background(), "Role no permission")
 			return resp.NotAuthorisedResp(c)
 		}
-
-		userId, err := FetchAuth(c.Request().Context(), tokenAuth)
-		if err != nil {
-			return resp.NotAuthenticatedResp(c)
-		}
-
-		if userId == 0 {
-			return resp.NotAuthenticatedResp(c)
-		}
 		return next(c)
 	}
+}
+
+func ExtractMetaFromToken(c echo.Context) error {
+	if err := globalAuthentication(c); err != nil {
+		return err
+	}
+
+	tokenAuth, err := ExtractTokenMetadata(c.Request().Context(), c.Request())
+	if err != nil {
+		return err
+	}
+
+	userId, err := FetchAuth(c.Request().Context(), tokenAuth)
+	if err != nil {
+		return err
+	}
+
+	if userId == 0 {
+		return errors.New("failed to fetch user_id")
+	}
+
+	c.Set("user_role", tokenAuth.Role)
+	c.Set("user_id", userId)
+	return nil
+}
+
+func GetUserRoleFromToken(c echo.Context) int64 {
+	return c.Get("user_role").(int64)
+}
+
+func GetUserIdFromToken(c echo.Context) int64 {
+	return c.Get("user_id").(int64)
 }

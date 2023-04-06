@@ -35,11 +35,12 @@ func (g *GetReferralById) GetReferralByIdImpl() (*pb.ReferralDetails, *resp.Erro
 	}
 
 	var (
-		r         = new(pb.ReferralDetails)
-		rDb       *pb.ReferralDb
-		b         *pb.BookingDetailsDb
-		affiliate = new(pb.AffiliateDetailsDb)
-		err       error
+		r          = new(pb.ReferralDetails)
+		rDb        *pb.ReferralDb
+		b          *pb.BookingDetailsDb
+		affiliate  = new(pb.AffiliateDetailsDb)
+		entityName *string
+		err        error
 	)
 
 	if err := orm.DbInstance(g.ctx).Raw(orm.GetReferralDetailsByIdQuery(), g.c.Param("id")).Scan(&rDb).Error; err != nil {
@@ -62,10 +63,14 @@ func (g *GetReferralById) GetReferralByIdImpl() (*pb.ReferralDetails, *resp.Erro
 		}
 	}
 
+	if affiliate != nil {
+		entityName = affiliate.EntityName
+	}
+
 	r = &pb.ReferralDetails{
 		ReferralId:         rDb.ReferralId,
 		AffiliateId:        rDb.AffiliateId,
-		EntityName:         affiliate.EntityName,
+		EntityName:         entityName,
 		ReferralClickTime:  rDb.ReferralClickTime,
 		ReferralStatus:     rDb.ReferralStatus,
 		BookingId:          nil,

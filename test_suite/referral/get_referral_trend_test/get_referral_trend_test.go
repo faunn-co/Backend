@@ -43,7 +43,7 @@ func TestGetTimesStats_NoLogin(t *testing.T) {
 
 func TestGetTimesStats_Period_None(t *testing.T) {
 	var (
-		expectedHTTPCode = http.StatusOK
+		expectedHTTPCode = http.StatusBadRequest
 		expectedErrCode  = int64(pb.GlobalErrorCode_ERROR_INVALID_PARAMS)
 	)
 	r := referral.New().Build()
@@ -159,7 +159,7 @@ func TestGetTimesStats_Period_Range(t *testing.T) {
 
 func TestGetTimesStats_Period_Range_StartBeforeEnd(t *testing.T) {
 	var (
-		expectedHTTPCode = http.StatusOK
+		expectedHTTPCode = http.StatusBadRequest
 		expectedErrCode  = int64(pb.GlobalErrorCode_ERROR_INVALID_PARAMS)
 	)
 	r := referral.New().Build()

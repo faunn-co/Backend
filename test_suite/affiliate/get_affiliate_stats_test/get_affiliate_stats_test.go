@@ -62,7 +62,7 @@ func TestGetAffiliateStats_NoPermission(t *testing.T) {
 
 func TestGetAffiliateStats_Period_None(t *testing.T) {
 	var (
-		expectedHTTPCode = http.StatusOK
+		expectedHTTPCode = http.StatusBadRequest
 		expectedErrCode  = int64(pb.GlobalErrorCode_ERROR_INVALID_PARAMS)
 	)
 	a := admin.New().Build()
@@ -178,7 +178,7 @@ func TestGetAffiliateStats_Period_Range(t *testing.T) {
 
 func TestGetAffiliateStats_Period_Range_StartBeforeEnd(t *testing.T) {
 	var (
-		expectedHTTPCode = http.StatusOK
+		expectedHTTPCode = http.StatusBadRequest
 		expectedErrCode  = int64(pb.GlobalErrorCode_ERROR_INVALID_PARAMS)
 	)
 	a := admin.New().Build()
