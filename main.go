@@ -19,6 +19,7 @@ func main() {
 	logger.InitializeLogger()
 	loadEnv()
 	e := echo.New()
+	e.Use(middleware.SecureWithConfig(middleware.DefaultSecureConfig))
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{"*"},
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAccept, echo.HeaderAuthorization},
